@@ -1,0 +1,170 @@
+.site-header {
+    background-color: #081120;
+    padding: 18px 0;
+    width: 100%;
+    border-bottom: 2px solid grey;
+    font-family: "Inter", sans-serif;
+
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.site-header .container {
+    position: relative;
+}
+
+.header-brand {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    background-color: #155DFC;
+    color: #f6f7f8;
+    font-weight: 900;
+    border-radius: 4px;
+    font-size: small;
+    margin-right: 3px;
+    box-shadow: 0 4px 8px rgba(21, 93, 252, 0.4);
+}
+
+.logo-name {
+    color: #d1cdcd;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+ul {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+.nav-list {
+    display: flex;
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-list a {
+    color: #90A1B9;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.5s ease;
+}
+
+.nav-list a:hover {
+    color: antiquewhite;
+}
+
+.lets-talk-btn {
+    background-color: #155DFC;
+    border-radius: 8px;
+    color: white;
+    padding: 8px 20px;
+    font-size: 14px;
+    box-shadow: 0 4px 8px rgba(21, 93, 252, 0.4);
+    transition: all 0.3s ease;
+}
+
+.lets-talk-btn:hover {
+    color: #000;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px rgba(21, 93, 252, 0.5);
+}
+
+.menu-toggle {
+    display: none;
+}
+
+.mobile-lets-talk-btn {
+    display: none;
+}
+
+@media (max-width: 991px) {
+    .menu-toggle {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+
+        width: 42px;
+        height: 42px;
+        padding: 9px;
+
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+    }
+
+    .menu-toggle span {
+        width: 100%;
+        height: 2px;
+        background-color: white;
+        border-radius: 2px;
+    }
+
+    .main-navigation {
+        display: none;
+
+        position: absolute;
+        top: calc(100% + 18px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100vw;
+
+        padding: 24px;
+        background-color: #081120;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 18px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .main-navigation--open {
+        display: block;
+    }
+
+    .nav-list {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .nav-list li,
+    .nav-list a {
+        width: 100%;
+    }
+
+    .nav-list a {
+        display: block;
+        padding: 14px 12px;
+        border-radius: 8px;
+    }
+
+    .nav-list a:hover {
+        color: white;
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .lets-talk-btn {
+        display: none;
+    }
+
+    .mobile-lets-talk-btn {
+        display: block;
+        margin-top: 16px;
+        padding: 12px 20px;
+
+        background-color: #155DFC;
+        color: white;
+        text-align: center;
+        border-radius: 8px;
+    }
+}
