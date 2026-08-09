@@ -1,4 +1,5 @@
 import "./Hero.css";
+import lovepreetImage from "../../assets/images/hero/lovepreetImage.jpeg";
 
 export default function Hero() {
     return (
@@ -45,7 +46,13 @@ export default function Hero() {
 
                 <div className="hero-card-area">
 
-                    
+                    <div className="lanyard">
+
+                    </div>
+
+                    <div className="id-card">
+                        <img src={lovepreetImage} alt="Image of Lovepreet Sandhu" />
+                    </div>
 
                 </div>
 
