@@ -1,7 +1,71 @@
+import { useEffect, useState } from "react";
 import "./Hero.css";
 import lovepreetImage from "../../assets/images/hero/lovepreetImage.jpeg";
 
 export default function Hero() {
+
+    const roles = [
+        "Full-Stack Developer",
+        "React Developer",
+        "Node.js Developer",
+        "MERN Stack Developer",
+        "ASP.NET Developer"
+    ];
+
+    const [roleIndex, setRoleIndex] = useState(0);
+    const [displayedText, setDisplayedText] = useState("");
+    const [charIndex, setCharIndex] = useState(0);
+
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    useEffect(() => {
+
+        const currentRole = roles[roleIndex];
+
+        //TYPING
+        if (!isDeleting && charIndex < currentRole.length) {
+
+            const timer = setTimeout(() => {
+                setDisplayedText(currentRole.slice(0, charIndex + 1));
+                setCharIndex(charIndex + 1);
+            }, 100);
+
+            return () => clearTimeout(timer);
+        }
+
+        // FINISHED TYPING
+        if (!isDeleting && charIndex === currentRole.length) {
+
+            const timer = setTimeout(() => {
+                setIsDeleting(true);
+            }, 1500);
+
+            return () => clearTimeout(timer);
+        }
+
+        //DELETING
+        if (isDeleting && charIndex > 0) {
+
+            const timer = setTimeout(() => {
+                setDisplayedText(currentRole.slice(0, charIndex - 1));
+                setCharIndex(charIndex - 1);
+            }, 75);
+
+            return () => clearTimeout(timer);
+        }
+
+        if (isDeleting && charIndex === 0) {
+
+            const timer = setTimeout(() => {
+                setIsDeleting(false);
+                setRoleIndex((roleIndex + 1) % roles.length);
+            }, 300);
+
+            return () => clearTimeout(timer);
+        }
+
+    }, [charIndex, roleIndex, roles, isDeleting]);
+
     return (
         <section className="hero" id="home">
 
@@ -27,7 +91,7 @@ export default function Hero() {
                         <span className="hero-last-name">Sandhu</span>
                     </h1>
 
-                    <h2 className="hero-role">Full-Stack Developer</h2>
+                    <h2 className="hero-role">{displayedText}</h2>
 
                     <p className="hero-description">
                         I build <span className="hero-main-words">responsive</span>, <span className="hero-main-words">full-stack web applications</span> with a focus on <span className="hero-main-words">clean code</span>, <span className="hero-main-words">practical solutions</span>, and <span className="hero-main-words">great user experiences</span>.
