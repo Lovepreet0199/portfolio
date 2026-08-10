@@ -31,11 +31,11 @@ export default function Header() {
 
                     <ul className="nav-list">
                         <li><a href="#">Home</a></li>
-                        <li><a href="#">Projects</a></li>
-                        <li><a href="#">Skills</a></li>
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">Experience</a></li>
-                        <li><a href="#">Contact</a></li>
+                        <li><a href="#projects">Projects</a></li>
+                        <li><a href="#skills">Skills</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#experience">Experience</a></li>
+                        <li><a href="#contact">Contact</a></li>
                         <a href="#contact" className="mobile-lets-talk-btn">
                             Let&apos;s Talk
                         </a>
