@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
+import { motion, useMotionValue, animate, useTransform } from "motion/react";
 import "./Hero.css";
 import lovepreetImage from "../../assets/images/hero/lovepreetImage.jpeg";
 
-export default function Hero() {
+const roles = [
+    "Full-Stack Developer",
+    "React Developer",
+    "Node.js Developer",
+    "MERN Stack Developer",
+    "ASP.NET Developer"
+];
 
-    const roles = [
-        "Full-Stack Developer",
-        "React Developer",
-        "Node.js Developer",
-        "MERN Stack Developer",
-        "ASP.NET Developer"
-    ];
+export default function Hero() {
 
     const [roleIndex, setRoleIndex] = useState(0);
     const [displayedText, setDisplayedText] = useState("");
@@ -64,7 +65,45 @@ export default function Hero() {
             return () => clearTimeout(timer);
         }
 
-    }, [charIndex, roleIndex, roles, isDeleting]);
+    }, [charIndex, roleIndex, isDeleting]);
+
+    // Stores the card's live horizontal and vertical position.
+    // 0, 0 represents the card's original hanging position.
+    const cardX = useMotionValue(0);
+    const cardY = useMotionValue(0);
+
+    // Creates a dynamic SVG path for the lanyard.
+    // It recalculates whenever the card's X or Y position changes.
+    const lanyardPath = useTransform(
+        [cardX, cardY],
+        ([x, y]) => {
+
+            // M 110 0:
+            // Fixed starting point (anchor) at the top of the lanyard.
+
+            // C 110 80:
+            // First control point stays near the top to keep the
+            // upper part of the lanyard stable.
+
+            // 110 + x * 0.35:
+            // Second control point follows 35% of the card's
+            // horizontal movement. This creates the bend in the strap.
+
+            // 110 + x:
+            // The bottom of the lanyard follows the card's full
+            // horizontal movement.
+
+            // 180 + y:
+            // The bottom also follows the card's vertical movement.
+            return `M 110 0 C 110 80, ${110 + x * 0.35} 120, ${110 + x} ${180 + y}`;
+        }
+    );
+
+    const cardRotation = useTransform(
+        cardX,
+        [-200, 0, 200],
+        [-12, 0, 12]
+    );
 
     return (
         <section className="hero" id="home">
@@ -130,26 +169,60 @@ export default function Hero() {
 
                 <div className="hero-card-area">
 
+                    {/* SVG lanyard that bends and follows the draggable card */}
                     <div className="lanyard">
+                        <svg
+                            className="lanyard-svg"
+                            viewBox="0 0 220 180"
+                        >
+                            {/* Motion path uses the dynamically calculated lanyard shape */}
+                            <motion.path
+                                id="lanyard-path"
+                                className="lanyard-path"
+                                d={lanyardPath}
+                            />
 
-                        <div className="lanyard-strap">
-                            <span>lovesandhu.com</span>
-                            <span>lovesandhu.com</span>
+                        </svg>
+                    </div>
+                    <motion.div
+                        className="draggable-badge"
+                        drag
+                        style={{
+                            x: cardX,
+                            y: cardY,
+                            rotate: cardRotation
+                        }}
+                        whileDrag={{
+                            cursor: "grabbing"
+                        }}
+                        onDragEnd={() => {
+                            animate(cardX, 0, {
+                                type: "spring",
+                                stiffness: 120,
+                                damping: 8
+                            });
+
+                            animate(cardY, 0, {
+                                type: "spring",
+                                stiffness: 120,
+                                damping: 8
+                            });
+
+                        }}
+                    >
+                        <div className="card-clip"></div>
+
+                        <div className="id-card">
+                            <img
+                                src={lovepreetImage}
+                                alt="Image of Lovepreet Sandhu"
+                            />
                         </div>
-                    </div>
-
-                    <div className="card-clip"></div>
-
-                    <div className="id-card">
-                        <img
-                            src={lovepreetImage}
-                            alt="Image of Lovepreet Sandhu"
-                        />
-                    </div>
+                    </motion.div>
 
                 </div>
 
             </div>
-        </section>
+        </section >
     );
 }
