@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { motion, useMotionValue, animate, useTransform } from "motion/react";
+import { motion, useMotionValue, animate, useTransform, useVelocity, useSpring } from "motion/react";
 import "./Hero.css";
 import lovepreetImage from "../../assets/images/hero/lovepreetImage.jpeg";
 
@@ -72,37 +72,39 @@ export default function Hero() {
     const cardX = useMotionValue(0);
     const cardY = useMotionValue(0);
 
+
     // Creates a dynamic SVG path for the lanyard.
     // It recalculates whenever the card's X or Y position changes.
     const lanyardPath = useTransform(
         [cardX, cardY],
         ([x, y]) => {
 
-            // M 110 0:
-            // Fixed starting point (anchor) at the top of the lanyard.
+            const startX = 300;
+            const startY = 0;
 
-            // C 110 80:
-            // First control point stays near the top to keep the
-            // upper part of the lanyard stable.
+            const endX = 300 + x;
+            const endY = 500 + y;
 
-            // 110 + x * 0.35:
-            // Second control point follows 35% of the card's
-            // horizontal movement. This creates the bend in the strap.
-
-            // 110 + x:
-            // The bottom of the lanyard follows the card's full
-            // horizontal movement.
-
-            // 180 + y:
-            // The bottom also follows the card's vertical movement.
-            return `M 110 0 C 110 80, ${110 + x * 0.35} 120, ${110 + x} ${180 + y}`;
+            return `
+            M ${startX} ${startY}
+            C ${startX} 160,
+              ${startX + x * 0.7} ${endY - 100},
+              ${endX} ${endY}
+        `;
         }
     );
 
+    const cardXVelocity = useVelocity(cardX);
+
+    const smoothVelocity = useSpring(cardXVelocity, {
+        stiffness: 100,
+        damping: 20
+    });
+
     const cardRotation = useTransform(
-        cardX,
-        [-200, 0, 200],
-        [-12, 0, 12]
+        smoothVelocity,
+        [-1200, 0, 1200],
+        [-15, 0, 15]
     );
 
     return (
@@ -169,17 +171,24 @@ export default function Hero() {
 
                 <div className="hero-card-area">
 
+
                     {/* SVG lanyard that bends and follows the draggable card */}
                     <div className="lanyard">
                         <svg
                             className="lanyard-svg"
-                            viewBox="0 0 220 180"
+                            viewBox="0 0 600 500"
                         >
                             {/* Motion path uses the dynamically calculated lanyard shape */}
                             <motion.path
-                                id="lanyard-path"
-                                className="lanyard-path"
+                                className="lanyard-path lanyard-path-base"
                                 d={lanyardPath}
+                                fill="none"
+                            />
+
+                            <motion.path
+                                className="lanyard-path lanyard-path-highlight"
+                                d={lanyardPath}
+                                fill="none"
                             />
 
                         </svg>
@@ -195,22 +204,29 @@ export default function Hero() {
                         whileDrag={{
                             cursor: "grabbing"
                         }}
-                        onDragEnd={() => {
+                        onDragEnd={(event, info) => {
                             animate(cardX, 0, {
                                 type: "spring",
-                                stiffness: 120,
-                                damping: 8
+                                stiffness: 35,
+                                damping: 6,
+                                mass: 1.8,
+                                velocity: info.velocity.x
                             });
 
                             animate(cardY, 0, {
                                 type: "spring",
-                                stiffness: 120,
-                                damping: 8
+                                stiffness: 30,
+                                damping: 5,
+                                mass: 2.2,
+                                velocity: info.velocity.y
                             });
 
                         }}
                     >
-                        <div className="card-clip"></div>
+                        <div className="card-clip">
+                            <div className="clip-hole"></div>
+                            <div className="clip-connector"></div>
+                        </div>
 
                         <div className="id-card">
                             <img

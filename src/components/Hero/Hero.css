@@ -29,10 +29,11 @@
 
 .hero-card-area {
     position: relative;
-
     width: 45%;
     display: flex;
     justify-content: center;
+
+    overflow: visible;
 }
 
 .draggable-badge {
@@ -41,84 +42,90 @@
 
 .lanyard {
     position: absolute;
+
+    left: 50%;
     bottom: 100%;
-    left: 50%;
+
+    width: 600px;
+    height: 500px;
+
     transform: translateX(-50%);
-    width: 220px;
-    height: 180px;
+    overflow: visible;
+
+    z-index: 0;
 }
-
-/* 
-.lanyard-strap {
-    width: 18px;
-    height: 260px;
-    background-color: #155DFC;
-    border-radius: 4px;
-
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 18px;
-}
-
-.lanyard-strap span {
-    color: white;
-    font-size: 8px;
-    white-space: nowrap;
-    writing-mode: vertical-rl;
-} */
 
 .lanyard-svg {
-    width: 220px;
-    height: 180px;
+    width: 600px;
+    height: 500px;
     overflow: visible;
 }
 
-.lanyard-path {
-    fill: none;
-    stroke: #155DFC;
+
+/* Main darker strap */
+.lanyard-path-base {
+    stroke: #0D47B5;
     stroke-width: 18;
-    stroke-linecap: round;
 }
 
-.card-clip {
-    width: 38px;
-    height: 24px;
-    background-color: #1a1a1a;
-    border-radius: 4px;
+/* Smaller bright area over the strap */
+.lanyard-path-highlight {
+    stroke: #2F73FF;
+    stroke-width: 11;
+    opacity: 0.9;
+}
 
+
+
+.card-clip {
     position: absolute;
-    top: -12px;
+
+    top: -22px;
     left: 50%;
     transform: translateX(-50%);
 
-    z-index: 2;
+    width: 28px;
+    height: 26px;
+
+    background-color: #1a1a1a;
     border: 2px solid #64748b;
+    border-radius: 6px 6px 4px 4px;
+
+    z-index: 3;
+
+    display: flex;
+    justify-content: center;
 }
 
-.card-clip::after {
-    content: "";
+/* Hole where the lanyard enters the clip */
+.clip-hole {
     position: absolute;
 
-    width: 18px;
+    top: 4px;
+
+    width: 14px;
     height: 6px;
 
     background-color: #081120;
     border-radius: 3px;
+}
 
-    left: 50%;
-    top: 5px;
-    transform: translateX(-50%);
+/* Small connector going into the ID card */
+.clip-connector {
+    position: absolute;
+
+    width: 10px;
+    height: 10px;
+
+    bottom: -8px;
+
+    background-color: #64748b;
+    border-radius: 0 0 3px 3px;
 }
 
 .hero-content {
     width: 55%;
 }
-
 
 .hero {
     background-color: #081120;
