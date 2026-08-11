@@ -53,16 +53,17 @@ export default function PortfolioShowcase() {
                         </button>
 
                     </div>
-                    <div className="portfolio-content">
-
-                        {activeTab === "projects" && <Projects />}
-
-                        {activeTab === "skills" && <Skills />}
-
-                        {activeTab === "certifications" && <Certifications />}
-
-                    </div>
                 </div>
+                <div className="portfolio-content">
+
+                    {activeTab === "projects" && <Projects />}
+
+                    {activeTab === "skills" && <Skills />}
+
+                    {activeTab === "certifications" && <Certifications />}
+
+                </div>
+
 
             </div>
         </section>

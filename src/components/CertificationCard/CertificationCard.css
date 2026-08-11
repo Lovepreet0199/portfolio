@@ -26,6 +26,12 @@
 
 .certification-content {
     padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    text-align: center;
 }
 
 .certification-content h3 {
@@ -40,6 +46,7 @@
 .certification-details {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
 
     color: #90A1B9;
@@ -66,3 +73,37 @@
 
     text-decoration: none;
 }
+
+@media (max-width: 576px) {
+
+    .certification-image {
+        height: auto;
+        padding: 12px;
+    }
+
+    .certification-image img {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+    }
+
+    .certification-content {
+        padding: 18px;
+    }
+
+    .certification-content h3 {
+        font-size: 16px;
+    }
+
+    .certification-details {
+        font-size: 12px;
+        gap: 7px;
+        flex-wrap: wrap;
+    }
+
+    .certification-link {
+        font-size: 12px;
+        padding: 9px 12px;
+    }
+}
+

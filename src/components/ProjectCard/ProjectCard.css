@@ -101,3 +101,33 @@
     object-fit: cover;
     display: block;
 }
+
+@media (max-width: 768px) {
+
+    .project-image {
+        height: 200px;
+    }
+
+    .project-content {
+        padding: 18px;
+    }
+
+    .project-card-header {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .project-card-header h3 {
+        font-size: 18px;
+    }
+
+    .project-description {
+        font-size: 13px;
+    }
+
+    .project-links {
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+}

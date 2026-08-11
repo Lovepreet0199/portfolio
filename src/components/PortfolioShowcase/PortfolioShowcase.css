@@ -81,3 +81,42 @@
     background-color: #155DFC;
     color: #FFFFFF;
 }
+
+@media (max-width: 576px) {
+
+    .portfolio-showcase {
+        padding: 50px 0;
+    }
+
+    .portfolio-showcase .container {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .portfolio-showcase-title {
+        font-size: 36px;
+    }
+
+    .portfolio-showcase-description {
+        font-size: 14px;
+    }
+
+    .portfolio-showcase-header {
+        margin-bottom: 28px;
+    }
+
+    .portfolio-tabs {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        padding: 6px;
+        margin: 24px auto 32px;
+    }
+
+    .portfolio-tab {
+        width: 100%;
+        padding: 10px 6px;
+        font-size: 12px;
+        gap: 5px;
+    }
+}

@@ -56,4 +56,20 @@
         grid-template-columns: 1fr;
     }
 
+    .skill-card {
+        padding: 10px 10px;
+        gap: 10px;
+    }
+
+    .skill-card i {
+        font-size: 28px;
+    }
+
+    .skill-info h3 {
+        font-size: 15px;
+    }
+
+    .skill-info p {
+        font-size: 12px;
+    }
 }
