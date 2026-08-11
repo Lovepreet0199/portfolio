@@ -1,0 +1,238 @@
+.contact {
+    background-color: #0B1422;
+    min-height: calc(100vh - 78px);
+    padding: 70px 0;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.contact-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.contact-label {
+    color: #51A2FF;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2.4px;
+    margin-bottom: 12px;
+}
+
+.contact-title {
+    color: #FFFFFF;
+    font-family: "Manrope", sans-serif;
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.contact-title span {
+    color: #51A2FF;
+}
+
+.contact-description {
+    color: #90A1B9;
+    font-family: "Inter", sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.contact-info {
+    height: 100%;
+    padding: 28px;
+
+    background-color: #081120;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+}
+
+.contact-info-title {
+    color: #FFFFFF;
+    font-family: "Manrope", sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.contact-info-description {
+    color: #90A1B9;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+
+/* CONTACT DETAILS */
+
+.contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.contact-detail {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.contact-detail i {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    color: #51A2FF;
+    font-size: 17px;
+
+    background-color: rgba(21, 93, 252, 0.12);
+    border-radius: 10px;
+}
+
+.contact-detail span {
+    display: block;
+
+    color: #62748E;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+
+    margin-bottom: 3px;
+}
+
+.contact-detail p {
+    color: #E2E8F0;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+
+    margin: 0;
+}
+
+
+/* SOCIAL LINKS */
+
+.contact-socials {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin-top: 32px;
+    padding-top: 22px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.contact-socials a {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #90A1B9;
+    font-size: 17px;
+
+    background-color: #0B1422;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+
+    text-decoration: none;
+}
+
+.contact-socials a:hover {
+    color: #51A2FF;
+    border-color: rgba(81, 162, 255, 0.35);
+}
+
+/* CONTACT FORM */
+
+.contact-form-area {
+    height: 100%;
+    padding: 28px;
+
+    background-color: #081120;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.contact-form label {
+    display: block;
+
+    color: #E2E8F0;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+
+    margin-bottom: 8px;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    color: #E2E8F0;
+    background-color: #0B1422;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+
+    outline: none;
+}
+
+.contact-form textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+    color: #62748E;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    border-color: #155DFC;
+}
+
+.contact-submit {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 14px 20px;
+
+    color: #FFFFFF;
+    background-color: #155DFC;
+
+    border: none;
+    border-radius: 10px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
