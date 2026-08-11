@@ -1,5 +1,5 @@
 import "./About.css";
-import lovepreetImage from "../../assets/images/hero/lovepreetImage.jpeg";
+import logoImage from "../../assets/images/logo.png";
 
 export default function About() {
     return (
@@ -62,7 +62,7 @@ export default function About() {
 
                     <div className="about-image">
                         <img
-                            src={lovepreetImage}
+                            src={logoImage}
                             alt="Lovepreet Sandhu"
                         />
 

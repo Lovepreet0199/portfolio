@@ -4,6 +4,8 @@ import About from "./components/About/About";
 import PortfolioShowcase from "./components/PortfolioShowcase/PortfolioShowcase";
 import Contact from "./components/Contact/Contact";
 import Guestbook from "./components/Guestbook/Guestbook";
+import Footer from "./components/Footer/Footer";
+
 
 function App() {
 
@@ -11,10 +13,11 @@ function App() {
     <>
       <Header />
       <Hero />
-      <PortfolioShowcase />
       <About />
+      <PortfolioShowcase />
       <Contact />
       <Guestbook />
+      <Footer />
     </>
   )
 }
