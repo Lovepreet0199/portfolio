@@ -1,6 +1,6 @@
 import "./Certifications.css";
 import CertificationCard from "../CertificationCard/CertificationCard";
-// import certificateImage from "../../assets/images/certifications";
+import certificateImage from "../../assets/images/certifications/certificate.png";
 
 export default function Certifications() {
     return (
@@ -12,7 +12,7 @@ export default function Certifications() {
                     title="Certificate Name"
                     issuer="Certificate Issuer"
                     date="2026"
-                    // image={certificateImage}
+                    image={certificateImage}
                     credentialLink="#"
                 />
 

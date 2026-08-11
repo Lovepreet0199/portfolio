@@ -23,6 +23,7 @@ export default function CertificationCard({
 
                 <div className="certification-details">
                     <span>{issuer}</span>
+                    <span>•</span>
                     <span>{date}</span>
                 </div>
 
