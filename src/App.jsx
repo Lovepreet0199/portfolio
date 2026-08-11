@@ -1,9 +1,10 @@
 import Header from "./components/Header/Header";
 import Hero from "./components/Hero/Hero";
 import About from "./components/About/About";
-import Projects from "./components/Projects/Projects";
 import PortfolioShowcase from "./components/PortfolioShowcase/PortfolioShowcase";
 import Contact from "./components/Contact/Contact";
+import Guestbook from "./components/Guestbook/Guestbook";
+
 function App() {
 
   return (
@@ -13,6 +14,7 @@ function App() {
       <PortfolioShowcase />
       <About />
       <Contact />
+      <Guestbook />
     </>
   )
 }

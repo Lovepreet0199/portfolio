@@ -1,0 +1,63 @@
+.guestbook-card {
+    padding: 22px;
+
+    background-color: #0B1422;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+}
+
+.guestbook-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin-bottom: 16px;
+}
+
+.guestbook-avatar {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    background-color: rgba(81, 162, 255, 0.12);
+    color: #51A2FF;
+
+    border: 1px solid rgba(81, 162, 255, 0.2);
+    border-radius: 50%;
+
+    font-family: "Manrope", sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.guestbook-author h3 {
+    color: #E2E8F0;
+
+    font-family: "Manrope", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+
+    margin: 0 0 3px;
+}
+
+.guestbook-author span {
+    color: #62748E;
+
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+}
+
+.guestbook-card-message {
+    color: #90A1B9;
+
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+
+    margin: 0;
+}

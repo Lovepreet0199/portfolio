@@ -1,0 +1,230 @@
+.guestbook {
+    background-color: #081120;
+    min-height: calc(100vh - 78px);
+    padding: 70px 0;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.guestbook-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.guestbook-label {
+    color: #51A2FF;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2.4px;
+    margin-bottom: 12px;
+}
+
+.guestbook-title {
+    color: #FFFFFF;
+    font-family: "Manrope", sans-serif;
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.guestbook-title span {
+    color: #51A2FF;
+}
+
+.guestbook-description {
+    color: #90A1B9;
+    font-family: "Inter", sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.guestbook-form-area {
+    height: 100%;
+    padding: 28px;
+
+    background-color: #0B1422;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+}
+
+.guestbook-form-header {
+    margin-bottom: 24px;
+}
+
+.guestbook-form-header h3 {
+    color: #E2E8F0;
+    font-family: "Manrope", sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.guestbook-form-header p {
+    color: #90A1B9;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.guestbook-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.guestbook-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.guestbook-form-group label {
+    color: #CAD5E2;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.guestbook-form-group input,
+.guestbook-form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+
+    color: #E2E8F0;
+    background-color: #081120;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+
+    outline: none;
+}
+
+.guestbook-form-group textarea {
+    resize: vertical;
+    min-height: 130px;
+}
+
+.guestbook-form-group input::placeholder,
+.guestbook-form-group textarea::placeholder {
+    color: #62748E;
+}
+
+.guestbook-form-group input:focus,
+.guestbook-form-group textarea:focus {
+    border-color: #51A2FF;
+}
+
+.guestbook-submit {
+    width: 100%;
+    padding: 12px 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    color: #FFFFFF;
+    background-color: #155DFC;
+
+    border: none;
+    border-radius: 8px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.guestbook-submit:hover {
+    background-color: #1447E6;
+}
+
+.guestbook-comments {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.guestbook-comments-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    margin-bottom: 4px;
+}
+
+.guestbook-comments-header h3 {
+    color: #E2E8F0;
+
+    font-family: "Manrope", sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+
+    margin: 0 0 5px;
+}
+
+.guestbook-comments-header p {
+    color: #62748E;
+
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+
+    margin: 0;
+}
+
+.guestbook-count {
+    padding: 6px 10px;
+
+    color: #51A2FF;
+    background-color: rgba(81, 162, 255, 0.1);
+
+    border: 1px solid rgba(81, 162, 255, 0.18);
+    border-radius: 20px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+
+    .guestbook {
+        padding: 50px 0;
+    }
+
+    .guestbook .container {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .guestbook-header {
+        margin-bottom: 32px;
+    }
+
+    .guestbook-title {
+        font-size: 36px;
+    }
+
+    .guestbook-description {
+        font-size: 14px;
+    }
+
+    .guestbook-form-area {
+        padding: 22px;
+    }
+
+    .guestbook-comments {
+        margin-top: 8px;
+    }
+
+}
