@@ -1,7 +1,7 @@
 import "./Guestbook.css";
 import { useState, useEffect } from "react";
 import GuestbookCard from "../GuestbookCard/GuestbookCard";
-import { setStyle } from "motion";
+
 
 export default function Guestbook() {
     const [guestData, setGuestData] = useState({
@@ -77,7 +77,9 @@ export default function Guestbook() {
             const guestbookData = await guestbookResponse.json();
 
             setGuestbookEntries(guestbookData);
+
         } catch (error) {
+            console.error("Guestbook form error: ", error);
 
             setError("Unable to submit Guestbook entry.");
             setSuccess("");

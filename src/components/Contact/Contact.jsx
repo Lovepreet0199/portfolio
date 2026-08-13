@@ -21,7 +21,7 @@ export default function Contact() {
         });
     }
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
 
         if (
@@ -38,19 +38,41 @@ export default function Contact() {
             return;
         }
 
-        setError("");
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_API_URL}/api/contact`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(formData)
+                }
+            );
 
-        console.log(formData);
+            const data = await response.json();
 
-        setSuccess("Message sent successfully!");
+            if (!response.ok) {
+                setError(data.message);
+                setSuccess("");
+                return;
+            }
 
-        setFormData({
-            name: "",
-            email: "",
-            subject: "",
-            message: ""
-        });
+            setError("");
+            setSuccess(data.message);
 
+            setFormData({
+                name: "",
+                email: "",
+                subject: "",
+                message: ""
+            });
+        } catch (error) {
+            console.error("Contact form error: ", error);
+
+            setError("Unable to send message.");
+            setSuccess("");
+        }
     }
 
     return (
