@@ -1,23 +1,41 @@
 import "./Projects.css";
 import ProjectCard from "../ProjectCard/ProjectCard";
-import photoScoutImage from "../../assets/images/projectImages/photoScout.png";
+
+
+import { useState, useEffect } from "react";
 
 export default function Projects() {
+
+    const [projects, setProjects] = useState([]);
+
+    useEffect(() => {
+
+        fetch(`${import.meta.env.VITE_API_URL}/api/projects`)
+            .then((response) => response.json())
+            .then((data) => {
+                setProjects(data);
+            });
+    }, []);
+
     return (
         <div className="projects" id="projects">
 
             <div className="projects-grid">
-                <ProjectCard
-                    title="PhotoScout Toronto"
-                    type="Full-Stack"
-                    description="A photography planning app that helps photographers find the best time, locations, and conditions for shooting around Toronto."
-                    technologies={["Node.js", "Express", "Pug", "REST APIs"]}
-                    image={photoScoutImage}
-                    githubLink="https://github.com/Lovepreet0199/PhotoScout.git"
-                    liveLink="https://photoscout.lovesandhu.com"
-                />
+                {projects.map((project) => {
+                    return (
+                        <ProjectCard
+                            key={project._id}
+                            title={project.title}
+                            type={project.type}
+                            description={project.description}
+                            technologies={project.technologies}
+                            image={project.imageUrl}
+                            githubLink={project.githubLink}
+                            liveLink={project.liveLink}
+                        />
+                    )
+                })}
             </div>
-
         </div>
     );
 }

@@ -1,7 +1,21 @@
 import "./Skills.css";
 import SkillCard from "../SkillCard/SkillCard";
+import { useState, useEffect } from "react";
 
 export default function Skills() {
+
+    const [skills, setSkills] = useState([]);
+
+    useEffect(() => {
+
+        fetch(`${import.meta.env.VITE_API_URL}/api/skills`)
+            .then((response) => response.json())
+            .then((data) => {
+                setSkills(data);
+            });
+    }, []);
+
+
     return (
         <div className="skills">
 
@@ -13,17 +27,18 @@ export default function Skills() {
 
                 <div className="skills-grid">
 
-                    <SkillCard
-                        name="JavaScript"
-                        category="Frontend & Backend"
-                        icon="bi bi-javascript"
-                    />
-
-                    <SkillCard
-                        name="React"
-                        category="Frontend"
-                        icon="bi bi-code-slash"
-                    />
+                    {skills
+                        .filter((skill) => skill.category === "Front-End")
+                        .map((skill) => {
+                            return (
+                                <SkillCard
+                                    key={skill._id}
+                                    name={skill.name}
+                                    category={skill.category}
+                                    icon={skill.icon}
+                                />
+                            )
+                        })}
 
                 </div>
 
@@ -38,18 +53,18 @@ export default function Skills() {
 
                 <div className="skills-grid">
 
-                    <SkillCard
-                        name="Node.js"
-                        category="Backend"
-                        icon="bi bi-hdd-stack"
-                    />
-
-                    <SkillCard
-                        name="ASP.NET Core"
-                        category="Backend"
-                        icon="bi bi-braces"
-                    />
-
+                    {skills
+                        .filter((skill) => skill.category === "Back-End")
+                        .map((skill) => {
+                            return (
+                                <SkillCard
+                                    key={skill._id}
+                                    name={skill.name}
+                                    category={skill.category}
+                                    icon={skill.icon}
+                                />
+                            )
+                        })}
                 </div>
 
             </div>
@@ -62,23 +77,18 @@ export default function Skills() {
 
                 <div className="skills-grid">
 
-                    <SkillCard
-                        name="MongoDB"
-                        category="Database"
-                        icon="bi bi-database"
-                    />
-
-                    <SkillCard
-                        name="MySQL"
-                        category="Database"
-                        icon="bi bi-database"
-                    />
-
-                    <SkillCard
-                        name="PostgreSQL"
-                        category="Database"
-                        icon="bi bi-database"
-                    />
+                    {skills
+                        .filter((skill) => skill.category === "Database")
+                        .map((skill) => {
+                            return (
+                                <SkillCard
+                                    key={skill._id}
+                                    name={skill.name}
+                                    category={skill.category}
+                                    icon={skill.icon}
+                                />
+                            )
+                        })}
 
                 </div>
 
@@ -93,29 +103,18 @@ export default function Skills() {
 
                 <div className="skills-grid">
 
-                    <SkillCard
-                        name="Git"
-                        category="Version Control"
-                        icon="bi bi-git"
-                    />
-
-                    <SkillCard
-                        name="GitHub"
-                        category="Code Hosting"
-                        icon="bi bi-github"
-                    />
-
-                    <SkillCard
-                        name="Postman"
-                        category="API Testing"
-                        icon="bi bi-send"
-                    />
-
-                    <SkillCard
-                        name="VS Code"
-                        category="Editor"
-                        icon="bi bi-code-square"
-                    />
+                    {skills
+                        .filter((skill) => skill.category === "Tools")
+                        .map((skill) => {
+                            return (
+                                <SkillCard
+                                    key={skill._id}
+                                    name={skill.name}
+                                    category={skill.category}
+                                    icon={skill.icon}
+                                />
+                            )
+                        })}
 
                 </div>
 

@@ -1,5 +1,5 @@
 import "./Guestbook.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import GuestbookCard from "../GuestbookCard/GuestbookCard";
 
 export default function Guestbook() {
@@ -7,6 +7,8 @@ export default function Guestbook() {
         guestName: "",
         guestMessage: ""
     });
+
+    const [guestbookEntries, setGuestbookEntries] = useState([]);
 
     const [error, setError] = useState("");
 
@@ -19,6 +21,15 @@ export default function Guestbook() {
         });
     }
 
+    useEffect(() => {
+        fetch(`${import.meta.env.VITE_API_URL}/api/guestbook`)
+            .then((response) => response.json())
+            .then((data) => {
+                setGuestbookEntries(data);
+            });
+
+    }, []);
+
     function handleSubmit(event) {
         event.preventDefault();
 
@@ -30,7 +41,7 @@ export default function Guestbook() {
 
         setError("");
         setSuccess("Guestbook entry submitted!");
-        
+
         console.log(guestData);
 
         setGuestData({
@@ -144,16 +155,20 @@ export default function Guestbook() {
                                 </div>
 
                                 <span className="guestbook-count">
-                                    1 Message
+                                    {guestbookEntries.length} {guestbookEntries.length === 1 ? "Message" : "Messages"}
                                 </span>
                             </div>
 
-                            <GuestbookCard
-                                name="Alex"
-                                message="Great portfolio! Really liked the PhotoScout project."
-                                date="August 11, 2026"
-                            />
-
+                            {guestbookEntries.map((entry) => {
+                                return (
+                                    <GuestbookCard
+                                        key={entry._id}
+                                        name={entry.guestName}
+                                        message={entry.guestMessage}
+                                        date={new Date(entry.createdAt).toLocaleDateString()}
+                                    />
+                                );
+                            })}
                         </div>
                     </div>
 
