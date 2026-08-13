@@ -1,6 +1,7 @@
 import "./Guestbook.css";
 import { useState, useEffect } from "react";
 import GuestbookCard from "../GuestbookCard/GuestbookCard";
+import { setStyle } from "motion";
 
 export default function Guestbook() {
     const [guestData, setGuestData] = useState({
@@ -30,7 +31,7 @@ export default function Guestbook() {
 
     }, []);
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
 
         if (guestData.guestName === "" || guestData.guestMessage === "") {
@@ -39,15 +40,48 @@ export default function Guestbook() {
             return;
         }
 
-        setError("");
-        setSuccess("Guestbook entry submitted!");
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_API_URL}/api/guestbook`,
+                {
+                    method: "POST",
 
-        console.log(guestData);
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
 
-        setGuestData({
-            guestName: "",
-            guestMessage: ""
-        });
+                    body: JSON.stringify(guestData)
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setError(data.message);
+                setSuccess("");
+                return;
+            }
+
+            setError("");
+            setSuccess(data.message);
+
+            setGuestData({
+                guestName: "",
+                guestMessage: ""
+            });
+
+            const guestbookResponse = await fetch(
+                `${import.meta.env.VITE_API_URL}/api/guestbook`
+            );
+
+            const guestbookData = await guestbookResponse.json();
+
+            setGuestbookEntries(guestbookData);
+        } catch (error) {
+
+            setError("Unable to submit Guestbook entry.");
+            setSuccess("");
+        }
 
     }
 
