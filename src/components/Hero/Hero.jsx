@@ -11,7 +11,7 @@ const roles = [
     "ASP.NET Developer"
 ];
 
-export default function Hero() {
+export default function Hero({ introFinished }) {
 
     const [roleIndex, setRoleIndex] = useState(0);
     const [displayedText, setDisplayedText] = useState("");
@@ -171,70 +171,73 @@ export default function Hero() {
 
                 <div className="hero-card-area">
 
+                    <div className={`hanging-badge ${introFinished ? "badge-drop" : ""}`}>
+                        {/* SVG lanyard that bends and follows the draggable card */}
+                        <div className="lanyard">
+                            <svg
+                                className="lanyard-svg"
+                                viewBox="0 0 600 500"
+                            >
+                                {/* Motion path uses the dynamically calculated lanyard shape */}
+                                <motion.path
+                                    className="lanyard-path lanyard-path-base"
+                                    d={lanyardPath}
+                                    fill="none"
+                                />
 
-                    {/* SVG lanyard that bends and follows the draggable card */}
-                    <div className="lanyard">
-                        <svg
-                            className="lanyard-svg"
-                            viewBox="0 0 600 500"
-                        >
-                            {/* Motion path uses the dynamically calculated lanyard shape */}
-                            <motion.path
-                                className="lanyard-path lanyard-path-base"
-                                d={lanyardPath}
-                                fill="none"
-                            />
+                                <motion.path
+                                    className="lanyard-path lanyard-path-highlight"
+                                    d={lanyardPath}
+                                    fill="none"
+                                />
 
-                            <motion.path
-                                className="lanyard-path lanyard-path-highlight"
-                                d={lanyardPath}
-                                fill="none"
-                            />
+                            </svg>
+                        </div>
+                        <div className={`badge-swing-wrapper ${introFinished ? "badge-swing" : ""}`}>
+                            <motion.div
+                                className="draggable-badge"
+                                drag
+                                style={{
+                                    x: cardX,
+                                    y: cardY,
+                                    rotate: cardRotation
+                                }}
+                                whileDrag={{
+                                    cursor: "grabbing"
+                                }}
+                                onDragEnd={(event, info) => {
+                                    animate(cardX, 0, {
+                                        type: "spring",
+                                        stiffness: 35,
+                                        damping: 6,
+                                        mass: 1.8,
+                                        velocity: info.velocity.x
+                                    });
 
-                        </svg>
+                                    animate(cardY, 0, {
+                                        type: "spring",
+                                        stiffness: 30,
+                                        damping: 5,
+                                        mass: 2.2,
+                                        velocity: info.velocity.y
+                                    });
+
+                                }}
+                            >
+                                <div className="card-clip">
+                                    <div className="clip-hole"></div>
+                                    <div className="clip-connector"></div>
+                                </div>
+
+                                <div className="id-card">
+                                    <img
+                                        src={lovepreetImage}
+                                        alt="Image of Lovepreet Sandhu"
+                                    />
+                                </div>
+                            </motion.div>
+                        </div>
                     </div>
-                    <motion.div
-                        className="draggable-badge"
-                        drag
-                        style={{
-                            x: cardX,
-                            y: cardY,
-                            rotate: cardRotation
-                        }}
-                        whileDrag={{
-                            cursor: "grabbing"
-                        }}
-                        onDragEnd={(event, info) => {
-                            animate(cardX, 0, {
-                                type: "spring",
-                                stiffness: 35,
-                                damping: 6,
-                                mass: 1.8,
-                                velocity: info.velocity.x
-                            });
-
-                            animate(cardY, 0, {
-                                type: "spring",
-                                stiffness: 30,
-                                damping: 5,
-                                mass: 2.2,
-                                velocity: info.velocity.y
-                            });
-
-                        }}
-                    >
-                        <div className="card-clip">
-                            <div className="clip-hole"></div>
-                            <div className="clip-connector"></div>
-                        </div>
-
-                        <div className="id-card">
-                            <img
-                                src={lovepreetImage}
-                                alt="Image of Lovepreet Sandhu"
-                            />
-                        </div>
-                    </motion.div>
 
                 </div>
 

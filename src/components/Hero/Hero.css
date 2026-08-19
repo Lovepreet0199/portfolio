@@ -40,6 +40,22 @@
     cursor: grab;
 }
 
+.hanging-badge {
+    transform: translateY(-700px);
+}
+
+.badge-drop {
+    animation: cardDrop 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.badge-swing {
+    animation: badgeSwing 2200ms ease-out forwards;
+}
+
+.badge-swing-wrapper {
+    transform-origin: top center;
+}
+
 .lanyard {
     position: absolute;
 

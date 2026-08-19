@@ -6,14 +6,15 @@ import Contact from "./components/Contact/Contact";
 import Guestbook from "./components/Guestbook/Guestbook";
 import Footer from "./components/Footer/Footer";
 import Intro from "./components/Intro/Intro";
+import { useState } from "react";
 
 function App() {
-
+  const [introFinished, setIntroFinished] = useState(false);
   return (
     <>
-      <Intro />
+      <Intro onFinish={() => setIntroFinished(true)} />
       <Header />
-      <Hero />
+      <Hero introFinished={introFinished} />
       <About />
       <PortfolioShowcase />
       <Contact />

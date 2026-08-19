@@ -5605,3 +5605,951 @@ Then begin the Hero and ID card entrance animations.
 ```
 
 ---
+
+## Step 14.21 - Made the Intro Responsive
+
+After completing the desktop Intro animation, updated the Intro so it also works correctly on tablet and mobile screens.
+
+The desktop design uses:
+
+```css
+.intro-name {
+    font-size: 86px;
+}
+```
+
+This size works on larger screens but is too large for smaller devices.
+
+Added media queries to adjust the Intro typography and spacing.
+
+---
+
+### Tablet Styles
+
+Added:
+
+```css
+/* Tablet */
+@media (max-width: 991px) {
+
+    .intro-name {
+        font-size: 64px;
+    }
+
+    .intro-welcome {
+        font-size: 12px;
+        letter-spacing: 3px;
+    }
+
+    .intro-role {
+        font-size: 12px;
+        letter-spacing: 2px;
+    }
+
+    .intro-icons i {
+        font-size: 24px;
+    }
+}
+```
+
+On tablet screens:
+
+```text
+Developer name
+86px → 64px
+
+Welcome text
+13px → 12px
+
+Role
+13px → 12px
+
+Icons
+26px → 24px
+```
+
+The letter spacing was also reduced so the text fits better on narrower screens.
+
+---
+
+## Step 14.22 - Added Mobile Intro Styles
+
+Added another media query for mobile screens.
+
+```css
+/* Mobile */
+@media (max-width: 576px) {
+
+    .intro-content {
+        padding: 0 20px;
+    }
+
+    .intro-name {
+        font-size: 42px;
+        margin-bottom: 22px;
+    }
+
+    .intro-welcome {
+        font-size: 10px;
+        letter-spacing: 2px;
+    }
+
+    .intro-role {
+        font-size: 11px;
+        letter-spacing: 2px;
+    }
+
+    .intro-icons {
+        margin-top: 16px;
+    }
+
+    .intro-icons i {
+        font-size: 22px;
+    }
+}
+```
+
+Added:
+
+```css
+padding: 0 20px;
+```
+
+to the Intro content so the text does not sit directly against the edges of smaller screens.
+
+The developer name is reduced to:
+
+```css
+font-size: 42px;
+```
+
+The supporting text, icons, spacing, and letter spacing are also reduced for mobile.
+
+---
+
+## Step 14.23 - Fixed Mobile Intro Viewport Height
+
+During mobile testing, noticed that the Intro did not completely cover the screen.
+
+Parts of the portfolio underneath could still be seen around the top or bottom of the Intro.
+
+The original Intro used:
+
+```css
+height: 100vh;
+```
+
+Mobile browsers can change the visible viewport when their browser controls appear or disappear.
+
+Updated the Intro height to:
+
+```css
+min-height: 100vh;
+min-height: 100dvh;
+```
+
+The updated Intro container is:
+
+```css
+/* Full-screen welcome section displayed when the portfolio first loads. */
+.intro {
+    position: fixed;
+    inset: 0;
+
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    background: #081120;
+
+    z-index: 9999;
+
+    /* Slides the intro screen away after the content disappears. */
+    animation: slideUp 900ms ease 4300ms forwards;
+}
+```
+
+The first value:
+
+```css
+min-height: 100vh;
+```
+
+acts as the normal viewport-height value.
+
+The second value:
+
+```css
+min-height: 100dvh;
+```
+
+uses the dynamic viewport height on supported browsers.
+
+This helps the Intro cover the complete visible mobile screen.
+
+---
+
+## Step 14.24 - Completed Responsive Welcome Intro
+
+The Welcome Intro is now complete for the current version.
+
+Final animation sequence:
+
+```text
+Intro opens
+↓
+Welcome text fades upward
+↓
+Developer name fades upward
+↓
+Developer role fades upward
+↓
+Developer icons appear one after another
+↓
+Intro content fades upward
+↓
+Full Intro screen slides upward
+↓
+onAnimationEnd detects slideUp
+↓
+React sets showIntro to false
+↓
+Intro component is removed
+↓
+Portfolio becomes available
+```
+
+The Intro now combines:
+
+```text
+React
+├── useState
+├── onAnimationEnd
+└── Conditional rendering
+
+Bootstrap
+├── Flexbox centering
+├── Text alignment
+└── Icon spacing
+
+CSS
+├── Keyframes
+├── Animation delays
+├── Staggered animations
+├── Media queries
+├── Responsive typography
+└── Dynamic viewport height
+```
+
+---
+
+## Step 14 - Final Status
+
+Completed:
+
+```text
+Welcome Intro component ✅
+Full-screen overlay ✅
+Welcome animation ✅
+Name animation ✅
+Role animation ✅
+Staggered icon animation ✅
+Content exit animation ✅
+Full-screen slide animation ✅
+React removal after animation ✅
+Reusable animations.css ✅
+Tablet responsiveness ✅
+Mobile responsiveness ✅
+Mobile viewport-height fix ✅
+Code comments ✅
+```
+
+---
+
+## Git Checkpoint - Responsive Welcome Intro
+
+The Welcome Intro feature is now complete.
+
+```bash
+git status
+git add .
+git commit -m "Add responsive animated portfolio intro"
+git push
+```
+
+### Next
+
+Start:
+
+```text
+Step 15 - Hero Entrance Animations
+```
+
+Planned order:
+
+```text
+Intro finishes
+↓
+Hero content enters
+↓
+Hero text and buttons animate
+↓
+Developer ID card enters
+↓
+ID card receives drop/swing animation
+```
+
+The next feature will continue using the reusable animations stored in:
+
+```text
+src/styles/animations.css
+```
+
+---
+
+# Step 15 - Hero ID Card Entrance Animation
+
+After completing the Welcome Intro, started connecting the Intro animation to the Hero section.
+
+The goal was:
+
+```text
+Welcome Intro finishes
+↓
+Portfolio is revealed
+↓
+Hanging ID card drops from above
+↓
+Card swings slightly
+↓
+Card remains draggable
+```
+
+The important part was making the Hero animation start only after the Intro was actually finished.
+
+---
+
+## Step 15.1 - Added Intro Completion Communication
+
+The Intro already knew when its final CSS animation finished because it was using:
+
+```jsx
+onAnimationEnd={handleAnimationEnd}
+```
+
+The final Intro animation is:
+
+```text
+slideUp
+```
+
+Updated the Intro component so it can notify its parent component when the animation finishes.
+
+Changed:
+
+```jsx
+export default function Intro() {
+```
+
+to:
+
+```jsx
+export default function Intro({ onFinish }) {
+```
+
+`onFinish` is a prop.
+
+The parent component can pass a function into the Intro using this prop.
+
+Inside the animation-end handler:
+
+```jsx
+// Removes the intro after the final slide-up animation finishes.
+function handleAnimationEnd(event) {
+
+    if (event.animationName === "slideUp") {
+        setShowIntro(false);
+
+        // Tells the parent component that the intro has finished animation.
+        onFinish();
+    }
+}
+```
+
+The Intro now performs two actions when `slideUp` finishes:
+
+```text
+1. Removes itself
+2. Calls onFinish()
+```
+
+---
+
+## Step 15.2 - Learned Function Props
+
+The Intro receives:
+
+```jsx
+function Intro({ onFinish })
+```
+
+The `onFinish` prop does not create the function itself.
+
+The parent provides the function.
+
+Example:
+
+```jsx
+<Intro onFinish={() => setIntroFinished(true)} />
+```
+
+This means:
+
+```text
+Prop name:
+onFinish
+
+Prop value:
+() => setIntroFinished(true)
+```
+
+Inside Intro:
+
+```jsx
+onFinish();
+```
+
+runs the function passed by the parent.
+
+Concept:
+
+```text
+onFinish
+→ reference to the function
+
+onFinish()
+→ runs the function
+```
+
+---
+
+## Step 15.3 - Added Intro Finished State to App
+
+Added React state inside `App.jsx`.
+
+```jsx
+const [introFinished, setIntroFinished] = useState(false);
+```
+
+Initial value:
+
+```text
+false
+```
+
+means:
+
+```text
+The Intro has not finished yet.
+```
+
+Connected Intro:
+
+```jsx
+<Intro onFinish={() => setIntroFinished(true)} />
+```
+
+When Intro calls:
+
+```jsx
+onFinish();
+```
+
+App runs:
+
+```jsx
+setIntroFinished(true);
+```
+
+The state then becomes:
+
+```text
+true
+```
+
+---
+
+## Step 15.4 - Passed Intro State to Hero
+
+The Hero needs to know when the Intro has finished so the ID card entrance does not run behind the Intro screen.
+
+Passed the state into Hero:
+
+```jsx
+<Hero introFinished={introFinished} />
+```
+
+Hero receives it:
+
+```jsx
+export default function Hero({ introFinished }) {
+```
+
+This is a normal React prop.
+
+The value can be:
+
+```text
+false
+```
+
+before the Intro finishes, or:
+
+```text
+true
+```
+
+after the Intro finishes.
+
+Flow:
+
+```text
+App
+introFinished = false
+↓
+Hero receives false
+
+Intro finishes
+↓
+setIntroFinished(true)
+↓
+App rerenders
+↓
+Hero receives true
+```
+
+---
+
+## Step 15.5 - Added Conditional Animation Class
+
+Used the `introFinished` prop to add a CSS class only after the Intro finishes.
+
+Created the hanging badge wrapper:
+
+```jsx
+<div className={`hanging-badge ${introFinished ? "badge-drop" : ""}`}>
+```
+
+The conditional expression:
+
+```jsx
+introFinished ? "badge-drop" : ""
+```
+
+means:
+
+```text
+If introFinished is true
+→ add "badge-drop"
+
+If introFinished is false
+→ add nothing
+```
+
+Before the Intro finishes:
+
+```html
+class="hanging-badge"
+```
+
+After the Intro finishes:
+
+```html
+class="hanging-badge badge-drop"
+```
+
+This starts the CSS entrance animation at the correct time.
+
+---
+
+## Step 15.6 - Wrapped the Lanyard and Badge Together
+
+Originally, only the ID card was being animated.
+
+This looked unrealistic because the card moved while the lanyard was already visible in its final position.
+
+Created a wrapper around both the lanyard and the card.
+
+Structure:
+
+```text
+hanging-badge
+├── lanyard
+└── draggable badge
+```
+
+This allows the entire hanging system to drop together.
+
+The wrapper controls the entrance motion.
+
+---
+
+## Step 15.7 - Added Badge Drop CSS
+
+Added the starting position:
+
+```css
+.hanging-badge {
+    transform: translateY(-700px);
+}
+```
+
+This keeps the hanging system above the visible Hero before the Intro finishes.
+
+Added the entrance animation class:
+
+```css
+.badge-drop {
+    animation: cardDrop 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+```
+
+The `cardDrop` keyframes are stored in the shared:
+
+```text
+src/styles/animations.css
+```
+
+This keeps reusable animations separate from Hero-specific styles.
+
+---
+
+## Step 15.8 - Improved the Drop Animation
+
+The first drop animation used large vertical rebounds.
+
+Example:
+
+```text
+80px
+-80px
+80px
+```
+
+This made the card feel more like a bouncing object than a real hanging badge.
+
+Reduced the vertical bounce and adjusted the timing so the entrance feels more natural.
+
+The entrance now focuses on:
+
+```text
+Fast downward movement
+↓
+Small overshoot
+↓
+Small correction
+↓
+Final resting position
+```
+
+---
+
+## Step 15.9 - Added Badge Swing Animation
+
+After the drop, added a small swinging motion.
+
+The swing is intended to make the card behave more like a hanging object.
+
+Created:
+
+```text
+badgeSwing
+```
+
+inside the reusable animation stylesheet.
+
+The swing uses smaller rotation angles so it does not look exaggerated.
+
+---
+
+## Step 15.10 - Found CSS and Motion Transform Conflict
+
+The existing ID card already uses Motion for dragging.
+
+The draggable badge uses:
+
+```jsx
+style={{
+    x: cardX,
+    y: cardY,
+    rotate: cardRotation
+}}
+```
+
+Motion uses these values to control the element's CSS transform.
+
+The swing animation was initially added directly to:
+
+```text
+.draggable-badge
+```
+
+This caused a problem because both:
+
+```text
+CSS animation
+```
+
+and:
+
+```text
+Motion
+```
+
+were trying to control `transform` on the same element.
+
+Result:
+
+```text
+Dragging became visually broken.
+```
+
+---
+
+## Step 15.11 - Added Separate Swing Wrapper
+
+Fixed the transform conflict by creating another wrapper.
+
+Final structure:
+
+```text
+hanging-badge
+├── lanyard
+└── badge-swing-wrapper
+    └── draggable-badge
+        ├── card clip
+        └── ID card
+```
+
+The responsibilities are now separated.
+
+```text
+hanging-badge
+→ drop animation
+
+badge-swing-wrapper
+→ CSS swing animation
+
+draggable-badge
+→ Motion drag and velocity rotation
+```
+
+Updated JSX:
+
+```jsx
+<div className={`hanging-badge ${introFinished ? "badge-drop" : ""}`}>
+
+    {/* SVG lanyard that bends and follows the draggable card */}
+    <div className="lanyard">
+
+        <svg
+            className="lanyard-svg"
+            viewBox="0 0 600 500"
+        >
+
+            <motion.path
+                className="lanyard-path lanyard-path-base"
+                d={lanyardPath}
+                fill="none"
+            />
+
+            <motion.path
+                className="lanyard-path lanyard-path-highlight"
+                d={lanyardPath}
+                fill="none"
+            />
+
+        </svg>
+
+    </div>
+
+    <div
+        className={`badge-swing-wrapper ${
+            introFinished ? "badge-swing" : ""
+        }`}
+    >
+
+        <motion.div
+            className="draggable-badge"
+            drag
+            style={{
+                x: cardX,
+                y: cardY,
+                rotate: cardRotation
+            }}
+        >
+            ...
+        </motion.div>
+
+    </div>
+
+</div>
+```
+
+---
+
+## Step 15.12 - Updated Hero CSS Responsibilities
+
+The draggable badge now contains only its drag-related styling.
+
+```css
+.draggable-badge {
+    cursor: grab;
+}
+```
+
+The entrance wrapper controls the vertical position:
+
+```css
+.hanging-badge {
+    transform: translateY(-700px);
+}
+```
+
+The drop class controls the entrance:
+
+```css
+.badge-drop {
+    animation: cardDrop 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+```
+
+The swing wrapper defines the rotation origin:
+
+```css
+.badge-swing-wrapper {
+    transform-origin: top center;
+}
+```
+
+The swing class controls the swing animation:
+
+```css
+.badge-swing {
+    animation: badgeSwing 2200ms ease-out forwards;
+}
+```
+
+The swing duration was adjusted during testing to make the motion feel more natural.
+
+---
+
+## Step 15.13 - Preserved Existing Drag Functionality
+
+The actual draggable element remains:
+
+```jsx
+<motion.div
+    className="draggable-badge"
+    drag
+```
+
+The existing Motion values are unchanged:
+
+```jsx
+style={{
+    x: cardX,
+    y: cardY,
+    rotate: cardRotation
+}}
+```
+
+The card still:
+
+```text
+Moves horizontally
+Moves vertically
+Rotates based on drag velocity
+Returns using spring animation
+Updates the SVG lanyard
+```
+
+This means the new entrance animation was added without removing the existing interactive behaviour.
+
+---
+
+## Step 15.14 - Final ID Card Entrance Flow
+
+The current opening interaction is:
+
+```text
+Page loads
+↓
+Welcome Intro animation runs
+↓
+slideUp finishes
+↓
+Intro calls onFinish()
+↓
+App sets introFinished = true
+↓
+Hero receives true
+↓
+badge-drop class is added
+↓
+Lanyard + badge drop together
+↓
+badge-swing class runs on separate wrapper
+↓
+Badge settles
+↓
+Motion drag remains available
+```
+
+---
+
+## Step 15 Current Status
+
+Completed:
+
+```text
+Intro completion callback ✅
+Function prop communication ✅
+App introFinished state ✅
+Hero introFinished prop ✅
+Conditional animation class ✅
+Whole lanyard + badge drop ✅
+Badge swing ✅
+Separate swing wrapper ✅
+Motion/CSS transform conflict fixed ✅
+Drag functionality preserved ✅
+```
+
+Next:
+
+```text
+Animate the Hero text and actions after the Intro finishes.
+```
+
+---
+
+## Git Checkpoint - Hero ID Card Entrance
+
+Completed the first Hero entrance interaction.
+
+Run:
+
+```bash
+git status
+git add .
+git commit -m "Add hanging ID card entrance animation"
+git push
+```
+
+Next:
+
+```text
+Step 16 - Hero Content Entrance Animations
+```
+
+---

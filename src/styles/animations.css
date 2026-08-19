@@ -50,3 +50,47 @@
         transform: translateY(-100%);
     }
 }
+
+/* Drops the hanging badge from above and settles it into position. */
+@keyframes cardDrop {
+
+    0% {
+        transform: translateY(-700px);
+    }
+
+    75% {
+        transform: translateY(18px);
+    }
+
+    88% {
+        transform: translateY(-8px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* Creates a small pendulum swing after the badge drops. */
+@keyframes badgeSwing {
+
+    0% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(5deg);
+    }
+
+    50% {
+        transform: rotate(-3deg);
+    }
+
+    75% {
+        transform: rotate(1.5deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
