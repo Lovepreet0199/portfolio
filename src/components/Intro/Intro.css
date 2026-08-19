@@ -103,3 +103,56 @@
 .intro-content {
     animation: fadeOutUp 600ms ease 3700ms forwards;
 }
+
+/* Tablet */
+@media (max-width:991px) {
+
+    .intro-name {
+        font-size: 64px;
+    }
+
+    .intro-welcome {
+        font-size: 12px;
+        letter-spacing: 3px;
+    }
+
+    .intro-role {
+        font-size: 12px;
+        letter-spacing: 2px;
+    }
+
+    .intro-icons i {
+        font-size: 24px;
+    }
+}
+
+/* Mobile */
+@media (max-width:576px) {
+
+    .intro-content {
+        padding: 0 20px;
+    }
+
+    .intro-name {
+        font-size: 42px;
+        margin-bottom: 22px;
+    }
+
+    .intro-welcome {
+        font-size: 10px;
+        letter-spacing: 2px;
+    }
+
+    .intro-role {
+        font-size: 11px;
+        letter-spacing: 2px;
+    }
+
+    .intro-icons {
+        margin-top: 16px;
+    }
+
+    .intro-icons i {
+        font-size: 22px;
+    }
+}
