@@ -5,12 +5,13 @@ import PortfolioShowcase from "./components/PortfolioShowcase/PortfolioShowcase"
 import Contact from "./components/Contact/Contact";
 import Guestbook from "./components/Guestbook/Guestbook";
 import Footer from "./components/Footer/Footer";
-
+import Intro from "./components/Intro/Intro";
 
 function App() {
 
   return (
     <>
+      <Intro />
       <Header />
       <Hero />
       <About />

@@ -1,0 +1,52 @@
+/* Fade in while moving it upwards. */
+@keyframes fadeUp {
+
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Fades an element in while moving upwards and growing  to its normal size. */
+@keyframes fadeUpScale {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.7);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Fades an element out while moving slightly upwards. */
+@keyframes fadeOutUp {
+
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+/* Moves an element upwards until it leaves the screen. */
+@keyframes slideUp {
+
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(-100%);
+    }
+}
