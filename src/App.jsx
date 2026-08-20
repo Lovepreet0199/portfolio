@@ -10,13 +10,17 @@ import { useState } from "react";
 
 function App() {
   const [introFinished, setIntroFinished] = useState(false);
+  const [activePortfolioTab, setActivePortfolioTab] = useState("projects");
   return (
     <>
       <Intro onFinish={() => setIntroFinished(true)} />
-      <Header />
+      <Header setActivePortfolioTab={setActivePortfolioTab} />
       <Hero introFinished={introFinished} />
       <About />
-      <PortfolioShowcase />
+      <PortfolioShowcase
+        activeTab={activePortfolioTab}
+        setActivePortfolioTab={setActivePortfolioTab}
+      />
       <Contact />
       <Guestbook />
       <Footer />

@@ -7161,3 +7161,747 @@ Final interaction polish
 ```
 
 ---
+
+# Step 17 - Mobile Navigation Improvements
+
+Improved the Header navigation so the mobile menu opens and closes smoothly and automatically closes after selecting a navigation item.
+
+---
+
+## Step 17.1 - Close Mobile Menu After Clicking a Navigation Link
+
+Previously, the hamburger menu could be opened and closed using the menu button, but selecting a navigation item did not close the mobile navigation.
+
+Each Header navigation link was updated to call:
+
+```jsx
+onClick={() => setIsMenuOpen(false)}
+```
+
+Example:
+
+```jsx
+<li>
+    <a
+        href="#about"
+        onClick={() => setIsMenuOpen(false)}
+    >
+        About
+    </a>
+</li>
+```
+
+This changes:
+
+```text
+isMenuOpen = true
+```
+
+to:
+
+```text
+isMenuOpen = false
+```
+
+after a navigation item is selected.
+
+The flow is:
+
+```text
+Open hamburger menu
+↓
+isMenuOpen = true
+↓
+Select navigation link
+↓
+setIsMenuOpen(false)
+↓
+Mobile navigation closes
+```
+
+The mobile Let's Talk button was also updated:
+
+```jsx
+<li>
+    <a
+        href="#contact"
+        className="mobile-lets-talk-btn"
+        onClick={() => setIsMenuOpen(false)}
+    >
+        Let&apos;s Talk
+    </a>
+</li>
+```
+
+The mobile Let's Talk link was placed inside an `<li>` so the `<ul>` keeps a correct HTML structure.
+
+---
+
+## Step 17.2 - Improved Hamburger Accessibility
+
+The hamburger button already used:
+
+```jsx
+aria-expanded={isMenuOpen}
+```
+
+The accessibility label was updated so it describes the action the button will perform.
+
+```jsx
+aria-label={
+    isMenuOpen
+        ? "Close navigation menu"
+        : "Open navigation menu"
+}
+```
+
+When the menu is closed, the label is:
+
+```text
+Open navigation menu
+```
+
+When the menu is open, the label is:
+
+```text
+Close navigation menu
+```
+
+---
+
+## Step 17.3 - Replace Instant Mobile Menu Opening
+
+The mobile navigation previously used:
+
+```css
+.main-navigation {
+    display: none;
+}
+
+.main-navigation--open {
+    display: block;
+}
+```
+
+This caused the navigation to instantly appear and disappear.
+
+The `display` property cannot be smoothly animated.
+
+The mobile navigation was changed to use:
+
+```text
+opacity
+visibility
+transform
+```
+
+instead.
+
+---
+
+## Step 17.4 - Add Mobile Navigation Slide Animation
+
+Updated the mobile navigation:
+
+```css
+/* Mobile navigation menu positioned below the header. */
+.main-navigation {
+    position: absolute;
+    top: calc(100% + 18px);
+    left: 50%;
+
+    width: 100vw;
+
+    padding: 24px;
+    background-color: #081120;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.35);
+
+    /* Keeps the menu hidden and slightly above its final position. */
+    opacity: 0;
+    visibility: hidden;
+
+    /* -50% keeps the menu horizontally centered.
+       -20px moves it upward so it can slide down when opened. */
+    transform: translate(-50%, -20px);
+
+    /* Creates a smooth fade and slide when opening or closing the menu. */
+    transition:
+        opacity 300ms ease,
+        transform 300ms ease,
+        visibility 300ms ease;
+}
+```
+
+The open state is:
+
+```css
+/* Applied when the hamburger button opens the mobile navigation. */
+.main-navigation--open {
+    opacity: 1;
+    visibility: visible;
+
+    /* Keeps the menu centered and moves it to its final vertical position. */
+    transform: translate(-50%, 0);
+}
+```
+
+Closed state:
+
+```text
+opacity: 0
+visibility: hidden
+translateY: -20px
+```
+
+Open state:
+
+```text
+opacity: 1
+visibility: visible
+translateY: 0
+```
+
+This creates a smooth slide-down and fade-in effect.
+
+---
+
+## Step 17.5 - Update Header Navigation Items
+
+The Experience navigation item was removed because the portfolio currently does not have an Experience section.
+
+It was replaced with:
+
+```text
+Guestbook
+```
+
+The Header navigation now contains:
+
+```text
+Home
+Projects
+Skills
+About
+Guestbook
+Contact
+```
+
+The mobile navigation also contains:
+
+```text
+Let's Talk
+```
+
+---
+
+# Step 18 - Portfolio Showcase Navigation With Shared State
+
+The Skills Header navigation link was not working correctly.
+
+The Skills component already contained:
+
+```jsx
+<div id="skills" className="skills">
+```
+
+However, the problem was caused by the Portfolio Showcase tab system.
+
+The Portfolio Showcase conditionally renders its content:
+
+```jsx
+{activeTab === "projects" && <Projects />}
+
+{activeTab === "skills" && <Skills />}
+
+{activeTab === "certifications" && <Certifications />}
+```
+
+When:
+
+```text
+activeTab = "projects"
+```
+
+the Skills component is not currently rendered.
+
+Therefore, trying to navigate directly to:
+
+```text
+#skills
+```
+
+does not work when the Skills component does not yet exist in the page.
+
+---
+
+## Step 18.1 - Give the Portfolio Showcase Its Own Navigation Target
+
+The main Portfolio Showcase section uses:
+
+```jsx
+<section
+    className="portfolio-showcase"
+    id="showcase"
+>
+```
+
+The ID:
+
+```text
+showcase
+```
+
+represents the entire Portfolio Showcase instead of a specific tab.
+
+This is more accurate because the section contains:
+
+```text
+Projects
+Skills
+Certifications
+```
+
+The Header can therefore navigate to:
+
+```text
+#showcase
+```
+
+regardless of which Portfolio tab is currently selected.
+
+---
+
+## Step 18.2 - Lift Portfolio Tab State Into App.jsx
+
+The Portfolio Showcase originally stored its own state:
+
+```jsx
+const [activeTab, setActiveTab] = useState("projects");
+```
+
+This worked for the buttons inside Portfolio Showcase, but Header could not control which tab was selected.
+
+Both:
+
+```text
+Header
+```
+
+and:
+
+```text
+PortfolioShowcase
+```
+
+need access to the Portfolio tab state.
+
+The state was therefore moved to their common parent:
+
+```text
+App.jsx
+```
+
+Added:
+
+```jsx
+const [activePortfolioTab, setActivePortfolioTab] = useState("projects");
+```
+
+The structure is now:
+
+```text
+                    App
+                     |
+          activePortfolioTab
+                     |
+          -----------------------
+          |                     |
+       Header          PortfolioShowcase
+          |                     |
+   changes the tab        displays the tab
+```
+
+This React pattern is called:
+
+```text
+Lifting State Up
+```
+
+---
+
+## Step 18.3 - Pass Portfolio State to PortfolioShowcase
+
+App passes the current selected tab and the function used to change it:
+
+```jsx
+<PortfolioShowcase
+    activeTab={activePortfolioTab}
+    setActiveTab={setActivePortfolioTab}
+/>
+```
+
+The value:
+
+```text
+activeTab
+```
+
+represents the currently selected Portfolio tab.
+
+Possible values are:
+
+```text
+projects
+skills
+certifications
+```
+
+The function:
+
+```text
+setActiveTab
+```
+
+allows PortfolioShowcase to change the currently selected tab.
+
+---
+
+## Step 18.4 - PortfolioShowcase Receives State Through Props
+
+Previously:
+
+```jsx
+export default function PortfolioShowcase() {
+
+    const [activeTab, setActiveTab] = useState("projects");
+```
+
+The local `useState` was removed.
+
+PortfolioShowcase now receives both values through props:
+
+```jsx
+export default function PortfolioShowcase({ activeTab, setActiveTab }) {
+```
+
+The `useState` import was also removed because PortfolioShowcase no longer creates the tab state itself.
+
+The top of the component is now:
+
+```jsx
+import "./PortfolioShowcase.css";
+
+import Projects from "../Projects/Projects";
+import Skills from "../Skills/Skills";
+import Certifications from "../Certifications/Certifications";
+
+export default function PortfolioShowcase({ activeTab, setActiveTab }) {
+```
+
+---
+
+## Step 18.5 - Portfolio Showcase Tab Buttons Continue to Work
+
+The existing tab buttons continue to use:
+
+```jsx
+setActiveTab()
+```
+
+Projects:
+
+```jsx
+<button
+    className={`portfolio-tab ${activeTab === "projects" ? "active" : ""}`}
+    onClick={() => setActiveTab("projects")}
+>
+    <i className="bi bi-folder"></i>
+    Projects
+</button>
+```
+
+Skills:
+
+```jsx
+<button
+    className={`portfolio-tab ${activeTab === "skills" ? "active" : ""}`}
+    onClick={() => setActiveTab("skills")}
+>
+    <i className="bi bi-code-slash"></i>
+    Skills
+</button>
+```
+
+Certifications:
+
+```jsx
+<button
+    className={`portfolio-tab ${activeTab === "certifications" ? "active" : ""}`}
+    onClick={() => setActiveTab("certifications")}
+>
+    <i className="bi bi-award"></i>
+    Certifications
+</button>
+```
+
+---
+
+## Step 18.6 - Pass Portfolio Setter to Header
+
+App also passes the Portfolio state-changing function to Header:
+
+```jsx
+<Header
+    setActivePortfolioTab={setActivePortfolioTab}
+/>
+```
+
+Header receives it:
+
+```jsx
+export default function Header({ setActivePortfolioTab }) {
+```
+
+This allows the Header to change the Portfolio Showcase tab.
+
+---
+
+## Step 18.7 - Fix Projects Header Navigation
+
+The Projects Header link now performs two jobs:
+
+```jsx
+<a
+    href="#showcase"
+    onClick={() => {
+        setActivePortfolioTab("projects");
+        setIsMenuOpen(false);
+    }}
+>
+    Projects
+</a>
+```
+
+When clicked:
+
+```text
+Projects
+↓
+setActivePortfolioTab("projects")
+↓
+Portfolio Showcase displays Projects
+↓
+Browser navigates to #showcase
+↓
+Mobile navigation closes
+```
+
+Using:
+
+```jsx
+href="#showcase"
+```
+
+is more accurate than using:
+
+```jsx
+href="#projects"
+```
+
+because `showcase` represents the entire Portfolio Showcase section.
+
+---
+
+## Step 18.8 - Fix Skills Header Navigation
+
+The Skills Header link now uses:
+
+```jsx
+<a
+    href="#showcase"
+    onClick={() => {
+        setActivePortfolioTab("skills");
+        setIsMenuOpen(false);
+    }}
+>
+    Skills
+</a>
+```
+
+When Skills is clicked:
+
+```text
+Click Skills
+↓
+setActivePortfolioTab("skills")
+↓
+App updates activePortfolioTab
+↓
+PortfolioShowcase receives activeTab="skills"
+↓
+Skills component renders
+↓
+Browser navigates to #showcase
+↓
+Skills tab is displayed
+↓
+Mobile navigation closes
+```
+
+The Header no longer needs to navigate directly to:
+
+```text
+#skills
+```
+
+because the Skills component is conditionally rendered.
+
+Instead, the Header always navigates to:
+
+```text
+#showcase
+```
+
+and React controls which tab appears.
+
+---
+
+## Step 18.9 - Shared State Flow
+
+The final Portfolio navigation structure is:
+
+```text
+                    App.jsx
+                       |
+             activePortfolioTab
+                       |
+             -------------------
+             |                 |
+             ↓                 ↓
+         Header         PortfolioShowcase
+             |                 |
+             |                 ↓
+             |          activeTab controls
+             |                 |
+             |        ---------------------
+             |        |         |         |
+             |    Projects    Skills   Certifications
+             |
+             ↓
+setActivePortfolioTab()
+```
+
+For example:
+
+```text
+Header Skills clicked
+↓
+setActivePortfolioTab("skills")
+↓
+App state changes
+↓
+PortfolioShowcase receives "skills"
+↓
+<Skills /> renders
+```
+
+This reinforces the same React parent/child communication concept used earlier for the Intro and Hero.
+
+Intro flow:
+
+```text
+Intro
+↓
+App
+↓
+Hero
+```
+
+Portfolio navigation flow:
+
+```text
+Header
+↓
+App
+↓
+PortfolioShowcase
+```
+
+---
+
+## Step 18.10 - Final Navigation Targets
+
+The Header navigation now uses the actual sections available in the portfolio.
+
+```text
+Home        → Home/Hero
+Projects    → #showcase + Projects tab
+Skills      → #showcase + Skills tab
+About       → #about
+Guestbook   → #guestbook
+Contact     → #contact
+Let's Talk  → #contact
+```
+
+The Portfolio Showcase itself uses:
+
+```jsx
+id="showcase"
+```
+
+so Projects and Skills can share the same scroll destination while displaying different tab content.
+
+---
+
+## Step 18 Status
+
+Completed:
+
+```text
+Mobile menu closes after selecting a link ✅
+Mobile menu slides open ✅
+Mobile menu slides closed ✅
+Mobile menu fades in/out ✅
+Hamburger accessibility improved ✅
+Experience removed from navigation ✅
+Guestbook added to navigation ✅
+Portfolio Showcase changed to id="showcase" ✅
+Skills navigation problem identified ✅
+Portfolio tab state lifted to App ✅
+Header can change Portfolio tab ✅
+PortfolioShowcase receives state through props ✅
+Projects navigates to #showcase + opens Projects ✅
+Skills navigates to #showcase + opens Skills ✅
+Mobile navigation closes after tab navigation ✅
+```
+
+---
+
+## Git Checkpoint
+
+Test:
+
+```text
+Desktop:
+Projects → Skills → Projects
+
+Mobile:
+Open menu → Skills
+Open menu → Projects
+Open menu → Guestbook
+Open menu → Contact
+Hamburger open/close
+```
+
+Then run:
+
+```bash
+git status
+git add .
+git commit -m "Fix mobile navigation and portfolio tab links"
+git push
+```
+
+---
+
