@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./Header.css";
 
-export default function Header() {
+export default function Header({ setActivePortfolioTab }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     return (
         <header className="site-header">
@@ -16,7 +16,7 @@ export default function Header() {
                 <button
                     type="button"
                     className="menu-toggle"
-                    aria-label="Open navigation menu"
+                    aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
                     aria-expanded={isMenuOpen}
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
@@ -30,15 +30,61 @@ export default function Header() {
                         }`}>
 
                     <ul className="nav-list">
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#projects">Projects</a></li>
-                        <li><a href="#skills">Skills</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#experience">Experience</a></li>
-                        <li><a href="#contact">Contact</a></li>
-                        <a href="#contact" className="mobile-lets-talk-btn">
-                            Let&apos;s Talk
-                        </a>
+                        <li>
+                            <a
+                                href="#"
+                                onClick={() => setIsMenuOpen(false)}>
+                                Home</a>
+                        </li>
+                        <li>
+                            <a
+                                href="#showcase"
+                                onClick={() => {
+                                    setActivePortfolioTab("projects"); setIsMenuOpen(false)
+                                }}>
+                                Projects</a>
+                        </li>
+                        <li>
+                            <a
+                                href="#showcase"
+                                onClick={() => {
+                                    setIsMenuOpen(false)
+                                    setActivePortfolioTab("skills");
+                                }}>
+                                Skills</a>
+                        </li>
+                        <li>
+                            <a
+                                href="#showcase"
+                                onClick={() => {
+                                    setIsMenuOpen(false)
+                                    setActivePortfolioTab("certifications");
+                                }}>
+                                Certifications</a>
+                        </li>
+                        <li>
+                            <a
+                                href="#about"
+                                onClick={() => setIsMenuOpen(false)}>
+                                About</a>
+                        </li>
+                        <li>
+                            <a
+                                href="#contact"
+                                onClick={() => setIsMenuOpen(false)}>
+                                Contact</a>
+                        </li>
+                        <li>
+                            <a
+                                href="#guestbook"
+                                onClick={() => setIsMenuOpen(false)}>
+                                Guestbook</a>
+                        </li>
+                        <li>
+                            <a href="#contact" className="mobile-lets-talk-btn" onClick={() => setIsMenuOpen(false)}>
+                                Let&apos;s Talk
+                            </a>
+                        </li>
                     </ul>
 
 

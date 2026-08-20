@@ -1,7 +1,7 @@
 import "./Intro.css";
 import { useState } from "react";
 
-export default function Intro() {
+export default function Intro({ onFinish }) {
     const [showIntro, setShowIntro] = useState(true);
 
     //Remove the intro after the final slide-up animation finishes.
@@ -9,6 +9,9 @@ export default function Intro() {
 
         if (event.animationName === "slideUp") {
             setShowIntro(false);
+
+            //Tells the parent component that the intro has finished animation.
+            onFinish();
         }
     }
 

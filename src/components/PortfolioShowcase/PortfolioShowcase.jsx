@@ -1,15 +1,13 @@
 import "./PortfolioShowcase.css";
-import { useState } from "react";
+
 import Projects from "../Projects/Projects";
 import Skills from "../Skills/Skills";
 import Certifications from "../Certifications/Certifications";
 
-export default function PortfolioShowcase() {
-
-    const [activeTab, setActiveTab] = useState("projects");
+export default function PortfolioShowcase({ activeTab, setActiveTab }) {
 
     return (
-        <section className="portfolio-showcase" id="projects">
+        <section className="portfolio-showcase" id="showcase">
             <div className="container">
 
                 <div className="portfolio-showcase-header">

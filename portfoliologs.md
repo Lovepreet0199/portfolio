@@ -5605,3 +5605,2303 @@ Then begin the Hero and ID card entrance animations.
 ```
 
 ---
+
+## Step 14.21 - Made the Intro Responsive
+
+After completing the desktop Intro animation, updated the Intro so it also works correctly on tablet and mobile screens.
+
+The desktop design uses:
+
+```css
+.intro-name {
+    font-size: 86px;
+}
+```
+
+This size works on larger screens but is too large for smaller devices.
+
+Added media queries to adjust the Intro typography and spacing.
+
+---
+
+### Tablet Styles
+
+Added:
+
+```css
+/* Tablet */
+@media (max-width: 991px) {
+
+    .intro-name {
+        font-size: 64px;
+    }
+
+    .intro-welcome {
+        font-size: 12px;
+        letter-spacing: 3px;
+    }
+
+    .intro-role {
+        font-size: 12px;
+        letter-spacing: 2px;
+    }
+
+    .intro-icons i {
+        font-size: 24px;
+    }
+}
+```
+
+On tablet screens:
+
+```text
+Developer name
+86px → 64px
+
+Welcome text
+13px → 12px
+
+Role
+13px → 12px
+
+Icons
+26px → 24px
+```
+
+The letter spacing was also reduced so the text fits better on narrower screens.
+
+---
+
+## Step 14.22 - Added Mobile Intro Styles
+
+Added another media query for mobile screens.
+
+```css
+/* Mobile */
+@media (max-width: 576px) {
+
+    .intro-content {
+        padding: 0 20px;
+    }
+
+    .intro-name {
+        font-size: 42px;
+        margin-bottom: 22px;
+    }
+
+    .intro-welcome {
+        font-size: 10px;
+        letter-spacing: 2px;
+    }
+
+    .intro-role {
+        font-size: 11px;
+        letter-spacing: 2px;
+    }
+
+    .intro-icons {
+        margin-top: 16px;
+    }
+
+    .intro-icons i {
+        font-size: 22px;
+    }
+}
+```
+
+Added:
+
+```css
+padding: 0 20px;
+```
+
+to the Intro content so the text does not sit directly against the edges of smaller screens.
+
+The developer name is reduced to:
+
+```css
+font-size: 42px;
+```
+
+The supporting text, icons, spacing, and letter spacing are also reduced for mobile.
+
+---
+
+## Step 14.23 - Fixed Mobile Intro Viewport Height
+
+During mobile testing, noticed that the Intro did not completely cover the screen.
+
+Parts of the portfolio underneath could still be seen around the top or bottom of the Intro.
+
+The original Intro used:
+
+```css
+height: 100vh;
+```
+
+Mobile browsers can change the visible viewport when their browser controls appear or disappear.
+
+Updated the Intro height to:
+
+```css
+min-height: 100vh;
+min-height: 100dvh;
+```
+
+The updated Intro container is:
+
+```css
+/* Full-screen welcome section displayed when the portfolio first loads. */
+.intro {
+    position: fixed;
+    inset: 0;
+
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    background: #081120;
+
+    z-index: 9999;
+
+    /* Slides the intro screen away after the content disappears. */
+    animation: slideUp 900ms ease 4300ms forwards;
+}
+```
+
+The first value:
+
+```css
+min-height: 100vh;
+```
+
+acts as the normal viewport-height value.
+
+The second value:
+
+```css
+min-height: 100dvh;
+```
+
+uses the dynamic viewport height on supported browsers.
+
+This helps the Intro cover the complete visible mobile screen.
+
+---
+
+## Step 14.24 - Completed Responsive Welcome Intro
+
+The Welcome Intro is now complete for the current version.
+
+Final animation sequence:
+
+```text
+Intro opens
+↓
+Welcome text fades upward
+↓
+Developer name fades upward
+↓
+Developer role fades upward
+↓
+Developer icons appear one after another
+↓
+Intro content fades upward
+↓
+Full Intro screen slides upward
+↓
+onAnimationEnd detects slideUp
+↓
+React sets showIntro to false
+↓
+Intro component is removed
+↓
+Portfolio becomes available
+```
+
+The Intro now combines:
+
+```text
+React
+├── useState
+├── onAnimationEnd
+└── Conditional rendering
+
+Bootstrap
+├── Flexbox centering
+├── Text alignment
+└── Icon spacing
+
+CSS
+├── Keyframes
+├── Animation delays
+├── Staggered animations
+├── Media queries
+├── Responsive typography
+└── Dynamic viewport height
+```
+
+---
+
+## Step 14 - Final Status
+
+Completed:
+
+```text
+Welcome Intro component ✅
+Full-screen overlay ✅
+Welcome animation ✅
+Name animation ✅
+Role animation ✅
+Staggered icon animation ✅
+Content exit animation ✅
+Full-screen slide animation ✅
+React removal after animation ✅
+Reusable animations.css ✅
+Tablet responsiveness ✅
+Mobile responsiveness ✅
+Mobile viewport-height fix ✅
+Code comments ✅
+```
+
+---
+
+## Git Checkpoint - Responsive Welcome Intro
+
+The Welcome Intro feature is now complete.
+
+```bash
+git status
+git add .
+git commit -m "Add responsive animated portfolio intro"
+git push
+```
+
+### Next
+
+Start:
+
+```text
+Step 15 - Hero Entrance Animations
+```
+
+Planned order:
+
+```text
+Intro finishes
+↓
+Hero content enters
+↓
+Hero text and buttons animate
+↓
+Developer ID card enters
+↓
+ID card receives drop/swing animation
+```
+
+The next feature will continue using the reusable animations stored in:
+
+```text
+src/styles/animations.css
+```
+
+---
+
+# Step 15 - Hero ID Card Entrance Animation
+
+After completing the Welcome Intro, started connecting the Intro animation to the Hero section.
+
+The goal was:
+
+```text
+Welcome Intro finishes
+↓
+Portfolio is revealed
+↓
+Hanging ID card drops from above
+↓
+Card swings slightly
+↓
+Card remains draggable
+```
+
+The important part was making the Hero animation start only after the Intro was actually finished.
+
+---
+
+## Step 15.1 - Added Intro Completion Communication
+
+The Intro already knew when its final CSS animation finished because it was using:
+
+```jsx
+onAnimationEnd={handleAnimationEnd}
+```
+
+The final Intro animation is:
+
+```text
+slideUp
+```
+
+Updated the Intro component so it can notify its parent component when the animation finishes.
+
+Changed:
+
+```jsx
+export default function Intro() {
+```
+
+to:
+
+```jsx
+export default function Intro({ onFinish }) {
+```
+
+`onFinish` is a prop.
+
+The parent component can pass a function into the Intro using this prop.
+
+Inside the animation-end handler:
+
+```jsx
+// Removes the intro after the final slide-up animation finishes.
+function handleAnimationEnd(event) {
+
+    if (event.animationName === "slideUp") {
+        setShowIntro(false);
+
+        // Tells the parent component that the intro has finished animation.
+        onFinish();
+    }
+}
+```
+
+The Intro now performs two actions when `slideUp` finishes:
+
+```text
+1. Removes itself
+2. Calls onFinish()
+```
+
+---
+
+## Step 15.2 - Learned Function Props
+
+The Intro receives:
+
+```jsx
+function Intro({ onFinish })
+```
+
+The `onFinish` prop does not create the function itself.
+
+The parent provides the function.
+
+Example:
+
+```jsx
+<Intro onFinish={() => setIntroFinished(true)} />
+```
+
+This means:
+
+```text
+Prop name:
+onFinish
+
+Prop value:
+() => setIntroFinished(true)
+```
+
+Inside Intro:
+
+```jsx
+onFinish();
+```
+
+runs the function passed by the parent.
+
+Concept:
+
+```text
+onFinish
+→ reference to the function
+
+onFinish()
+→ runs the function
+```
+
+---
+
+## Step 15.3 - Added Intro Finished State to App
+
+Added React state inside `App.jsx`.
+
+```jsx
+const [introFinished, setIntroFinished] = useState(false);
+```
+
+Initial value:
+
+```text
+false
+```
+
+means:
+
+```text
+The Intro has not finished yet.
+```
+
+Connected Intro:
+
+```jsx
+<Intro onFinish={() => setIntroFinished(true)} />
+```
+
+When Intro calls:
+
+```jsx
+onFinish();
+```
+
+App runs:
+
+```jsx
+setIntroFinished(true);
+```
+
+The state then becomes:
+
+```text
+true
+```
+
+---
+
+## Step 15.4 - Passed Intro State to Hero
+
+The Hero needs to know when the Intro has finished so the ID card entrance does not run behind the Intro screen.
+
+Passed the state into Hero:
+
+```jsx
+<Hero introFinished={introFinished} />
+```
+
+Hero receives it:
+
+```jsx
+export default function Hero({ introFinished }) {
+```
+
+This is a normal React prop.
+
+The value can be:
+
+```text
+false
+```
+
+before the Intro finishes, or:
+
+```text
+true
+```
+
+after the Intro finishes.
+
+Flow:
+
+```text
+App
+introFinished = false
+↓
+Hero receives false
+
+Intro finishes
+↓
+setIntroFinished(true)
+↓
+App rerenders
+↓
+Hero receives true
+```
+
+---
+
+## Step 15.5 - Added Conditional Animation Class
+
+Used the `introFinished` prop to add a CSS class only after the Intro finishes.
+
+Created the hanging badge wrapper:
+
+```jsx
+<div className={`hanging-badge ${introFinished ? "badge-drop" : ""}`}>
+```
+
+The conditional expression:
+
+```jsx
+introFinished ? "badge-drop" : ""
+```
+
+means:
+
+```text
+If introFinished is true
+→ add "badge-drop"
+
+If introFinished is false
+→ add nothing
+```
+
+Before the Intro finishes:
+
+```html
+class="hanging-badge"
+```
+
+After the Intro finishes:
+
+```html
+class="hanging-badge badge-drop"
+```
+
+This starts the CSS entrance animation at the correct time.
+
+---
+
+## Step 15.6 - Wrapped the Lanyard and Badge Together
+
+Originally, only the ID card was being animated.
+
+This looked unrealistic because the card moved while the lanyard was already visible in its final position.
+
+Created a wrapper around both the lanyard and the card.
+
+Structure:
+
+```text
+hanging-badge
+├── lanyard
+└── draggable badge
+```
+
+This allows the entire hanging system to drop together.
+
+The wrapper controls the entrance motion.
+
+---
+
+## Step 15.7 - Added Badge Drop CSS
+
+Added the starting position:
+
+```css
+.hanging-badge {
+    transform: translateY(-700px);
+}
+```
+
+This keeps the hanging system above the visible Hero before the Intro finishes.
+
+Added the entrance animation class:
+
+```css
+.badge-drop {
+    animation: cardDrop 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+```
+
+The `cardDrop` keyframes are stored in the shared:
+
+```text
+src/styles/animations.css
+```
+
+This keeps reusable animations separate from Hero-specific styles.
+
+---
+
+## Step 15.8 - Improved the Drop Animation
+
+The first drop animation used large vertical rebounds.
+
+Example:
+
+```text
+80px
+-80px
+80px
+```
+
+This made the card feel more like a bouncing object than a real hanging badge.
+
+Reduced the vertical bounce and adjusted the timing so the entrance feels more natural.
+
+The entrance now focuses on:
+
+```text
+Fast downward movement
+↓
+Small overshoot
+↓
+Small correction
+↓
+Final resting position
+```
+
+---
+
+## Step 15.9 - Added Badge Swing Animation
+
+After the drop, added a small swinging motion.
+
+The swing is intended to make the card behave more like a hanging object.
+
+Created:
+
+```text
+badgeSwing
+```
+
+inside the reusable animation stylesheet.
+
+The swing uses smaller rotation angles so it does not look exaggerated.
+
+---
+
+## Step 15.10 - Found CSS and Motion Transform Conflict
+
+The existing ID card already uses Motion for dragging.
+
+The draggable badge uses:
+
+```jsx
+style={{
+    x: cardX,
+    y: cardY,
+    rotate: cardRotation
+}}
+```
+
+Motion uses these values to control the element's CSS transform.
+
+The swing animation was initially added directly to:
+
+```text
+.draggable-badge
+```
+
+This caused a problem because both:
+
+```text
+CSS animation
+```
+
+and:
+
+```text
+Motion
+```
+
+were trying to control `transform` on the same element.
+
+Result:
+
+```text
+Dragging became visually broken.
+```
+
+---
+
+## Step 15.11 - Added Separate Swing Wrapper
+
+Fixed the transform conflict by creating another wrapper.
+
+Final structure:
+
+```text
+hanging-badge
+├── lanyard
+└── badge-swing-wrapper
+    └── draggable-badge
+        ├── card clip
+        └── ID card
+```
+
+The responsibilities are now separated.
+
+```text
+hanging-badge
+→ drop animation
+
+badge-swing-wrapper
+→ CSS swing animation
+
+draggable-badge
+→ Motion drag and velocity rotation
+```
+
+Updated JSX:
+
+```jsx
+<div className={`hanging-badge ${introFinished ? "badge-drop" : ""}`}>
+
+    {/* SVG lanyard that bends and follows the draggable card */}
+    <div className="lanyard">
+
+        <svg
+            className="lanyard-svg"
+            viewBox="0 0 600 500"
+        >
+
+            <motion.path
+                className="lanyard-path lanyard-path-base"
+                d={lanyardPath}
+                fill="none"
+            />
+
+            <motion.path
+                className="lanyard-path lanyard-path-highlight"
+                d={lanyardPath}
+                fill="none"
+            />
+
+        </svg>
+
+    </div>
+
+    <div
+        className={`badge-swing-wrapper ${
+            introFinished ? "badge-swing" : ""
+        }`}
+    >
+
+        <motion.div
+            className="draggable-badge"
+            drag
+            style={{
+                x: cardX,
+                y: cardY,
+                rotate: cardRotation
+            }}
+        >
+            ...
+        </motion.div>
+
+    </div>
+
+</div>
+```
+
+---
+
+## Step 15.12 - Updated Hero CSS Responsibilities
+
+The draggable badge now contains only its drag-related styling.
+
+```css
+.draggable-badge {
+    cursor: grab;
+}
+```
+
+The entrance wrapper controls the vertical position:
+
+```css
+.hanging-badge {
+    transform: translateY(-700px);
+}
+```
+
+The drop class controls the entrance:
+
+```css
+.badge-drop {
+    animation: cardDrop 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+```
+
+The swing wrapper defines the rotation origin:
+
+```css
+.badge-swing-wrapper {
+    transform-origin: top center;
+}
+```
+
+The swing class controls the swing animation:
+
+```css
+.badge-swing {
+    animation: badgeSwing 2200ms ease-out forwards;
+}
+```
+
+The swing duration was adjusted during testing to make the motion feel more natural.
+
+---
+
+## Step 15.13 - Preserved Existing Drag Functionality
+
+The actual draggable element remains:
+
+```jsx
+<motion.div
+    className="draggable-badge"
+    drag
+```
+
+The existing Motion values are unchanged:
+
+```jsx
+style={{
+    x: cardX,
+    y: cardY,
+    rotate: cardRotation
+}}
+```
+
+The card still:
+
+```text
+Moves horizontally
+Moves vertically
+Rotates based on drag velocity
+Returns using spring animation
+Updates the SVG lanyard
+```
+
+This means the new entrance animation was added without removing the existing interactive behaviour.
+
+---
+
+## Step 15.14 - Final ID Card Entrance Flow
+
+The current opening interaction is:
+
+```text
+Page loads
+↓
+Welcome Intro animation runs
+↓
+slideUp finishes
+↓
+Intro calls onFinish()
+↓
+App sets introFinished = true
+↓
+Hero receives true
+↓
+badge-drop class is added
+↓
+Lanyard + badge drop together
+↓
+badge-swing class runs on separate wrapper
+↓
+Badge settles
+↓
+Motion drag remains available
+```
+
+---
+
+## Step 15 Current Status
+
+Completed:
+
+```text
+Intro completion callback ✅
+Function prop communication ✅
+App introFinished state ✅
+Hero introFinished prop ✅
+Conditional animation class ✅
+Whole lanyard + badge drop ✅
+Badge swing ✅
+Separate swing wrapper ✅
+Motion/CSS transform conflict fixed ✅
+Drag functionality preserved ✅
+```
+
+Next:
+
+```text
+Animate the Hero text and actions after the Intro finishes.
+```
+
+---
+
+## Git Checkpoint - Hero ID Card Entrance
+
+Completed the first Hero entrance interaction.
+
+Run:
+
+```bash
+git status
+git add .
+git commit -m "Add hanging ID card entrance animation"
+git push
+```
+
+Next:
+
+```text
+Step 16 - Hero Content Entrance Animations
+```
+
+---
+
+# Step 16 - Hero Content Entrance Animations
+
+After completing the hanging ID card entrance, added entrance animations to the left side of the Hero.
+
+The goal was to make the Hero content appear gradually instead of displaying everything at once.
+
+Planned order:
+
+```text
+Intro finishes
+↓
+Portfolio label appears
+↓
+Main title appears
+↓
+Developer role appears
+↓
+Description appears
+↓
+CTA buttons appear
+↓
+Social icons appear one by one
+```
+
+The existing reusable:
+
+```css
+@keyframes fadeUp
+```
+
+and:
+
+```css
+@keyframes fadeUpScale
+```
+
+animations were reused from:
+
+```text
+src/styles/animations.css
+```
+
+---
+
+## Step 16.1 - Delayed Typing Effect Until Intro Finishes
+
+The Hero typing effect originally started immediately when the page loaded.
+
+Because the Intro covers the Hero for several seconds, the typing animation could already be halfway through before the Hero became visible.
+
+Updated the existing `useEffect()` so it waits until:
+
+```text
+introFinished = true
+```
+
+Added:
+
+```jsx
+// Wait until the Intro animation is finished before starting typing effect.
+if (!introFinished) {
+    return;
+}
+```
+
+The beginning of the effect is now:
+
+```jsx
+useEffect(() => {
+
+    // Wait until the Intro animation is finished before starting typing effect.
+    if (!introFinished) {
+        return;
+    }
+
+    const currentRole = roles[roleIndex];
+
+    // Remaining typing logic...
+
+}, [charIndex, roleIndex, isDeleting, introFinished]);
+```
+
+Also added:
+
+```jsx
+introFinished
+```
+
+to the dependency array.
+
+The new flow is:
+
+```text
+Page loads
+↓
+introFinished = false
+↓
+Typing effect waits
+↓
+Intro finishes
+↓
+introFinished = true
+↓
+Typing effect begins from the first role
+```
+
+This ensures the typing animation starts when the user can actually see it.
+
+---
+
+## Step 16.2 - Animated Portfolio Label
+
+Updated:
+
+```jsx
+<p className="hero-label">
+    PORTFOLIO 2026
+</p>
+```
+
+to:
+
+```jsx
+<p className={`hero-label ${introFinished ? "hero-show" : ""}`}>
+    PORTFOLIO 2026
+</p>
+```
+
+Before the Intro finishes:
+
+```text
+hero-label
+```
+
+After the Intro finishes:
+
+```text
+hero-label hero-show
+```
+
+Added:
+
+```css
+.hero-label {
+    opacity: 0;
+}
+```
+
+and:
+
+```css
+.hero-label.hero-show {
+    animation: fadeUp 700ms ease forwards;
+}
+```
+
+The label is the first Hero text element to appear.
+
+---
+
+## Step 16.3 - Animated Main Hero Title
+
+Updated the Hero title:
+
+```jsx
+<h1 className={`hero-title ${introFinished ? "hero-show" : ""}`}>
+```
+
+The title contains:
+
+```text
+Hi, I'm
+Lovepreet
+Sandhu
+```
+
+Added:
+
+```css
+.hero-title {
+    margin-bottom: 14px;
+
+    /* Keeps the title hidden until the Intro finishes. */
+    opacity: 0;
+}
+```
+
+Added the entrance animation:
+
+```css
+.hero-title.hero-show {
+    animation: fadeUp 700ms ease 150ms forwards;
+}
+```
+
+The `150ms` delay makes the title appear shortly after the portfolio label.
+
+---
+
+## Step 16.4 - Animated Developer Role
+
+Updated:
+
+```jsx
+<h2 className="hero-role">
+```
+
+to:
+
+```jsx
+<h2 className={`hero-role ${introFinished ? "hero-show" : ""}`}>
+    {displayedText}
+</h2>
+```
+
+Added:
+
+```css
+.hero-role {
+    opacity: 0;
+}
+```
+
+Added:
+
+```css
+.hero-role.hero-show {
+    animation: fadeUp 700ms ease 300ms forwards;
+}
+```
+
+The role uses the same entrance style as the other Hero text to keep the animation consistent.
+
+After appearing, the existing typing animation continues controlling:
+
+```text
+Full-Stack Developer
+React Developer
+Node.js Developer
+MERN Stack Developer
+ASP.NET Developer
+```
+
+---
+
+## Step 16.5 - Animated Hero Description
+
+Updated:
+
+```jsx
+<p className="hero-description">
+```
+
+to:
+
+```jsx
+<p className={`hero-description ${introFinished ? "hero-show" : ""}`}>
+```
+
+Added:
+
+```css
+.hero-description {
+    opacity: 0;
+}
+```
+
+Added:
+
+```css
+.hero-description.hero-show {
+    animation: fadeUp 700ms ease 450ms forwards;
+}
+```
+
+The description appears after the role.
+
+---
+
+## Step 16.6 - Animated Hero CTA Buttons
+
+Updated:
+
+```jsx
+<div className="hero-actions">
+```
+
+to:
+
+```jsx
+<div className={`hero-actions ${introFinished ? "hero-actions-show" : ""}`}>
+```
+
+Added:
+
+```css
+.hero-actions {
+    opacity: 0;
+}
+```
+
+The buttons use the existing:
+
+```text
+fadeUpScale
+```
+
+animation instead of the normal text `fadeUp`.
+
+Added:
+
+```css
+.hero-actions-show {
+    animation: fadeUpScale 700ms ease 600ms forwards;
+}
+```
+
+This gives the buttons a slightly different entrance because they are interactive elements.
+
+The CTA buttons are:
+
+```text
+View My Work
+Download CV
+```
+
+---
+
+## Step 16.7 - Animated Social Icons
+
+Updated:
+
+```jsx
+<div className="hero-socials">
+```
+
+to:
+
+```jsx
+<div className={`hero-socials ${introFinished ? "hero-socials-show" : ""}`}>
+```
+
+The social links are:
+
+```text
+GitHub
+LinkedIn
+Email
+```
+
+The container remains hidden before the Intro finishes.
+
+```css
+.hero-socials {
+    opacity: 0;
+}
+```
+
+After the Intro finishes:
+
+```css
+.hero-socials-show {
+    opacity: 1;
+}
+```
+
+Each icon then receives the reusable:
+
+```text
+fadeUpScale
+```
+
+animation.
+
+```css
+.hero-socials-show .icons {
+    opacity: 0;
+    animation: fadeUpScale 500ms ease forwards;
+}
+```
+
+---
+
+## Step 16.8 - Added Staggered Social Icon Timing
+
+Used `:nth-child()` to make the social icons appear one at a time.
+
+```css
+.hero-socials-show .icons:nth-child(1) {
+    animation-delay: 750ms;
+}
+
+.hero-socials-show .icons:nth-child(2) {
+    animation-delay: 850ms;
+}
+
+.hero-socials-show .icons:nth-child(3) {
+    animation-delay: 950ms;
+}
+```
+
+The social entrance sequence is:
+
+```text
+GitHub
+↓ 100ms
+LinkedIn
+↓ 100ms
+Email
+```
+
+---
+
+## Step 16.9 - Added Hero Button Hover Effects
+
+Added hover feedback to the primary CTA button.
+
+```css
+.hero-primary-btn {
+    transition:
+        transform 200ms ease,
+        box-shadow 200ms ease;
+}
+
+.hero-primary-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(21, 93, 252, 0.3);
+}
+```
+
+This slightly lifts the button and adds a blue shadow.
+
+---
+
+## Step 16.10 - Added Secondary Button Hover Effect
+
+Added:
+
+```css
+.hero-secondary-btn {
+    transition:
+        transform 200ms ease,
+        border-color 200ms ease;
+}
+
+.hero-secondary-btn:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+```
+
+The secondary button keeps its outlined design while responding to pointer interaction.
+
+---
+
+## Step 16.11 - Added Social Icon Hover Effects
+
+Updated the `.icons` styling:
+
+```css
+.icons {
+    color: #62748E;
+    font-size: 20px;
+    text-decoration: none;
+
+    transition:
+        transform 200ms ease,
+        color 200ms ease;
+}
+```
+
+Added:
+
+```css
+.icons:hover {
+    transform: translateY(-3px);
+    color: #51A2FF;
+}
+```
+
+The social links now:
+
+```text
+Move upward slightly
++
+Change to the portfolio blue color
+```
+
+when hovered.
+
+---
+
+## Step 16.12 - Final Hero Entrance Timing
+
+The current Hero entrance sequence is:
+
+```text
+Intro finishes
+↓
+0ms
+Portfolio label begins
+
+150ms
+Main title begins
+
+300ms
+Developer role begins
+
+450ms
+Description begins
+
+600ms
+CTA buttons begin
+
+750ms
+GitHub begins
+
+850ms
+LinkedIn begins
+
+950ms
+Email begins
+```
+
+At the same time, the hanging developer badge performs its own drop and swing entrance.
+
+This makes the Hero feel active without giving every element a completely different animation style.
+
+---
+
+## Step 16.13 - Fixed Unused Import Warning
+
+An accidental import was added:
+
+```jsx
+import { i } from "motion/react-client";
+```
+
+The variable was not used, which caused:
+
+```text
+'i' is defined but never used
+```
+
+Removed the import.
+
+The HTML:
+
+```jsx
+<i className="bi bi-github"></i>
+```
+
+does not require importing `i`.
+
+---
+
+## Step 16 Status
+
+Completed:
+
+```text
+Typing waits for Intro ✅
+Portfolio label entrance ✅
+Hero title entrance ✅
+Developer role entrance ✅
+Description entrance ✅
+CTA entrance ✅
+Social icon stagger ✅
+Primary button hover ✅
+Secondary button hover ✅
+Social icon hover ✅
+ID badge entrance still working ✅
+ID badge dragging still working ✅
+```
+
+The Hero now has a complete opening sequence connected to the Welcome Intro.
+
+---
+
+## Git Checkpoint - Hero Content Entrance
+
+Run:
+
+```bash
+git status
+git add .
+git commit -m "Add animated hero content entrance"
+git push
+```
+
+### Next
+
+Continue with the next portfolio improvement feature.
+
+Possible next tasks:
+
+```text
+Project preview limit
+View More Projects
+Projects page
+Project Details page
+Scroll reveal animations
+QR code
+Final interaction polish
+```
+
+---
+
+# Step 17 - Mobile Navigation Improvements
+
+Improved the Header navigation so the mobile menu opens and closes smoothly and automatically closes after selecting a navigation item.
+
+---
+
+## Step 17.1 - Close Mobile Menu After Clicking a Navigation Link
+
+Previously, the hamburger menu could be opened and closed using the menu button, but selecting a navigation item did not close the mobile navigation.
+
+Each Header navigation link was updated to call:
+
+```jsx
+onClick={() => setIsMenuOpen(false)}
+```
+
+Example:
+
+```jsx
+<li>
+    <a
+        href="#about"
+        onClick={() => setIsMenuOpen(false)}
+    >
+        About
+    </a>
+</li>
+```
+
+This changes:
+
+```text
+isMenuOpen = true
+```
+
+to:
+
+```text
+isMenuOpen = false
+```
+
+after a navigation item is selected.
+
+The flow is:
+
+```text
+Open hamburger menu
+↓
+isMenuOpen = true
+↓
+Select navigation link
+↓
+setIsMenuOpen(false)
+↓
+Mobile navigation closes
+```
+
+The mobile Let's Talk button was also updated:
+
+```jsx
+<li>
+    <a
+        href="#contact"
+        className="mobile-lets-talk-btn"
+        onClick={() => setIsMenuOpen(false)}
+    >
+        Let&apos;s Talk
+    </a>
+</li>
+```
+
+The mobile Let's Talk link was placed inside an `<li>` so the `<ul>` keeps a correct HTML structure.
+
+---
+
+## Step 17.2 - Improved Hamburger Accessibility
+
+The hamburger button already used:
+
+```jsx
+aria-expanded={isMenuOpen}
+```
+
+The accessibility label was updated so it describes the action the button will perform.
+
+```jsx
+aria-label={
+    isMenuOpen
+        ? "Close navigation menu"
+        : "Open navigation menu"
+}
+```
+
+When the menu is closed, the label is:
+
+```text
+Open navigation menu
+```
+
+When the menu is open, the label is:
+
+```text
+Close navigation menu
+```
+
+---
+
+## Step 17.3 - Replace Instant Mobile Menu Opening
+
+The mobile navigation previously used:
+
+```css
+.main-navigation {
+    display: none;
+}
+
+.main-navigation--open {
+    display: block;
+}
+```
+
+This caused the navigation to instantly appear and disappear.
+
+The `display` property cannot be smoothly animated.
+
+The mobile navigation was changed to use:
+
+```text
+opacity
+visibility
+transform
+```
+
+instead.
+
+---
+
+## Step 17.4 - Add Mobile Navigation Slide Animation
+
+Updated the mobile navigation:
+
+```css
+/* Mobile navigation menu positioned below the header. */
+.main-navigation {
+    position: absolute;
+    top: calc(100% + 18px);
+    left: 50%;
+
+    width: 100vw;
+
+    padding: 24px;
+    background-color: #081120;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.35);
+
+    /* Keeps the menu hidden and slightly above its final position. */
+    opacity: 0;
+    visibility: hidden;
+
+    /* -50% keeps the menu horizontally centered.
+       -20px moves it upward so it can slide down when opened. */
+    transform: translate(-50%, -20px);
+
+    /* Creates a smooth fade and slide when opening or closing the menu. */
+    transition:
+        opacity 300ms ease,
+        transform 300ms ease,
+        visibility 300ms ease;
+}
+```
+
+The open state is:
+
+```css
+/* Applied when the hamburger button opens the mobile navigation. */
+.main-navigation--open {
+    opacity: 1;
+    visibility: visible;
+
+    /* Keeps the menu centered and moves it to its final vertical position. */
+    transform: translate(-50%, 0);
+}
+```
+
+Closed state:
+
+```text
+opacity: 0
+visibility: hidden
+translateY: -20px
+```
+
+Open state:
+
+```text
+opacity: 1
+visibility: visible
+translateY: 0
+```
+
+This creates a smooth slide-down and fade-in effect.
+
+---
+
+## Step 17.5 - Update Header Navigation Items
+
+The Experience navigation item was removed because the portfolio currently does not have an Experience section.
+
+It was replaced with:
+
+```text
+Guestbook
+```
+
+The Header navigation now contains:
+
+```text
+Home
+Projects
+Skills
+About
+Guestbook
+Contact
+```
+
+The mobile navigation also contains:
+
+```text
+Let's Talk
+```
+
+---
+
+# Step 18 - Portfolio Showcase Navigation With Shared State
+
+The Skills Header navigation link was not working correctly.
+
+The Skills component already contained:
+
+```jsx
+<div id="skills" className="skills">
+```
+
+However, the problem was caused by the Portfolio Showcase tab system.
+
+The Portfolio Showcase conditionally renders its content:
+
+```jsx
+{activeTab === "projects" && <Projects />}
+
+{activeTab === "skills" && <Skills />}
+
+{activeTab === "certifications" && <Certifications />}
+```
+
+When:
+
+```text
+activeTab = "projects"
+```
+
+the Skills component is not currently rendered.
+
+Therefore, trying to navigate directly to:
+
+```text
+#skills
+```
+
+does not work when the Skills component does not yet exist in the page.
+
+---
+
+## Step 18.1 - Give the Portfolio Showcase Its Own Navigation Target
+
+The main Portfolio Showcase section uses:
+
+```jsx
+<section
+    className="portfolio-showcase"
+    id="showcase"
+>
+```
+
+The ID:
+
+```text
+showcase
+```
+
+represents the entire Portfolio Showcase instead of a specific tab.
+
+This is more accurate because the section contains:
+
+```text
+Projects
+Skills
+Certifications
+```
+
+The Header can therefore navigate to:
+
+```text
+#showcase
+```
+
+regardless of which Portfolio tab is currently selected.
+
+---
+
+## Step 18.2 - Lift Portfolio Tab State Into App.jsx
+
+The Portfolio Showcase originally stored its own state:
+
+```jsx
+const [activeTab, setActiveTab] = useState("projects");
+```
+
+This worked for the buttons inside Portfolio Showcase, but Header could not control which tab was selected.
+
+Both:
+
+```text
+Header
+```
+
+and:
+
+```text
+PortfolioShowcase
+```
+
+need access to the Portfolio tab state.
+
+The state was therefore moved to their common parent:
+
+```text
+App.jsx
+```
+
+Added:
+
+```jsx
+const [activePortfolioTab, setActivePortfolioTab] = useState("projects");
+```
+
+The structure is now:
+
+```text
+                    App
+                     |
+          activePortfolioTab
+                     |
+          -----------------------
+          |                     |
+       Header          PortfolioShowcase
+          |                     |
+   changes the tab        displays the tab
+```
+
+This React pattern is called:
+
+```text
+Lifting State Up
+```
+
+---
+
+## Step 18.3 - Pass Portfolio State to PortfolioShowcase
+
+App passes the current selected tab and the function used to change it:
+
+```jsx
+<PortfolioShowcase
+    activeTab={activePortfolioTab}
+    setActiveTab={setActivePortfolioTab}
+/>
+```
+
+The value:
+
+```text
+activeTab
+```
+
+represents the currently selected Portfolio tab.
+
+Possible values are:
+
+```text
+projects
+skills
+certifications
+```
+
+The function:
+
+```text
+setActiveTab
+```
+
+allows PortfolioShowcase to change the currently selected tab.
+
+---
+
+## Step 18.4 - PortfolioShowcase Receives State Through Props
+
+Previously:
+
+```jsx
+export default function PortfolioShowcase() {
+
+    const [activeTab, setActiveTab] = useState("projects");
+```
+
+The local `useState` was removed.
+
+PortfolioShowcase now receives both values through props:
+
+```jsx
+export default function PortfolioShowcase({ activeTab, setActiveTab }) {
+```
+
+The `useState` import was also removed because PortfolioShowcase no longer creates the tab state itself.
+
+The top of the component is now:
+
+```jsx
+import "./PortfolioShowcase.css";
+
+import Projects from "../Projects/Projects";
+import Skills from "../Skills/Skills";
+import Certifications from "../Certifications/Certifications";
+
+export default function PortfolioShowcase({ activeTab, setActiveTab }) {
+```
+
+---
+
+## Step 18.5 - Portfolio Showcase Tab Buttons Continue to Work
+
+The existing tab buttons continue to use:
+
+```jsx
+setActiveTab()
+```
+
+Projects:
+
+```jsx
+<button
+    className={`portfolio-tab ${activeTab === "projects" ? "active" : ""}`}
+    onClick={() => setActiveTab("projects")}
+>
+    <i className="bi bi-folder"></i>
+    Projects
+</button>
+```
+
+Skills:
+
+```jsx
+<button
+    className={`portfolio-tab ${activeTab === "skills" ? "active" : ""}`}
+    onClick={() => setActiveTab("skills")}
+>
+    <i className="bi bi-code-slash"></i>
+    Skills
+</button>
+```
+
+Certifications:
+
+```jsx
+<button
+    className={`portfolio-tab ${activeTab === "certifications" ? "active" : ""}`}
+    onClick={() => setActiveTab("certifications")}
+>
+    <i className="bi bi-award"></i>
+    Certifications
+</button>
+```
+
+---
+
+## Step 18.6 - Pass Portfolio Setter to Header
+
+App also passes the Portfolio state-changing function to Header:
+
+```jsx
+<Header
+    setActivePortfolioTab={setActivePortfolioTab}
+/>
+```
+
+Header receives it:
+
+```jsx
+export default function Header({ setActivePortfolioTab }) {
+```
+
+This allows the Header to change the Portfolio Showcase tab.
+
+---
+
+## Step 18.7 - Fix Projects Header Navigation
+
+The Projects Header link now performs two jobs:
+
+```jsx
+<a
+    href="#showcase"
+    onClick={() => {
+        setActivePortfolioTab("projects");
+        setIsMenuOpen(false);
+    }}
+>
+    Projects
+</a>
+```
+
+When clicked:
+
+```text
+Projects
+↓
+setActivePortfolioTab("projects")
+↓
+Portfolio Showcase displays Projects
+↓
+Browser navigates to #showcase
+↓
+Mobile navigation closes
+```
+
+Using:
+
+```jsx
+href="#showcase"
+```
+
+is more accurate than using:
+
+```jsx
+href="#projects"
+```
+
+because `showcase` represents the entire Portfolio Showcase section.
+
+---
+
+## Step 18.8 - Fix Skills Header Navigation
+
+The Skills Header link now uses:
+
+```jsx
+<a
+    href="#showcase"
+    onClick={() => {
+        setActivePortfolioTab("skills");
+        setIsMenuOpen(false);
+    }}
+>
+    Skills
+</a>
+```
+
+When Skills is clicked:
+
+```text
+Click Skills
+↓
+setActivePortfolioTab("skills")
+↓
+App updates activePortfolioTab
+↓
+PortfolioShowcase receives activeTab="skills"
+↓
+Skills component renders
+↓
+Browser navigates to #showcase
+↓
+Skills tab is displayed
+↓
+Mobile navigation closes
+```
+
+The Header no longer needs to navigate directly to:
+
+```text
+#skills
+```
+
+because the Skills component is conditionally rendered.
+
+Instead, the Header always navigates to:
+
+```text
+#showcase
+```
+
+and React controls which tab appears.
+
+---
+
+## Step 18.9 - Shared State Flow
+
+The final Portfolio navigation structure is:
+
+```text
+                    App.jsx
+                       |
+             activePortfolioTab
+                       |
+             -------------------
+             |                 |
+             ↓                 ↓
+         Header         PortfolioShowcase
+             |                 |
+             |                 ↓
+             |          activeTab controls
+             |                 |
+             |        ---------------------
+             |        |         |         |
+             |    Projects    Skills   Certifications
+             |
+             ↓
+setActivePortfolioTab()
+```
+
+For example:
+
+```text
+Header Skills clicked
+↓
+setActivePortfolioTab("skills")
+↓
+App state changes
+↓
+PortfolioShowcase receives "skills"
+↓
+<Skills /> renders
+```
+
+This reinforces the same React parent/child communication concept used earlier for the Intro and Hero.
+
+Intro flow:
+
+```text
+Intro
+↓
+App
+↓
+Hero
+```
+
+Portfolio navigation flow:
+
+```text
+Header
+↓
+App
+↓
+PortfolioShowcase
+```
+
+---
+
+## Step 18.10 - Final Navigation Targets
+
+The Header navigation now uses the actual sections available in the portfolio.
+
+```text
+Home        → Home/Hero
+Projects    → #showcase + Projects tab
+Skills      → #showcase + Skills tab
+About       → #about
+Guestbook   → #guestbook
+Contact     → #contact
+Let's Talk  → #contact
+```
+
+The Portfolio Showcase itself uses:
+
+```jsx
+id="showcase"
+```
+
+so Projects and Skills can share the same scroll destination while displaying different tab content.
+
+---
+
+## Step 18 Status
+
+Completed:
+
+```text
+Mobile menu closes after selecting a link ✅
+Mobile menu slides open ✅
+Mobile menu slides closed ✅
+Mobile menu fades in/out ✅
+Hamburger accessibility improved ✅
+Experience removed from navigation ✅
+Guestbook added to navigation ✅
+Portfolio Showcase changed to id="showcase" ✅
+Skills navigation problem identified ✅
+Portfolio tab state lifted to App ✅
+Header can change Portfolio tab ✅
+PortfolioShowcase receives state through props ✅
+Projects navigates to #showcase + opens Projects ✅
+Skills navigates to #showcase + opens Skills ✅
+Mobile navigation closes after tab navigation ✅
+```
+
+---
+
+## Git Checkpoint
+
+Test:
+
+```text
+Desktop:
+Projects → Skills → Projects
+
+Mobile:
+Open menu → Skills
+Open menu → Projects
+Open menu → Guestbook
+Open menu → Contact
+Hamburger open/close
+```
+
+Then run:
+
+```bash
+git status
+git add .
+git commit -m "Fix mobile navigation and portfolio tab links"
+git push
+```
+
+---
+

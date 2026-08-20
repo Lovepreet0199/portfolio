@@ -6,16 +6,21 @@ import Contact from "./components/Contact/Contact";
 import Guestbook from "./components/Guestbook/Guestbook";
 import Footer from "./components/Footer/Footer";
 import Intro from "./components/Intro/Intro";
+import { useState } from "react";
 
 function App() {
-
+  const [introFinished, setIntroFinished] = useState(false);
+  const [activePortfolioTab, setActivePortfolioTab] = useState("projects");
   return (
     <>
-      <Intro />
-      <Header />
-      <Hero />
+      <Intro onFinish={() => setIntroFinished(true)} />
+      <Header setActivePortfolioTab={setActivePortfolioTab} />
+      <Hero introFinished={introFinished} />
       <About />
-      <PortfolioShowcase />
+      <PortfolioShowcase
+        activeTab={activePortfolioTab}
+        setActivePortfolioTab={setActivePortfolioTab}
+      />
       <Contact />
       <Guestbook />
       <Footer />

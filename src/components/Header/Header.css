@@ -113,23 +113,41 @@ a {
         border-radius: 2px;
     }
 
+    /* Mobile navigation menu positioned below the header. */
     .main-navigation {
-        display: none;
-
         position: absolute;
         top: calc(100% + 18px);
         left: 50%;
-        transform: translateX(-50%);
+
         width: 100vw;
 
         padding: 24px;
         background-color: #081120;
         border-top: 1px solid rgba(255, 255, 255, 0.08);
         box-shadow: 0 18px 30px rgba(0, 0, 0, 0.35);
+
+        /* Keeps the menu hidden and slightly above its final position. */
+        opacity: 0;
+        visibility: hidden;
+
+        /* -50% keeps the menu horizontally centered.
+       -20px moves it upward so it can slide down when opened. */
+        transform: translate(-50%, -20px);
+
+        /* Creates a smooth fade and slide when opening or closing the menu. */
+        transition:
+            opacity 300ms ease,
+            transform 300ms ease,
+            visibility 300ms ease;
     }
 
+    /* Applied when the hamburger button opens the mobile navigation. */
     .main-navigation--open {
-        display: block;
+        opacity: 1;
+        visibility: visible;
+
+        /* Keeps the menu centered and moves it to its final vertical position. */
+        transform: translate(-50%, 0);
     }
 
     .nav-list {
