@@ -11,16 +11,30 @@ export default function About() {
         // Runs whenever the user scrolls the page.
         function handleScroll() {
 
-            // Starts the About animations once the user scrolls far enough down the page.
-            if (window.scrollY > 500) {
+            const aboutSection = document.getElementById("about");
+
+            if (!aboutSection) {
+                return;
+            }
+
+            const sectionPosition = aboutSection.getBoundingClientRect();
+
+            // Starts the animation when the section enters the visible screen.
+            if (
+                sectionPosition.top < window.innerHeight * 0.8 &&
+                sectionPosition.bottom > 0
+            ) {
                 setAboutVisible(true);
+            } else {
+                setAboutVisible(false);
             }
         }
 
-        // Listen for scrolling on the browser window.
         window.addEventListener("scroll", handleScroll);
 
-        // Removes the scroll listener when the component is removed.
+        // Checks the position once when the component first loads.
+        handleScroll();
+
         return () => {
             window.removeEventListener("scroll", handleScroll);
         };

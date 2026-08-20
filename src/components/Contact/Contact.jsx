@@ -8,19 +8,30 @@ export default function Contact() {
 
     useEffect(() => {
 
-        // Runs whenever the user scrolls the page.
         function handleScroll() {
 
-            // Starts the Contact animations once the user scrolls far enough down.
-            if (window.scrollY > 2000) {
+            const contactSection = document.getElementById("contact");
+
+            if (!contactSection) {
+                return;
+            }
+
+            const sectionPosition = contactSection.getBoundingClientRect();
+
+            if (
+                sectionPosition.top < window.innerHeight * 0.8 &&
+                sectionPosition.bottom > 0
+            ) {
                 setContactVisible(true);
+            } else {
+                setContactVisible(false);
             }
         }
 
-        // Listen for scrolling on the browser window.
         window.addEventListener("scroll", handleScroll);
 
-        // Removes the scroll listener when the component is removed.
+        handleScroll();
+
         return () => {
             window.removeEventListener("scroll", handleScroll);
         };
@@ -182,7 +193,7 @@ export default function Contact() {
                     </div>
 
                     <div className="col-12 col-lg-8">
-                        
+
                         <div className={`contact-form-area ${contactVisible ? "contact-form-show" : ""}`}>
 
                             <form

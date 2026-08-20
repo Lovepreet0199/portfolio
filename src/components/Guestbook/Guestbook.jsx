@@ -14,19 +14,30 @@ export default function Guestbook() {
 
     useEffect(() => {
 
-        // Runs whenever the user scrolls the page.
         function handleScroll() {
 
-            // Starts the Guestbook animations once the user scrolls far enough down.
-            if (window.scrollY > 2800) {
+            const guestbookSection = document.getElementById("guestbook");
+
+            if (!guestbookSection) {
+                return;
+            }
+
+            const sectionPosition = guestbookSection.getBoundingClientRect();
+
+            if (
+                sectionPosition.top < window.innerHeight * 0.8 &&
+                sectionPosition.bottom > 0
+            ) {
                 setGuestbookVisible(true);
+            } else {
+                setGuestbookVisible(false);
             }
         }
 
-        // Listen for scrolling on the browser window.
         window.addEventListener("scroll", handleScroll);
 
-        // Removes the scroll listener when the component is removed.
+        handleScroll();
+
         return () => {
             window.removeEventListener("scroll", handleScroll);
         };

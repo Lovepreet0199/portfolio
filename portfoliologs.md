@@ -17120,3 +17120,2587 @@ Hover effects
 
 ---
 
+# Step 20 - Portfolio Showcase Animations and Interactions
+
+After completing the About section animations, started improving the Portfolio Showcase.
+
+The goals were to:
+
+```text
+Animate the Showcase when it enters the screen
+Animate tab changes
+Make the active tab move smoothly
+Connect Header navigation to Showcase tabs
+Show only 2 Projects initially
+Show only 2 Certifications initially
+Add View More / Show Less
+Improve scrolling between sections
+```
+
+The animation system continued using:
+
+```text
+React
+→ useState
+→ useEffect
+
+CSS
+→ opacity
+→ transform
+→ transition
+→ animation
+→ @keyframes
+```
+
+No additional animation library was added for the Showcase.
+
+---
+
+## Step 20.1 - Added Portfolio Showcase Animation State
+
+Imported:
+
+```jsx
+import { useState, useEffect } from "react";
+```
+
+Created:
+
+```jsx
+// Tracks whether the Portfolio Showcase should start its animations.
+const [showcaseVisible, setShowcaseVisible] = useState(false);
+```
+
+The initial value is:
+
+```text
+false
+```
+
+This keeps the Showcase entrance animations from starting immediately when the application loads.
+
+---
+
+## Step 20.2 - Added Initial Showcase Scroll Detection
+
+Initially used a scroll position to decide when the Showcase animations should start.
+
+```jsx
+useEffect(() => {
+
+    // Runs whenever the user scrolls the page.
+    function handleScroll() {
+
+        // Starts the Showcase animations once the user scrolls far enough down.
+        if (window.scrollY > 1200) {
+            setShowcaseVisible(true);
+        }
+    }
+
+    // Listen for scrolling on the browser window.
+    window.addEventListener("scroll", handleScroll);
+
+    // Removes the scroll listener when the component is removed.
+    return () => {
+        window.removeEventListener("scroll", handleScroll);
+    };
+
+}, []);
+```
+
+Flow:
+
+```text
+User scrolls
+↓
+window.scrollY > 1200
+↓
+setShowcaseVisible(true)
+↓
+Showcase animation classes are added
+```
+
+This scroll system was later improved so animations can replay when the user returns to the section.
+
+---
+
+## Step 20.3 - Animated Showcase Label
+
+Updated:
+
+```jsx
+<p className="portfolio-showcase-label">
+    MY WORK
+</p>
+```
+
+to:
+
+```jsx
+<p className={`portfolio-showcase-label ${showcaseVisible ? "showcase-show-item" : ""}`}>
+    MY WORK
+</p>
+```
+
+The element starts hidden:
+
+```css
+.portfolio-showcase-label {
+    opacity: 0;
+}
+```
+
+Added:
+
+```css
+.portfolio-showcase-label.showcase-show-item {
+    animation: fadeUp 700ms ease forwards;
+}
+```
+
+The `MY WORK` label is the first Showcase element to appear.
+
+---
+
+## Step 20.4 - Animated Showcase Title
+
+Updated:
+
+```jsx
+<h2 className="portfolio-showcase-title">
+    Portfolio <span>Showcase</span>
+</h2>
+```
+
+to:
+
+```jsx
+<h2 className={`portfolio-showcase-title ${showcaseVisible ? "showcase-show-item" : ""}`}>
+    Portfolio <span>Showcase</span>
+</h2>
+```
+
+The title begins hidden:
+
+```css
+.portfolio-showcase-title {
+    opacity: 0;
+}
+```
+
+Added:
+
+```css
+.portfolio-showcase-title.showcase-show-item {
+    animation: fadeUp 700ms ease 150ms forwards;
+}
+```
+
+Sequence:
+
+```text
+0ms
+→ MY WORK
+
+150ms
+→ Portfolio Showcase
+```
+
+---
+
+## Step 20.5 - Animated Showcase Description
+
+Updated:
+
+```jsx
+<p className="portfolio-showcase-description">
+    Explore my projects, skills, and certifications.
+</p>
+```
+
+to:
+
+```jsx
+<p className={`portfolio-showcase-description ${showcaseVisible ? "showcase-show-item" : ""}`}>
+    Explore my projects, skills, and certifications.
+</p>
+```
+
+Added:
+
+```css
+.portfolio-showcase-description {
+    opacity: 0;
+}
+```
+
+Then:
+
+```css
+.portfolio-showcase-description.showcase-show-item {
+    animation: fadeUp 700ms ease 300ms forwards;
+}
+```
+
+The sequence became:
+
+```text
+0ms
+→ MY WORK
+
+150ms
+→ Portfolio Showcase
+
+300ms
+→ Description
+```
+
+---
+
+## Step 20.6 - Animated Showcase Tabs
+
+Updated:
+
+```jsx
+<div className="portfolio-tabs">
+```
+
+to:
+
+```jsx
+<div className={`portfolio-tabs ${showcaseVisible ? "showcase-tabs-show" : ""}`}>
+```
+
+The tabs begin hidden:
+
+```css
+.portfolio-tabs {
+    opacity: 0;
+}
+```
+
+Added:
+
+```css
+.portfolio-tabs.showcase-tabs-show {
+    animation: fadeUp 700ms ease 450ms forwards;
+}
+```
+
+The initial entrance sequence became:
+
+```text
+MY WORK
+↓
+Portfolio Showcase
+↓
+Description
+↓
+Projects / Skills / Certifications tabs
+```
+
+---
+
+## Step 20.7 - Fixed Showcase Content Appearing Before Animation
+
+The Projects content was already rendered while the heading and tabs were still animating.
+
+The content wrapper originally always contained:
+
+```jsx
+showcase-content-show
+```
+
+Changed the wrapper so the animation class is only added when the Showcase is visible:
+
+```jsx
+<div
+    key={activePortfolioTab}
+    className={`portfolio-content ${
+        showcaseVisible ? "showcase-content-show" : ""
+    }`}
+>
+```
+
+Added:
+
+```css
+.portfolio-content {
+    opacity: 0;
+}
+```
+
+Then:
+
+```css
+.portfolio-content.showcase-content-show {
+    animation: fadeUp 700ms ease 600ms forwards;
+}
+```
+
+The initial Showcase load now follows:
+
+```text
+MY WORK
+↓
+Title
+↓
+Description
+↓
+Tabs
+↓
+Projects
+```
+
+instead of showing the project cards immediately.
+
+---
+
+## Step 20.8 - Added Animation When Switching Showcase Tabs
+
+Added:
+
+```jsx
+key={activePortfolioTab}
+```
+
+to the content wrapper.
+
+```jsx
+<div
+    key={activePortfolioTab}
+    className={`portfolio-content ${
+        showcaseVisible ? "showcase-content-show" : ""
+    }`}
+>
+```
+
+The selected content is rendered using:
+
+```jsx
+{activePortfolioTab === "projects" && <Projects />}
+
+{activePortfolioTab === "skills" && <Skills />}
+
+{activePortfolioTab === "certifications" && <Certifications />}
+```
+
+When:
+
+```text
+projects
+```
+
+changes to:
+
+```text
+skills
+```
+
+the key also changes.
+
+React creates a new wrapper and the existing `fadeUp` animation runs again.
+
+This keeps the animation system simple and reuses the animation already used throughout the portfolio.
+
+---
+
+## Step 20.9 - Lifted Showcase Tab State Into App.jsx
+
+Originally the Portfolio Showcase stored its own active tab state.
+
+The Header also needed to control:
+
+```text
+Projects
+Skills
+Certifications
+```
+
+so the state was moved into `App.jsx`.
+
+Created:
+
+```jsx
+const [activePortfolioTab, setActivePortfolioTab] = useState("projects");
+```
+
+`projects` remains the default tab.
+
+---
+
+## Step 20.10 - Passed Showcase State to PortfolioShowcase
+
+Added:
+
+```jsx
+<PortfolioShowcase
+    activePortfolioTab={activePortfolioTab}
+    setActivePortfolioTab={setActivePortfolioTab}
+/>
+```
+
+The component receives:
+
+```jsx
+export default function PortfolioShowcase({
+    activePortfolioTab,
+    setActivePortfolioTab
+}) {
+```
+
+This allows PortfolioShowcase to read the selected tab and change it.
+
+---
+
+## Step 20.11 - Passed Tab Setter to Header
+
+Added:
+
+```jsx
+<Header setActivePortfolioTab={setActivePortfolioTab} />
+```
+
+The Header can now change the same Showcase state.
+
+This creates:
+
+```text
+App.jsx
+↓
+activePortfolioTab
+
+Header
+↕
+PortfolioShowcase
+```
+
+Both components now control the same state.
+
+---
+
+## Step 20.12 - Fixed Portfolio Prop Name Mismatch
+
+There was a prop mismatch.
+
+`PortfolioShowcase.jsx` expected:
+
+```jsx
+activePortfolioTab
+```
+
+but `App.jsx` was temporarily passing:
+
+```jsx
+activeTab={activePortfolioTab}
+```
+
+Updated it to:
+
+```jsx
+<PortfolioShowcase
+    activePortfolioTab={activePortfolioTab}
+    setActivePortfolioTab={setActivePortfolioTab}
+/>
+```
+
+This fixed the Showcase tabs not responding when clicked.
+
+---
+
+## Step 20.13 - Updated Showcase Navigation Target
+
+The main Showcase section uses:
+
+```jsx
+<section className="portfolio-showcase" id="showcase">
+```
+
+Navigation links can now scroll to:
+
+```text
+#showcase
+```
+
+instead of depending on content that may not currently be rendered.
+
+This is important because Skills and Certifications use conditional rendering.
+
+---
+
+## Step 20.14 - Added Sliding Active Tab Indicator
+
+The active tab originally changed background immediately.
+
+Added one blue element that physically moves between the tabs.
+
+Added inside `.portfolio-tabs`:
+
+```jsx
+<div
+    className={`portfolio-tab-slider slider-${activePortfolioTab}`}
+></div>
+```
+
+Possible classes become:
+
+```text
+slider-projects
+slider-skills
+slider-certifications
+```
+
+---
+
+## Step 20.15 - Styled Sliding Tab Background
+
+Made the tab container relative:
+
+```css
+.portfolio-tabs {
+    position: relative;
+}
+```
+
+Created:
+
+```css
+/* Blue background that slides behind the active Showcase tab. */
+.portfolio-tab-slider {
+    position: absolute;
+
+    top: 8px;
+    left: 8px;
+
+    width: calc((100% - 16px) / 3);
+    height: calc(100% - 16px);
+
+    background-color: #155DFC;
+    border-radius: 12px;
+
+    transition: transform 350ms ease;
+}
+```
+
+The available area is divided into three equal tab positions.
+
+---
+
+## Step 20.16 - Added Slider Positions
+
+Projects:
+
+```css
+.slider-projects {
+    transform: translateX(0);
+}
+```
+
+Skills:
+
+```css
+.slider-skills {
+    transform: translateX(100%);
+}
+```
+
+Certifications:
+
+```css
+.slider-certifications {
+    transform: translateX(200%);
+}
+```
+
+Flow:
+
+```text
+Projects
+→ 0%
+
+Skills
+→ 100%
+
+Certifications
+→ 200%
+```
+
+The same blue element now moves horizontally across the tab bar.
+
+---
+
+## Step 20.17 - Kept Tab Buttons Above Slider
+
+Added:
+
+```css
+.portfolio-tab {
+    position: relative;
+    z-index: 1;
+}
+```
+
+The buttons use:
+
+```css
+background-color: transparent;
+```
+
+because the sliding indicator now provides the blue active background.
+
+---
+
+## Step 20.18 - Added Active Tab Text Transition
+
+The selected button uses:
+
+```css
+.portfolio-tab.active {
+    color: #FFFFFF;
+}
+```
+
+Added:
+
+```css
+.portfolio-tab {
+    transition: color 300ms ease;
+}
+```
+
+The tab interaction now combines:
+
+```text
+Blue slider movement
++
+Smooth text color change
+```
+
+---
+
+## Step 20.19 - Added Mobile Tab Slider
+
+The mobile tab container uses:
+
+```css
+padding: 6px;
+```
+
+so the slider also needed smaller offsets.
+
+Added inside the mobile media query:
+
+```css
+.portfolio-tab-slider {
+    top: 6px;
+    left: 6px;
+
+    width: calc((100% - 12px) / 3);
+    height: calc(100% - 12px);
+}
+```
+
+The active slider now aligns correctly on mobile.
+
+---
+
+## Step 20.20 - Limited Projects to Two Initially
+
+Added:
+
+```jsx
+const [showAllProjects, setShowAllProjects] = useState(false);
+```
+
+When:
+
+```text
+showAllProjects = false
+```
+
+only two Projects are shown.
+
+When:
+
+```text
+showAllProjects = true
+```
+
+all Projects are displayed.
+
+Used the project array with `slice()` to limit the initial results.
+
+Example:
+
+```jsx
+{projects
+    .slice(
+        0,
+        showAllProjects
+            ? projects.length
+            : 2
+    )
+    .map((project) => {
+        return (
+            <ProjectCard
+                key={project._id}
+                title={project.title}
+                type={project.type}
+                description={project.description}
+                technologies={project.technologies}
+                image={project.imageUrl}
+                githubLink={project.githubLink}
+                liveLink={project.liveLink}
+            />
+        );
+    })}
+```
+
+---
+
+## Step 20.21 - Added Project View More / Show Less
+
+Added a button that changes the Project display state.
+
+```jsx
+{projects.length > 2 && (
+    <button
+        type="button"
+        className="projects-view-more-btn"
+        onClick={() => setShowAllProjects(!showAllProjects)}
+    >
+        {showAllProjects
+            ? "Show Less"
+            : "View More Projects"}
+    </button>
+)}
+```
+
+The button only appears when more than two Projects exist.
+
+Flow:
+
+```text
+2 Projects
+↓
+View More Projects
+↓
+All Projects
+↓
+Show Less
+↓
+2 Projects
+```
+
+---
+
+## Step 20.22 - Added Project Expansion Animation
+
+Added a conditional expanded class to the Project grid.
+
+Example:
+
+```jsx
+<div
+    className={`projects-grid ${
+        showAllProjects ? "projects-grid-expanded" : ""
+    }`}
+>
+```
+
+Added:
+
+```css
+.projects-grid-expanded {
+    animation: fadeUp 500ms ease forwards;
+}
+```
+
+Now clicking View More does not make additional cards appear completely instantly.
+
+---
+
+## Step 20.23 - Added Project View More Icon
+
+Updated the button to visually show whether the section can expand or collapse.
+
+Example:
+
+```jsx
+<i
+    className={`bi ${
+        showAllProjects
+            ? "bi-chevron-up"
+            : "bi-chevron-down"
+    }`}
+></i>
+```
+
+Interaction:
+
+```text
+View More Projects ↓
+
+Show Less ↑
+```
+
+---
+
+## Step 20.24 - Limited Certifications to Two Initially
+
+Added:
+
+```jsx
+const [showAllCertifications, setShowAllCertifications] = useState(false);
+```
+
+Updated the Certification rendering:
+
+```jsx
+{certifications
+    .slice(
+        0,
+        showAllCertifications
+            ? certifications.length
+            : 2
+    )
+    .map((certification) => {
+        return (
+            <CertificationCard
+                key={certification._id}
+                title={certification.title}
+                issuer={certification.issuer}
+                date={certification.date}
+                image={certification.imageUrl}
+                credentialLink={certification.credentialLink}
+            />
+        );
+    })}
+```
+
+Initially:
+
+```text
+2 Certifications
+```
+
+After expanding:
+
+```text
+All Certifications
+```
+
+---
+
+## Step 20.25 - Added Certification View More / Show Less
+
+Added:
+
+```jsx
+{certifications.length > 2 && (
+    <button
+        type="button"
+        className="certifications-view-more-btn"
+        onClick={() =>
+            setShowAllCertifications(!showAllCertifications)
+        }
+    >
+        {showAllCertifications
+            ? "Show Less"
+            : "View More Certifications"}
+    </button>
+)}
+```
+
+The Projects and Certifications sections now behave consistently.
+
+---
+
+## Step 20.26 - Added Certification Expansion Animation
+
+Updated the grid:
+
+```jsx
+<div
+    className={`certifications-grid ${
+        showAllCertifications
+            ? "certifications-grid-expanded"
+            : ""
+    }`}
+>
+```
+
+Added:
+
+```css
+.certifications-grid-expanded {
+    animation: fadeUp 500ms ease forwards;
+}
+```
+
+Additional certifications now appear with a small entrance animation.
+
+---
+
+## Step 20.27 - Added Certification View More Icon
+
+Added:
+
+```jsx
+<i
+    className={`bi ${
+        showAllCertifications
+            ? "bi-chevron-up"
+            : "bi-chevron-down"
+    }`}
+></i>
+```
+
+Result:
+
+```text
+View More Certifications ↓
+
+Show Less ↑
+```
+
+---
+
+## Step 20.28 - Added Smooth Website Scrolling
+
+Added globally:
+
+```css
+html {
+    scroll-behavior: smooth;
+}
+```
+
+Anchor navigation now scrolls smoothly instead of jumping immediately.
+
+Example:
+
+```text
+Home
+↓
+About
+↓
+Showcase
+↓
+Contact
+↓
+Guestbook
+```
+
+---
+
+## Step 20 Status
+
+Completed:
+
+```text
+Showcase scroll animation state ✅
+Showcase label animation ✅
+Showcase title animation ✅
+Showcase description animation ✅
+Tab entrance animation ✅
+Showcase content entrance animation ✅
+Tab content animation ✅
+Shared Showcase state ✅
+Header tab control ✅
+Showcase tab control ✅
+Prop mismatch fixed ✅
+Showcase navigation target ✅
+Sliding tab indicator ✅
+Smooth slider transition ✅
+Mobile tab slider ✅
+Projects limited to two ✅
+Project View More / Show Less ✅
+Project expansion animation ✅
+Certifications limited to two ✅
+Certification View More / Show Less ✅
+Certification expansion animation ✅
+Smooth website scrolling ✅
+```
+
+---
+
+# Step 21 - Contact Section Animations
+
+After completing the Portfolio Showcase, added entrance and interaction animations to the Contact section.
+
+---
+
+## Step 21.1 - Added Contact Animation State
+
+Updated the import:
+
+```jsx
+import { useEffect, useState } from "react";
+```
+
+Added:
+
+```jsx
+// Tracks whether the Contact section should start its animations.
+const [contactVisible, setContactVisible] = useState(false);
+```
+
+---
+
+## Step 21.2 - Added Initial Contact Scroll Detection
+
+Initially used:
+
+```jsx
+useEffect(() => {
+
+    // Runs whenever the user scrolls the page.
+    function handleScroll() {
+
+        // Starts the Contact animations once the user scrolls far enough down.
+        if (window.scrollY > 2000) {
+            setContactVisible(true);
+        }
+    }
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+        window.removeEventListener("scroll", handleScroll);
+    };
+
+}, []);
+```
+
+This was later improved using the actual Contact section position.
+
+---
+
+## Step 21.3 - Animated Contact Label
+
+Updated:
+
+```jsx
+<p className={`contact-label ${contactVisible ? "contact-show-item" : ""}`}>
+    CONTACT
+</p>
+```
+
+Added:
+
+```css
+.contact-label,
+.contact-title,
+.contact-description {
+    opacity: 0;
+}
+```
+
+Then:
+
+```css
+.contact-label.contact-show-item {
+    animation: fadeUp 700ms ease forwards;
+}
+```
+
+---
+
+## Step 21.4 - Animated Contact Title
+
+Updated:
+
+```jsx
+<h2 className={`contact-title ${contactVisible ? "contact-show-item" : ""}`}>
+    Let&apos;s <span>work together</span>
+</h2>
+```
+
+Added:
+
+```css
+.contact-title.contact-show-item {
+    animation: fadeUp 700ms ease 150ms forwards;
+}
+```
+
+---
+
+## Step 21.5 - Animated Contact Description
+
+Updated:
+
+```jsx
+<p className={`contact-description ${contactVisible ? "contact-show-item" : ""}`}>
+    Have a project, opportunity, or idea in mind? Send me a message.
+</p>
+```
+
+Added:
+
+```css
+.contact-description.contact-show-item {
+    animation: fadeUp 700ms ease 300ms forwards;
+}
+```
+
+---
+
+## Step 21.6 - Animated Contact Information Card
+
+Updated:
+
+```jsx
+<div className={`contact-info ${contactVisible ? "contact-info-show" : ""}`}>
+```
+
+Added:
+
+```css
+.contact-info,
+.contact-form-area {
+    opacity: 0;
+}
+```
+
+Then:
+
+```css
+.contact-info.contact-info-show {
+    animation: contactSlideLeft 700ms ease 450ms forwards;
+}
+```
+
+Created:
+
+```css
+@keyframes contactSlideLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+```
+
+---
+
+## Step 21.7 - Animated Contact Form
+
+Updated:
+
+```jsx
+<div className={`contact-form-area ${contactVisible ? "contact-form-show" : ""}`}>
+```
+
+Added:
+
+```css
+.contact-form-area.contact-form-show {
+    animation: contactSlideRight 700ms ease 450ms forwards;
+}
+```
+
+Created:
+
+```css
+@keyframes contactSlideRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+```
+
+The Contact sequence became:
+
+```text
+CONTACT
+↓
+Let's work together
+↓
+Description
+↓
+Contact Information ←     → Contact Form
+```
+
+---
+
+## Step 21.8 - Added Contact Detail Hover
+
+Added:
+
+```css
+.contact-detail {
+    transition: transform 250ms ease;
+}
+```
+
+Then:
+
+```css
+.contact-detail:hover {
+    transform: translateX(5px);
+}
+```
+
+---
+
+## Step 21.9 - Added Contact Icon Hover
+
+Added:
+
+```css
+.contact-detail i {
+    transition:
+        transform 250ms ease,
+        background-color 250ms ease;
+}
+```
+
+Then:
+
+```css
+.contact-detail:hover i {
+    transform: scale(1.08);
+    background-color: rgba(21, 93, 252, 0.2);
+}
+```
+
+---
+
+## Step 21.10 - Improved Social Link Hover
+
+Added:
+
+```css
+.contact-socials a {
+    transition:
+        transform 250ms ease,
+        color 250ms ease,
+        border-color 250ms ease;
+}
+```
+
+Updated:
+
+```css
+.contact-socials a:hover {
+    color: #51A2FF;
+    border-color: rgba(81, 162, 255, 0.35);
+    transform: translateY(-4px);
+}
+```
+
+---
+
+## Step 21.11 - Improved Form Input Focus
+
+Added:
+
+```css
+.contact-form input,
+.contact-form textarea {
+    transition:
+        border-color 250ms ease,
+        box-shadow 250ms ease;
+}
+```
+
+Updated:
+
+```css
+.contact-form input:focus,
+.contact-form textarea:focus {
+    border-color: #155DFC;
+    box-shadow: 0 0 0 3px rgba(21, 93, 252, 0.12);
+}
+```
+
+---
+
+## Step 21.12 - Added Send Message Hover
+
+Added:
+
+```css
+.contact-submit {
+    transition:
+        transform 250ms ease,
+        box-shadow 250ms ease;
+}
+```
+
+Then:
+
+```css
+.contact-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(21, 93, 252, 0.3);
+}
+```
+
+---
+
+## Step 21 Status
+
+Completed:
+
+```text
+Contact animation state ✅
+Contact heading stagger ✅
+Contact information slide-in ✅
+Contact form slide-in ✅
+Contact detail hover ✅
+Contact icon hover ✅
+Social link hover ✅
+Input focus glow ✅
+Send Message hover ✅
+```
+
+---
+
+# Step 22 - Guestbook Section Animations
+
+Added entrance and interaction animations to the Guestbook section.
+
+---
+
+## Step 22.1 - Added Guestbook Animation State
+
+The Guestbook already imports:
+
+```jsx
+import { useState, useEffect } from "react";
+```
+
+Added:
+
+```jsx
+// Tracks whether the Guestbook section should start its animations.
+const [guestbookVisible, setGuestbookVisible] = useState(false);
+```
+
+---
+
+## Step 22.2 - Added Initial Guestbook Scroll Detection
+
+Initially added:
+
+```jsx
+useEffect(() => {
+
+    function handleScroll() {
+
+        if (window.scrollY > 2800) {
+            setGuestbookVisible(true);
+        }
+    }
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+        window.removeEventListener("scroll", handleScroll);
+    };
+
+}, []);
+```
+
+This was later replaced with actual section position detection.
+
+---
+
+## Step 22.3 - Animated Guestbook Label
+
+Updated:
+
+```jsx
+<p className={`guestbook-label ${guestbookVisible ? "guestbook-show-item" : ""}`}>
+    GUESTBOOK
+</p>
+```
+
+Added:
+
+```css
+.guestbook-label,
+.guestbook-title,
+.guestbook-description {
+    opacity: 0;
+}
+```
+
+Then:
+
+```css
+.guestbook-label.guestbook-show-item {
+    animation: fadeUp 700ms ease forwards;
+}
+```
+
+---
+
+## Step 22.4 - Animated Guestbook Title
+
+Updated:
+
+```jsx
+<h2 className={`guestbook-title ${guestbookVisible ? "guestbook-show-item" : ""}`}>
+    Sign the <span>Guestbook</span>
+</h2>
+```
+
+Added:
+
+```css
+.guestbook-title.guestbook-show-item {
+    animation: fadeUp 700ms ease 150ms forwards;
+}
+```
+
+---
+
+## Step 22.5 - Animated Guestbook Description
+
+Updated:
+
+```jsx
+<p className={`guestbook-description ${guestbookVisible ? "guestbook-show-item" : ""}`}>
+    Say hello, share feedback, or leave a message.
+</p>
+```
+
+Added:
+
+```css
+.guestbook-description.guestbook-show-item {
+    animation: fadeUp 700ms ease 300ms forwards;
+}
+```
+
+---
+
+## Step 22.6 - Animated Guestbook Form
+
+Updated:
+
+```jsx
+<div className={`guestbook-form-area ${guestbookVisible ? "guestbook-form-show" : ""}`}>
+```
+
+Added:
+
+```css
+.guestbook-form-area,
+.guestbook-comments {
+    opacity: 0;
+}
+```
+
+Then:
+
+```css
+.guestbook-form-area.guestbook-form-show {
+    animation: guestbookSlideLeft 700ms ease 450ms forwards;
+}
+```
+
+Created:
+
+```css
+@keyframes guestbookSlideLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+```
+
+---
+
+## Step 22.7 - Animated Recent Guestbook Messages
+
+Updated:
+
+```jsx
+<div className={`guestbook-comments ${guestbookVisible ? "guestbook-comments-show" : ""}`}>
+```
+
+Added:
+
+```css
+.guestbook-comments.guestbook-comments-show {
+    animation: guestbookSlideRight 700ms ease 550ms forwards;
+}
+```
+
+Created:
+
+```css
+@keyframes guestbookSlideRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+```
+
+The entrance sequence became:
+
+```text
+GUESTBOOK
+↓
+Sign the Guestbook
+↓
+Description
+↓
+Form ←          → Recent Messages
+```
+
+---
+
+## Step 22.8 - Improved Guestbook Input Focus
+
+Added:
+
+```css
+.guestbook-form-group input,
+.guestbook-form-group textarea {
+    transition:
+        border-color 250ms ease,
+        box-shadow 250ms ease;
+}
+```
+
+Updated:
+
+```css
+.guestbook-form-group input:focus,
+.guestbook-form-group textarea:focus {
+    border-color: #51A2FF;
+    box-shadow: 0 0 0 3px rgba(81, 162, 255, 0.12);
+}
+```
+
+---
+
+## Step 22.9 - Improved Sign Guestbook Button
+
+Added:
+
+```css
+.guestbook-submit {
+    transition:
+        transform 250ms ease,
+        background-color 250ms ease,
+        box-shadow 250ms ease;
+}
+```
+
+Updated:
+
+```css
+.guestbook-submit:hover {
+    background-color: #1447E6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(21, 93, 252, 0.3);
+}
+```
+
+---
+
+## Step 22.10 - Added Guestbook Message Card Hover
+
+Added:
+
+```css
+.guestbook-card {
+    transition:
+        transform 250ms ease,
+        border-color 250ms ease,
+        box-shadow 250ms ease;
+}
+```
+
+Then:
+
+```css
+.guestbook-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(81, 162, 255, 0.3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+```
+
+---
+
+## Step 22 Status
+
+Completed:
+
+```text
+Guestbook animation state ✅
+Guestbook heading animation ✅
+Guestbook form entrance ✅
+Recent Messages entrance ✅
+Input focus animation ✅
+Submit button animation ✅
+Guestbook message hover ✅
+```
+
+---
+
+# Step 23 - Portfolio Background and Navigation Visual Polish
+
+The portfolio used dark navy backgrounds, but the large sections felt slightly plain.
+
+Added a subtle technical grid, blue background glows, a Scroll indicator, and redesigned the Header into a floating navbar.
+
+---
+
+## Step 23.1 - Added Technical Grid to Hero
+
+Updated the Hero background:
+
+```css
+.hero {
+    background-color: #081120;
+
+    background-image:
+        radial-gradient(
+            circle at 15% 50%,
+            rgba(21, 93, 252, 0.10),
+            transparent 35%
+        ),
+        linear-gradient(
+            rgba(255, 255, 255, 0.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.025) 1px,
+            transparent 1px
+        );
+
+    background-size:
+        100% 100%,
+        32px 32px,
+        32px 32px;
+}
+```
+
+The background combines:
+
+```text
+Navy base
++
+Subtle blue radial glow
++
+Horizontal grid
++
+Vertical grid
+```
+
+---
+
+## Step 23.2 - Added Softer Grid to About
+
+Used:
+
+```css
+.about {
+    background-color: #0B1422;
+
+    background-image:
+        linear-gradient(
+            rgba(255, 255, 255, 0.018) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.018) 1px,
+            transparent 1px
+        );
+
+    background-size: 32px 32px;
+}
+```
+
+The lighter About background keeps a softer grid than the Hero.
+
+---
+
+## Step 23.3 - Added Grid and Glow to Showcase
+
+Updated:
+
+```css
+.portfolio-showcase {
+    background-color: #081120;
+
+    background-image:
+        radial-gradient(
+            circle at 85% 30%,
+            rgba(21, 93, 252, 0.07),
+            transparent 30%
+        ),
+        linear-gradient(
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px
+        );
+
+    background-size:
+        100% 100%,
+        32px 32px,
+        32px 32px;
+}
+```
+
+---
+
+## Step 23.4 - Added Grid to Contact
+
+Updated:
+
+```css
+.contact {
+    background-color: #0B1422;
+
+    background-image:
+        linear-gradient(
+            rgba(255, 255, 255, 0.018) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.018) 1px,
+            transparent 1px
+        );
+
+    background-size: 32px 32px;
+}
+```
+
+---
+
+## Step 23.5 - Added Grid and Glow to Guestbook
+
+Updated:
+
+```css
+.guestbook {
+    background-color: #081120;
+
+    background-image:
+        radial-gradient(
+            circle at 15% 70%,
+            rgba(21, 93, 252, 0.06),
+            transparent 30%
+        ),
+        linear-gradient(
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px
+        );
+
+    background-size:
+        100% 100%,
+        32px 32px,
+        32px 32px;
+}
+```
+
+---
+
+## Step 23.6 - Added Hero Scroll Indicator
+
+Added inside `Hero.jsx`:
+
+```jsx
+<div className="hero-scroll">
+    <span>SCROLL</span>
+    <i className="bi bi-arrow-down"></i>
+</div>
+```
+
+Made Hero relative:
+
+```css
+.hero {
+    position: relative;
+}
+```
+
+Styled:
+
+```css
+.hero-scroll {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+
+    color: #62748E;
+
+    font-family: "Inter", sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+}
+```
+
+---
+
+## Step 23.7 - Animated Scroll Arrow
+
+Added:
+
+```css
+.hero-scroll i {
+    font-size: 16px;
+
+    animation: scrollArrow 1.5s ease-in-out infinite;
+}
+```
+
+Created:
+
+```css
+@keyframes scrollArrow {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(6px);
+    }
+}
+```
+
+The arrow gently moves down and back up to indicate that more content exists below the Hero.
+
+---
+
+## Step 23.8 - Redesigned Header Into Floating Navbar
+
+Changed the outer Header:
+
+```css
+.site-header {
+    background-color: transparent;
+    padding: 14px 0;
+    width: 100%;
+
+    font-family: "Inter", sans-serif;
+
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+```
+
+Removed the old full-width solid Header appearance.
+
+---
+
+## Step 23.9 - Styled Floating Navbar Container
+
+Styled the Bootstrap container itself as the visible navigation bar.
+
+```css
+/* Floating rounded navigation container. */
+.site-header .container {
+    position: relative;
+    max-width: 95%;
+
+    padding: 12px 22px;
+
+    background-color: rgba(8, 17, 32, 0.92);
+
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 28px;
+
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22);
+
+    backdrop-filter: blur(12px);
+
+    transition:
+        border-color 300ms ease,
+        box-shadow 300ms ease;
+}
+```
+
+Using:
+
+```css
+max-width: 95%;
+```
+
+creates a small gap between the navbar and the browser edges.
+
+---
+
+## Step 23.10 - Added Navbar Container Hover
+
+Added:
+
+```css
+.site-header .container:hover {
+    border-color: rgba(81, 162, 255, 0.20);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.28);
+}
+```
+
+The navbar gets slightly more depth without physically moving.
+
+---
+
+## Step 23.11 - Improved Navigation Link Hover
+
+Updated:
+
+```css
+.nav-list a {
+    display: inline-block;
+
+    color: #90A1B9;
+    font-size: 14px;
+    font-weight: 500;
+
+    transition:
+        color 250ms ease,
+        transform 250ms ease;
+}
+```
+
+Updated hover:
+
+```css
+.nav-list a:hover {
+    color: #FFFFFF;
+    transform: translateY(-2px);
+}
+```
+
+---
+
+## Step 23.12 - Added Logo Hover Interaction
+
+Added:
+
+```css
+.logo-icon {
+    transition:
+        transform 250ms ease,
+        box-shadow 250ms ease;
+}
+```
+
+Then:
+
+```css
+.header-brand:hover .logo-icon {
+    transform: rotate(-5deg) scale(1.06);
+    box-shadow: 0 6px 14px rgba(21, 93, 252, 0.55);
+}
+```
+
+Added:
+
+```css
+.logo-name {
+    transition: color 250ms ease;
+}
+```
+
+Then:
+
+```css
+.header-brand:hover .logo-name {
+    color: #FFFFFF;
+}
+```
+
+---
+
+## Step 23.13 - Improved Let's Talk Button Hover
+
+Updated:
+
+```css
+.lets-talk-btn {
+    background-color: #155DFC;
+    border-radius: 8px;
+    color: white;
+
+    padding: 8px 20px;
+    font-size: 14px;
+
+    box-shadow: 0 4px 8px rgba(21, 93, 252, 0.4);
+
+    transition:
+        transform 250ms ease,
+        background-color 250ms ease,
+        box-shadow 250ms ease;
+}
+```
+
+Updated hover:
+
+```css
+.lets-talk-btn:hover {
+    color: #FFFFFF;
+    background-color: #2B7FFF;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 8px 20px rgba(21, 93, 252, 0.45);
+}
+```
+
+The previous black hover text was removed.
+
+---
+
+## Step 23.14 - Improved Hamburger Hover
+
+Added:
+
+```css
+.menu-toggle {
+    cursor: pointer;
+
+    transition:
+        border-color 250ms ease,
+        background-color 250ms ease;
+}
+```
+
+Added:
+
+```css
+.menu-toggle:hover {
+    border-color: rgba(81, 162, 255, 0.4);
+    background-color: rgba(81, 162, 255, 0.08);
+}
+```
+
+Updated:
+
+```css
+.menu-toggle span {
+    transition: transform 250ms ease;
+}
+```
+
+Then:
+
+```css
+.menu-toggle:hover span {
+    transform: scaleX(0.85);
+}
+```
+
+---
+
+# Step 24 - Replay Section Animations When Re-entering the Screen
+
+The earlier scroll animation logic only changed state from:
+
+```text
+false
+→ true
+```
+
+Once an animation ran, the state remained true.
+
+This meant returning to the section did not replay the animation.
+
+The new goal was:
+
+```text
+Section enters screen
+→ true
+→ animation
+
+Section leaves screen
+→ false
+
+Section enters again
+→ true
+→ animation again
+```
+
+The Hero was intentionally left unchanged because the Hero animation is connected to the Intro sequence.
+
+---
+
+## Step 24.1 - Replaced Fixed About Scroll Number
+
+The previous About logic used:
+
+```jsx
+if (window.scrollY > 500) {
+    setAboutVisible(true);
+}
+```
+
+Replaced it with:
+
+```jsx
+useEffect(() => {
+
+    // Runs whenever the user scrolls the page.
+    function handleScroll() {
+
+        const aboutSection = document.getElementById("about");
+
+        if (!aboutSection) {
+            return;
+        }
+
+        const sectionPosition = aboutSection.getBoundingClientRect();
+
+        // Starts the animation when the section enters the visible screen.
+        if (
+            sectionPosition.top < window.innerHeight * 0.8 &&
+            sectionPosition.bottom > 0
+        ) {
+            setAboutVisible(true);
+        } else {
+            setAboutVisible(false);
+        }
+    }
+
+    window.addEventListener("scroll", handleScroll);
+
+    // Checks the section once when the component first loads.
+    handleScroll();
+
+    return () => {
+        window.removeEventListener("scroll", handleScroll);
+    };
+
+}, []);
+```
+
+---
+
+## Step 24.2 - Used getBoundingClientRect()
+
+Used:
+
+```jsx
+aboutSection.getBoundingClientRect();
+```
+
+This gives the current section position relative to the browser window.
+
+Important values:
+
+```text
+top
+→ position of the section's top edge
+
+bottom
+→ position of the section's bottom edge
+```
+
+---
+
+## Step 24.3 - Used Browser Height as Animation Trigger
+
+Used:
+
+```jsx
+window.innerHeight
+```
+
+to determine the height of the visible browser area.
+
+The condition:
+
+```jsx
+sectionPosition.top < window.innerHeight * 0.8
+```
+
+means the animation starts before the section reaches the very top of the browser.
+
+Also used:
+
+```jsx
+sectionPosition.bottom > 0
+```
+
+so the animation state resets once the section completely leaves the top of the screen.
+
+---
+
+## Step 24.4 - Updated Portfolio Showcase Re-entry Animation
+
+Replaced the fixed Showcase scroll value with:
+
+```jsx
+useEffect(() => {
+
+    function handleScroll() {
+
+        const showcaseSection =
+            document.getElementById("showcase");
+
+        if (!showcaseSection) {
+            return;
+        }
+
+        const sectionPosition =
+            showcaseSection.getBoundingClientRect();
+
+        if (
+            sectionPosition.top < window.innerHeight * 0.8 &&
+            sectionPosition.bottom > 0
+        ) {
+            setShowcaseVisible(true);
+        } else {
+            setShowcaseVisible(false);
+        }
+    }
+
+    window.addEventListener("scroll", handleScroll);
+
+    handleScroll();
+
+    return () => {
+        window.removeEventListener("scroll", handleScroll);
+    };
+
+}, []);
+```
+
+The Showcase animations can now replay when returning to the section.
+
+---
+
+## Step 24.5 - Updated Contact Re-entry Animation
+
+Replaced the fixed Contact scroll position with:
+
+```jsx
+useEffect(() => {
+
+    function handleScroll() {
+
+        const contactSection =
+            document.getElementById("contact");
+
+        if (!contactSection) {
+            return;
+        }
+
+        const sectionPosition =
+            contactSection.getBoundingClientRect();
+
+        if (
+            sectionPosition.top < window.innerHeight * 0.8 &&
+            sectionPosition.bottom > 0
+        ) {
+            setContactVisible(true);
+        } else {
+            setContactVisible(false);
+        }
+    }
+
+    window.addEventListener("scroll", handleScroll);
+
+    handleScroll();
+
+    return () => {
+        window.removeEventListener("scroll", handleScroll);
+    };
+
+}, []);
+```
+
+---
+
+## Step 24.6 - Updated Guestbook Re-entry Animation
+
+Replaced the fixed Guestbook scroll number with:
+
+```jsx
+useEffect(() => {
+
+    function handleScroll() {
+
+        const guestbookSection =
+            document.getElementById("guestbook");
+
+        if (!guestbookSection) {
+            return;
+        }
+
+        const sectionPosition =
+            guestbookSection.getBoundingClientRect();
+
+        if (
+            sectionPosition.top < window.innerHeight * 0.8 &&
+            sectionPosition.bottom > 0
+        ) {
+            setGuestbookVisible(true);
+        } else {
+            setGuestbookVisible(false);
+        }
+    }
+
+    window.addEventListener("scroll", handleScroll);
+
+    handleScroll();
+
+    return () => {
+        window.removeEventListener("scroll", handleScroll);
+    };
+
+}, []);
+```
+
+---
+
+## Step 24.7 - Final Scroll Animation Behaviour
+
+The current site animation behaviour is:
+
+```text
+HERO
+→ Intro-triggered animation only
+
+ABOUT
+→ Animates when entering
+→ Resets when leaving
+→ Animates again when returning
+
+PORTFOLIO SHOWCASE
+→ Animates when entering
+→ Resets when leaving
+→ Animates again when returning
+
+CONTACT
+→ Animates when entering
+→ Resets when leaving
+→ Animates again when returning
+
+GUESTBOOK
+→ Animates when entering
+→ Resets when leaving
+→ Animates again when returning
+```
+
+---
+
+# Step 24 Status
+
+Completed:
+
+```text
+Removed fixed About scroll trigger ✅
+Removed fixed Showcase scroll trigger ✅
+Removed fixed Contact scroll trigger ✅
+Removed fixed Guestbook scroll trigger ✅
+Added getBoundingClientRect() ✅
+Added viewport-based animation detection ✅
+Added animation reset when sections leave ✅
+Added replay when sections return ✅
+Kept Hero Intro animation separate ✅
+```
+
+---
+
+# Current Portfolio Visual / Animation Status
+
+```text
+INTRO
+✅ Welcome screen
+✅ Intro animation
+✅ Hero transition
+
+HEADER
+✅ Floating rounded navbar
+✅ Transparent outer Header
+✅ Glass-style background
+✅ Rounded border
+✅ Navbar hover
+✅ Nav link hover
+✅ Logo hover
+✅ Let's Talk hover
+✅ Animated mobile menu
+
+HERO
+✅ Grid background
+✅ Blue glow
+✅ Animated text entrance
+✅ Typing developer roles
+✅ Hanging ID card
+✅ Dynamic lanyard
+✅ Draggable badge
+✅ Badge drop
+✅ Badge swing
+✅ Scroll indicator
+✅ Animated Scroll arrow
+
+ABOUT
+✅ Entrance animation
+✅ Staggered text
+✅ Image entrance
+✅ Info row entrance
+✅ Statistics entrance
+✅ Hover interactions
+✅ Replays when returning
+
+PORTFOLIO SHOWCASE
+✅ Entrance animation
+✅ Shared tab state
+✅ Header-controlled tabs
+✅ Sliding active tab
+✅ Tab content animation
+✅ Projects View More
+✅ Certifications View More
+✅ Expansion animation
+✅ Mobile slider
+✅ Replays when returning
+
+CONTACT
+✅ Entrance animation
+✅ Left/right card movement
+✅ Detail hover
+✅ Social hover
+✅ Input focus
+✅ Submit hover
+✅ Replays when returning
+
+GUESTBOOK
+✅ Entrance animation
+✅ Form movement
+✅ Recent Messages movement
+✅ Input focus
+✅ Submit hover
+✅ Guestbook card hover
+✅ Replays when returning
+
+BACKGROUND
+✅ Alternating navy shades
+✅ Technical grid
+✅ Subtle radial blue glows
+✅ More visual depth
+```
+
+---
+
+## Git Checkpoint - Portfolio Animation and Visual Polish
+
+Run:
+
+```bash
+git status
+git add .
+git commit -m "Polish portfolio animations and visual design"
+git push
+```
+
+---
+
+## Concepts Practiced
+
+React:
+
+```text
+useState()
+useEffect()
+Shared state
+Lifting state up
+Props
+Conditional rendering
+Conditional class names
+Array map()
+Array slice()
+React key
+DOM element selection
+getBoundingClientRect()
+```
+
+CSS:
+
+```text
+@keyframes
+animation
+animation-delay
+opacity
+transform
+translateX()
+translateY()
+scale()
+rotate()
+transition
+radial-gradient()
+linear-gradient()
+background-size
+backdrop-filter
+z-index
+absolute positioning
+relative positioning
+responsive media queries
+scroll-behavior
+```
+
+---
+
+### Next
+
+Continue with the final portfolio cleanup:
+
+```text
+Footer polish
+Real GitHub link
+Real LinkedIn link
+Email links
+Resume / CV file
+Final mobile testing
+API loading states
+API error states
+Accessibility check
+Deployment preparation
+Final README update
+```

@@ -12,24 +12,36 @@ export default function PortfolioShowcase({ activePortfolioTab, setActivePortfol
 
     useEffect(() => {
 
-        // Runs whenever the user scrolls the page.
         function handleScroll() {
 
-            // Starts the Showcase animations once the user scrolls far enough down.
-            if (window.scrollY > 1200) {
+            const showcaseSection = document.getElementById("showcase");
+
+            if (!showcaseSection) {
+                return;
+            }
+
+            const sectionPosition = showcaseSection.getBoundingClientRect();
+
+            if (
+                sectionPosition.top < window.innerHeight * 0.8 &&
+                sectionPosition.bottom > 0
+            ) {
                 setShowcaseVisible(true);
+            } else {
+                setShowcaseVisible(false);
             }
         }
 
-        // Listen for scrolling on the browser window.
         window.addEventListener("scroll", handleScroll);
 
-        // Removes the scroll listener when the component is removed.
+        handleScroll();
+
         return () => {
             window.removeEventListener("scroll", handleScroll);
         };
 
     }, []);
+
     return (
 
         <section className="portfolio-showcase" id="showcase">
