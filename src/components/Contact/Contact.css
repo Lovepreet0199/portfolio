@@ -236,3 +236,104 @@
 
     cursor: pointer;
 }
+
+.contact-label,
+.contact-title,
+.contact-description {
+    opacity: 0;
+}
+
+/* Shows the Contact label first. */
+.contact-label.contact-show-item {
+    animation: fadeUp 700ms ease forwards;
+}
+
+/* Shows the Contact heading shortly after the label. */
+.contact-title.contact-show-item {
+    animation: fadeUp 700ms ease 150ms forwards;
+}
+
+/* Shows the Contact description after the heading. */
+.contact-description.contact-show-item {
+    animation: fadeUp 700ms ease 300ms forwards;
+}
+
+/* Keeps both Contact cards hidden before their entrance animations. */
+.contact-info,
+.contact-form-area {
+    opacity: 0;
+}
+
+/* Brings the Contact Information card in from the left. */
+.contact-info.contact-info-show {
+    animation: contactSlideLeft 700ms ease 500ms forwards;
+}
+
+/* Brings the Contact Form in from the right. */
+.contact-form-area.contact-form-show {
+    animation: contactSlideRight 700ms ease 500ms forwards;
+}
+
+/* Smooth interaction for each Contact detail row. */
+.contact-detail {
+    transition: transform 250ms ease;
+}
+
+.contact-detail:hover {
+    transform: translateX(5px);
+}
+
+/* Smooth interaction for the Contact detail icons. */
+.contact-detail i {
+    transition:
+        transform 250ms ease,
+        background-color 250ms ease;
+}
+
+.contact-detail:hover i {
+    transform: scale(1.08);
+    background-color: rgba(21, 93, 252, 0.2);
+}
+
+
+/* Smooth hover animation for social links. */
+.contact-socials a {
+    transition:
+        transform 250ms ease,
+        color 250ms ease,
+        border-color 250ms ease;
+}
+
+.contact-socials a:hover {
+    color: #51A2FF;
+    border-color: rgba(81, 162, 255, 0.35);
+    transform: translateY(-4px);
+}
+
+
+/* Smooth transition when the user selects a form field. */
+.contact-form input,
+.contact-form textarea {
+    transition:
+        border-color 250ms ease,
+        box-shadow 250ms ease;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    border-color: #155DFC;
+    box-shadow: 0 0 0 3px rgba(21, 93, 252, 0.12);
+}
+
+
+/* Smooth Send Message button interaction. */
+.contact-submit {
+    transition:
+        transform 250ms ease,
+        box-shadow 250ms ease;
+}
+
+.contact-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(21, 93, 252, 0.3);
+}

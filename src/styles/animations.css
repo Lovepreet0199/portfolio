@@ -107,3 +107,43 @@
         transform: translateX(0) scale(1);
     }
 }
+
+/* Fades Showcase tab content in with a small upward movement. */
+@keyframes tabContentIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Moves the element from the left while fading it in. */
+@keyframes contactSlideLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Moves the element from the right while fading it in. */
+@keyframes contactSlideRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

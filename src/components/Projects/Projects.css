@@ -4,6 +4,50 @@
     gap: 24px;
 }
 
+/* Centers the View More button below the project cards. */
+.projects {
+    text-align: center;
+}
+
+/* Button used to expand or collapse the project list. */
+.projects-view-more-btn {
+    margin-top: 28px;
+    padding: 12px 24px;
+
+    background-color: #155DFC;
+    color: #FFFFFF;
+
+    border: none;
+    border-radius: 10px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    transition:
+        transform 200ms ease,
+        box-shadow 200ms ease,
+        background-color 200ms ease;
+}
+
+.projects-view-more-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(21, 93, 252, 0.3);
+    background-color: #2B7FFF;
+}
+
+/* Adds a small entrance animation when more projects are displayed. */
+.projects-grid-expanded {
+    animation: fadeUp 500ms ease forwards;
+}
+
+
 @media (max-width: 768px) {
 
     .projects-grid {

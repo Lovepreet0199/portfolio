@@ -1,7 +1,31 @@
 import "./Contact.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Contact() {
+
+    // Tracks whether the Contact section should start its animations.
+    const [contactVisible, setContactVisible] = useState(false);
+
+    useEffect(() => {
+
+        // Runs whenever the user scrolls the page.
+        function handleScroll() {
+
+            // Starts the Contact animations once the user scrolls far enough down.
+            if (window.scrollY > 2000) {
+                setContactVisible(true);
+            }
+        }
+
+        // Listen for scrolling on the browser window.
+        window.addEventListener("scroll", handleScroll);
+
+        // Removes the scroll listener when the component is removed.
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+        };
+
+    }, []);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -82,15 +106,15 @@ export default function Contact() {
 
                 <div className="contact-header">
 
-                    <p className="contact-label">
+                    <p className={`contact-label ${contactVisible ? "contact-show-item" : ""}`}>
                         CONTACT
                     </p>
 
-                    <h2 className="contact-title">
+                    <h2 className={`contact-title ${contactVisible ? "contact-show-item" : ""}`}>
                         Let&apos;s <span>work together</span>
                     </h2>
 
-                    <p className="contact-description">
+                    <p className={`contact-description ${contactVisible ? "contact-show-item" : ""}`}>
                         Have a project, opportunity, or idea in mind? Send me a message.
                     </p>
 
@@ -99,7 +123,7 @@ export default function Contact() {
                 <div className="row g-4">
 
                     <div className="col-12 col-lg-4">
-                        <div className="contact-info">
+                        <div className={`contact-info ${contactVisible ? "contact-info-show" : ""}`}>
                             <h3 className="contact-info-title">
                                 Contact Information
                             </h3>
@@ -158,7 +182,8 @@ export default function Contact() {
                     </div>
 
                     <div className="col-12 col-lg-8">
-                        <div className="contact-form-area">
+                        
+                        <div className={`contact-form-area ${contactVisible ? "contact-form-show" : ""}`}>
 
                             <form
                                 className="contact-form"

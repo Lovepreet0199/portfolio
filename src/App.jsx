@@ -18,7 +18,7 @@ function App() {
       <Hero introFinished={introFinished} />
       <About />
       <PortfolioShowcase
-        activeTab={activePortfolioTab}
+        activePortfolioTab={activePortfolioTab}
         setActivePortfolioTab={setActivePortfolioTab}
       />
       <Contact />
