@@ -1,5 +1,15 @@
 .footer {
     background-color: #081120;
+
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px,
+            transparent 1px),
+        linear-gradient(90deg,
+            rgba(255, 255, 255, 0.018) 1px,
+            transparent 1px);
+
+    background-size: 32px 32px;
+
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding: 40px 0 20px;
 }
@@ -44,10 +54,17 @@
     font-weight: 500;
 
     text-decoration: none;
+
+    display: inline-block;
+
+    transition:
+        color 250ms ease,
+        transform 250ms ease;
 }
 
 .footer-links a:hover {
     color: #51A2FF;
+    transform: translateY(-2px);
 }
 
 .footer-socials {
@@ -71,11 +88,21 @@
     border-radius: 8px;
 
     text-decoration: none;
+
+    transition:
+        transform 250ms ease,
+        color 250ms ease,
+        border-color 250ms ease,
+        box-shadow 250ms ease;
 }
 
 .footer-socials a:hover {
     color: #51A2FF;
     border-color: rgba(81, 162, 255, 0.3);
+
+    transform: translateY(-3px);
+
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
 }
 
 .footer-bottom {
@@ -92,6 +119,26 @@
     font-size: 11px;
 
     margin: 0;
+}
+
+/* Keeps Footer content hidden before its entrance animation. */
+.footer-content {
+    opacity: 0;
+}
+
+/* Shows the main Footer content when the Footer enters the screen. */
+.footer-content.footer-content-show {
+    animation: fadeUp 700ms ease forwards;
+}
+
+/* Keeps the copyright area hidden until the main Footer appears. */
+.footer-bottom {
+    opacity: 0;
+}
+
+/* Shows the copyright shortly after the main Footer content. */
+.footer-bottom.footer-bottom-show {
+    animation: fadeUp 700ms ease 200ms forwards;
 }
 
 @media (max-width: 768px) {

@@ -1,8 +1,8 @@
 .site-header {
-    background-color: #081120;
-    padding: 18px 0;
+    background-color: transparent;
+    padding: 14px 0;
     width: 100%;
-    border-bottom: 2px solid grey;
+
     font-family: "Inter", sans-serif;
 
     position: sticky;
@@ -10,8 +10,21 @@
     z-index: 1000;
 }
 
+/* Floating rounded navigation container. */
 .site-header .container {
     position: relative;
+    max-width: 90%;
+
+    padding: 12px 22px;
+
+    background-color: rgba(8, 17, 32, 0.92);
+
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 28px;
+
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22);
+
+    backdrop-filter: blur(12px);
 }
 
 .header-brand {
@@ -32,6 +45,22 @@
     font-size: small;
     margin-right: 3px;
     box-shadow: 0 4px 8px rgba(21, 93, 252, 0.4);
+    transition:
+        transform 250ms ease,
+        box-shadow 250ms ease;
+}
+
+.header-brand:hover .logo-icon {
+    transform: rotate(-5deg) scale(1.06);
+    box-shadow: 0 6px 14px rgba(21, 93, 252, 0.55);
+}
+
+.logo-name {
+    transition: color 250ms ease;
+}
+
+.header-brand:hover .logo-name {
+    color: #FFFFFF;
 }
 
 .logo-name {
@@ -56,37 +85,53 @@ a {
 }
 
 .nav-list a {
+    display: inline-block;
+
     color: #90A1B9;
     font-size: 14px;
     font-weight: 500;
-    transition: all 0.5s ease;
+
+    transition:
+        color 250ms ease,
+        transform 250ms ease;
 }
 
 .nav-list a:hover {
-    color: antiquewhite;
+    color: #FFFFFF;
+    transform: translateY(-2px);
 }
 
 .lets-talk-btn {
     background-color: #155DFC;
     border-radius: 8px;
     color: white;
+
     padding: 8px 20px;
     font-size: 14px;
+
     box-shadow: 0 4px 8px rgba(21, 93, 252, 0.4);
-    transition: all 0.3s ease;
+
+    transition:
+        transform 250ms ease,
+        background-color 250ms ease,
+        box-shadow 250ms ease;
 }
 
 .lets-talk-btn:hover {
-    color: #000;
-    transform: translateY(-1px);
-    box-shadow: 0 8px 16px rgba(21, 93, 252, 0.5);
+    color: #FFFFFF;
+    background-color: #2B7FFF;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 8px 20px rgba(21, 93, 252, 0.45);
 }
 
 .menu-toggle {
     display: none;
 }
 
-.mobile-lets-talk-btn {
+/* Hidden on desktop. */
+.nav-list .mobile-lets-talk-btn {
     display: none;
 }
 

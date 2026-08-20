@@ -1,7 +1,42 @@
 import "./Contact.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Contact() {
+
+    // Tracks whether the Contact section should start its animations.
+    const [contactVisible, setContactVisible] = useState(false);
+
+    useEffect(() => {
+
+        function handleScroll() {
+
+            const contactSection = document.getElementById("contact");
+
+            if (!contactSection) {
+                return;
+            }
+
+            const sectionPosition = contactSection.getBoundingClientRect();
+
+            if (
+                sectionPosition.top < window.innerHeight * 0.8 &&
+                sectionPosition.bottom > 0
+            ) {
+                setContactVisible(true);
+            } else {
+                setContactVisible(false);
+            }
+        }
+
+        window.addEventListener("scroll", handleScroll);
+
+        handleScroll();
+
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+        };
+
+    }, []);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -82,15 +117,15 @@ export default function Contact() {
 
                 <div className="contact-header">
 
-                    <p className="contact-label">
+                    <p className={`contact-label ${contactVisible ? "contact-show-item" : ""}`}>
                         CONTACT
                     </p>
 
-                    <h2 className="contact-title">
+                    <h2 className={`contact-title ${contactVisible ? "contact-show-item" : ""}`}>
                         Let&apos;s <span>work together</span>
                     </h2>
 
-                    <p className="contact-description">
+                    <p className={`contact-description ${contactVisible ? "contact-show-item" : ""}`}>
                         Have a project, opportunity, or idea in mind? Send me a message.
                     </p>
 
@@ -99,7 +134,7 @@ export default function Contact() {
                 <div className="row g-4">
 
                     <div className="col-12 col-lg-4">
-                        <div className="contact-info">
+                        <div className={`contact-info ${contactVisible ? "contact-info-show" : ""}`}>
                             <h3 className="contact-info-title">
                                 Contact Information
                             </h3>
@@ -115,7 +150,11 @@ export default function Contact() {
 
                                     <div>
                                         <span>Email</span>
-                                        <p>Love.sandhu8@gmail.com</p>
+                                        <p>
+                                            <a href="mailto:Love.sandhu8@gmail.com">
+                                                Love.sandhu8@gmail.com
+                                            </a>
+                                        </p>
                                     </div>
                                 </div>
 
@@ -124,7 +163,11 @@ export default function Contact() {
 
                                     <div>
                                         <span>Phone</span>
-                                        <p>+1 437-213-1495</p>
+                                        <p>
+                                            <a href="tel:+14372131495">
+                                                +1 437-213-1495
+                                            </a>
+                                        </p>
                                     </div>
                                 </div>
 
@@ -141,15 +184,15 @@ export default function Contact() {
 
                             <div className="contact-socials">
 
-                                <a href="#" aria-label="GitHub">
+                                <a href="https://github.com/Lovepreet0199" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                                     <i className="bi bi-github"></i>
                                 </a>
 
-                                <a href="#" aria-label="LinkedIn">
+                                <a href="https://www.linkedin.com/in/lovepreet-singh-sandhu-567345164/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                                     <i className="bi bi-linkedin"></i>
                                 </a>
 
-                                <a href="#" aria-label="Email">
+                                <a href="mailto:Love.sandhu8@gmail.com" aria-label="Email">
                                     <i className="bi bi-envelope"></i>
                                 </a>
 
@@ -158,7 +201,8 @@ export default function Contact() {
                     </div>
 
                     <div className="col-12 col-lg-8">
-                        <div className="contact-form-area">
+
+                        <div className={`contact-form-area ${contactVisible ? "contact-form-show" : ""}`}>
 
                             <form
                                 className="contact-form"

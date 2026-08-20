@@ -160,15 +160,15 @@ export default function Hero({ introFinished }) {
 
                     <div className={`hero-socials ${introFinished ? "hero-socials-show" : ""}`}>
 
-                        <a href="#" className="icons" aria-label="Github">
+                        <a href="https://github.com/Lovepreet0199" target="_blank"  rel="noopener noreferrer" className="icons" aria-label="Github">
                             <i className="bi bi-github"></i>
                         </a>
 
-                        <a href="#" className="icons" aria-label="LinkedIn">
+                        <a href="https://www.linkedin.com/in/lovepreet-singh-sandhu-567345164/" target="_blank"  rel="noopener noreferrer" className="icons" aria-label="LinkedIn">
                             <i className="bi bi-linkedin"></i>
                         </a>
 
-                        <a href="#" className="icons" aria-label="Email">
+                        <a href="mailto:Love.sandhu8@gmail.com" className="icons" aria-label="Email">
                             <i className="bi bi-envelope"></i>
                         </a>
 
@@ -247,6 +247,10 @@ export default function Hero({ introFinished }) {
 
                 </div>
 
+            </div>
+            <div className="hero-scroll">
+                <span>SCROLL</span>
+                <i className="bi bi-arrow-down"></i>
             </div>
         </section >
     );

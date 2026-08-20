@@ -9,6 +9,41 @@ export default function Guestbook() {
         guestMessage: ""
     });
 
+    // Tracks whether the Guestbook section should start its animations.
+    const [guestbookVisible, setGuestbookVisible] = useState(false);
+
+    useEffect(() => {
+
+        function handleScroll() {
+
+            const guestbookSection = document.getElementById("guestbook");
+
+            if (!guestbookSection) {
+                return;
+            }
+
+            const sectionPosition = guestbookSection.getBoundingClientRect();
+
+            if (
+                sectionPosition.top < window.innerHeight * 0.8 &&
+                sectionPosition.bottom > 0
+            ) {
+                setGuestbookVisible(true);
+            } else {
+                setGuestbookVisible(false);
+            }
+        }
+
+        window.addEventListener("scroll", handleScroll);
+
+        handleScroll();
+
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+        };
+
+    }, []);
+
     const [guestbookEntries, setGuestbookEntries] = useState([]);
 
     const [error, setError] = useState("");
@@ -95,15 +130,15 @@ export default function Guestbook() {
 
                 <div className="guestbook-header">
 
-                    <p className="guestbook-label">
+                    <p className={`guestbook-label ${guestbookVisible ? "guestbook-show-item" : ""}`}>
                         GUESTBOOK
                     </p>
 
-                    <h2 className="guestbook-title">
+                    <h2 className={`guestbook-title ${guestbookVisible ? "guestbook-show-item" : ""}`}>
                         Sign the <span>Guestbook</span>
                     </h2>
 
-                    <p className="guestbook-description">
+                    <p className={`guestbook-description ${guestbookVisible ? "guestbook-show-item" : ""}`}>
                         Say hello, share feedback, or leave a message.
                     </p>
 
@@ -112,7 +147,7 @@ export default function Guestbook() {
                 <div className="row g-4">
 
                     <div className="col-12 col-lg-5">
-                        <div className="guestbook-form-area">
+                        <div className={`guestbook-form-area ${guestbookVisible ? "guestbook-form-show" : ""}`}>
                             <div className="guestbook-form-header">
                                 <h3>Sign the Guestbook</h3>
 
@@ -182,7 +217,7 @@ export default function Guestbook() {
                     </div>
 
                     <div className="col-12 col-lg-7">
-                        <div className="guestbook-comments">
+                        <div className={`guestbook-comments ${guestbookVisible ? "guestbook-comments-show" : ""}`}>
 
                             <div className="guestbook-comments-header">
                                 <div>

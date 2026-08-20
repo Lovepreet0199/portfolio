@@ -1,5 +1,18 @@
 .guestbook {
     background-color: #081120;
+
+    background-image:
+        radial-gradient(circle at 15% 70%,
+            rgba(21, 93, 252, 0.06),
+            transparent 30%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+
+    background-size:
+        100% 100%,
+        32px 32px,
+        32px 32px;
+
     min-height: calc(100vh - 78px);
     padding: 70px 0;
 
@@ -180,6 +193,20 @@
     margin: 0;
 }
 
+/* Adds a smooth interaction when hovering over a Guestbook message. */
+.guestbook-card {
+    transition:
+        transform 250ms ease,
+        border-color 250ms ease,
+        box-shadow 250ms ease;
+}
+
+.guestbook-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(81, 162, 255, 0.3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
 .guestbook-count {
     padding: 6px 10px;
 
@@ -194,6 +221,73 @@
     font-weight: 600;
 
     white-space: nowrap;
+}
+
+/* Keeps the Guestbook heading content hidden before animations begin. */
+.guestbook-label,
+.guestbook-title,
+.guestbook-description {
+    opacity: 0;
+}
+
+/* Shows the Guestbook label first. */
+.guestbook-label.guestbook-show-item {
+    animation: fadeUp 700ms ease forwards;
+}
+
+/* Shows the Guestbook title shortly after the label. */
+.guestbook-title.guestbook-show-item {
+    animation: fadeUp 700ms ease 150ms forwards;
+}
+
+/* Shows the Guestbook description after the title. */
+.guestbook-description.guestbook-show-item {
+    animation: fadeUp 700ms ease 300ms forwards;
+}
+
+/* Keeps the Guestbook form and messages hidden before their animations. */
+.guestbook-form-area,
+.guestbook-comments {
+    opacity: 0;
+}
+
+/* Brings the Guestbook form in from the left. */
+.guestbook-form-area.guestbook-form-show {
+    animation: guestbookSlideLeft 700ms ease 450ms forwards;
+}
+
+/* Brings the Recent Messages area in from the right. */
+.guestbook-comments.guestbook-comments-show {
+    animation: guestbookSlideRight 700ms ease 550ms forwards;
+}
+
+/* Smooth focus animation for Guestbook fields. */
+.guestbook-form-group input,
+.guestbook-form-group textarea {
+    transition:
+        border-color 250ms ease,
+        box-shadow 250ms ease;
+}
+
+.guestbook-form-group input:focus,
+.guestbook-form-group textarea:focus {
+    border-color: #51A2FF;
+    box-shadow: 0 0 0 3px rgba(81, 162, 255, 0.12);
+}
+
+
+/* Smooth hover animation for the Sign Guestbook button. */
+.guestbook-submit {
+    transition:
+        transform 250ms ease,
+        background-color 250ms ease,
+        box-shadow 250ms ease;
+}
+
+.guestbook-submit:hover {
+    background-color: #1447E6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(21, 93, 252, 0.3);
 }
 
 @media (max-width: 768px) {
