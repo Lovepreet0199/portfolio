@@ -1,51 +1,78 @@
 import "./About.css";
 import logoImage from "../../assets/images/logo.png";
+import { useEffect, useState } from "react";
 
 export default function About() {
+    // Tracks whether the About section should start its animations.
+    const [aboutVisible, setAboutVisible] = useState(false);
+
+    useEffect(() => {
+
+        // Runs whenever the user scrolls the page.
+        function handleScroll() {
+
+            // Starts the About animations once the user scrolls far enough down the page.
+            if (window.scrollY > 500) {
+                setAboutVisible(true);
+            }
+        }
+
+        // Listen for scrolling on the browser window.
+        window.addEventListener("scroll", handleScroll);
+
+        // Removes the scroll listener when the component is removed.
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+        };
+
+    }, []);
+
     return (
         <section className="about" id="about">
 
             <div className="container">
                 <div className="about-top">
                     <div className="about-content">
-                        <p className="about-label">ABOUT ME</p>
+                        <p className={`about-label ${aboutVisible ? "about-show-item" : ""}`}>
+                            ABOUT ME
+                        </p>
 
-                        <h2 className="about-title">
+                        <h2 className={`about-title ${aboutVisible ? "about-show-item" : ""}`}>
                             Get to <span>know me</span>
                         </h2>
 
-                        <p className="about-description">
+                        <p className={`about-description ${aboutVisible ? "about-show-item" : ""}`}>
                             I&apos;m a <strong>Full-Stack Developer</strong> who enjoys building clean, practical, and user-focused web applications.
                         </p>
 
                         <div className="about-info">
 
-                            <div className="about-info-item">
+                            <div className={`about-info-item ${aboutVisible ? "about-info-show" : ""}`}>
                                 <i className="bi bi-person about-info-icon"></i>
                                 <span className="about-info-label">Name</span>
                                 <span className="about-info-value">Lovepreet Sandhu</span>
                             </div>
 
-                            <div className="about-info-item">
+                            <div className={`about-info-item ${aboutVisible ? "about-info-show" : ""}`}>
                                 <i className="bi bi-geo-alt about-info-icon"></i>
                                 <span className="about-info-label">Location</span>
                                 <span className="about-info-value">Toronto, Ontario</span>
                             </div>
 
-                            <div className="about-info-item">
+                            <div className={`about-info-item ${aboutVisible ? "about-info-show" : ""}`}>
                                 <i className="bi bi-envelope about-info-icon"></i>
                                 <span className="about-info-label">Email</span>
                                 <span className="about-info-value">Love.sandhu8@gmail.com</span>
                             </div>
 
-                            <div className="about-info-item">
+                            <div className={`about-info-item ${aboutVisible ? "about-info-show" : ""}`}>
                                 <i className="bi bi-mortarboard about-info-icon"></i>
 
                                 <span className="about-info-label">Education</span>
                                 <span className="about-info-value">Web Development (Humber College)</span>
                             </div>
 
-                            <div className="about-info-item">
+                            <div className={`about-info-item ${aboutVisible ? "about-info-show" : ""}`}>
                                 <i className="bi bi-lightning-charge about-info-icon"></i>
                                 <span className="about-info-label">Availability</span>
                                 <span className="about-info-value about-availability">Open to Work</span>
@@ -60,7 +87,7 @@ export default function About() {
 
                     </div>
 
-                    <div className="about-image">
+                    <div className={`about-image ${aboutVisible ? "about-image-show" : ""}`}>
                         <img
                             src={logoImage}
                             alt="Lovepreet Sandhu"
@@ -72,7 +99,7 @@ export default function About() {
 
                 <div className="about-stats row">
 
-                    <div className="col-12 col-md-4">
+                    <div className={`col-12 col-md-4 ${aboutVisible ? "about-stat-show" : ""}`}>
                         <div className="about-stat-card">
 
                             <div className="about-stat-info">
@@ -85,7 +112,7 @@ export default function About() {
                         </div>
                     </div>
 
-                    <div className="col-12 col-md-4">
+                    <div className={`col-12 col-md-4 ${aboutVisible ? "about-stat-show" : ""}`}>
                         <div className="about-stat-card">
 
                             <div className="about-stat-info">
@@ -98,7 +125,7 @@ export default function About() {
                         </div>
                     </div>
 
-                    <div className="col-12 col-md-4">
+                    <div className={`col-12 col-md-4 ${aboutVisible ? "about-stat-show" : ""}`}>
                         <div className="about-stat-card">
 
                             <div className="about-stat-info">

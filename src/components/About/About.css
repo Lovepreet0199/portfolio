@@ -15,6 +15,14 @@
     font-weight: 600;
     letter-spacing: 2.4px;
     margin-bottom: 12px;
+
+    /* hide the about label before animations */
+    opacity: 0;
+}
+
+/* Shows the About label when the user scrolls to the section. */
+.about-label.about-show-item {
+    animation: fadeUp 700ms ease forwards;
 }
 
 .about-title {
@@ -23,6 +31,12 @@
     font-size: 48px;
     font-weight: 700;
     margin-bottom: 20px;
+
+    opacity: 0;
+}
+
+.about-title.about-show-item {
+    animation: fadeUp 700ms ease 150ms forwards;
 }
 
 .about-title span {
@@ -37,6 +51,12 @@
     line-height: 1.7;
     max-width: 560px;
     margin-bottom: 32px;
+
+    opacity: 0;
+}
+
+.about-description.about-show-item {
+    animation: fadeUp 700ms ease 300ms forwards;
 }
 
 .about-description strong {
@@ -53,6 +73,34 @@
     align-items: center;
     gap: 20px;
     margin-bottom: 16px;
+
+    /* Keeps each information row hidden until its animation begins. */
+    opacity: 0;
+}
+
+/* Animates the information rows after the About description. */
+.about-info-show {
+    animation: fadeUp 600ms ease forwards;
+}
+
+.about-info-show:nth-child(1) {
+    animation-delay: 450ms;
+}
+
+.about-info-show:nth-child(2) {
+    animation-delay: 550ms;
+}
+
+.about-info-show:nth-child(3) {
+    animation-delay: 650ms;
+}
+
+.about-info-show:nth-child(4) {
+    animation-delay: 750ms;
+}
+
+.about-info-show:nth-child(5) {
+    animation-delay: 850ms;
 }
 
 .about-info-label {
@@ -112,6 +160,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    /* Keeps the image hidden until its entrance animation begins. */
+    opacity: 0;
+}
+
+/* Shows the About image when the About section animation starts. */
+.about-image.about-image-show {
+    animation: fadeInRight 900ms ease 400ms forwards;
 }
 
 .about-image img {
@@ -136,6 +192,39 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    transition:
+        transform 250ms ease,
+        border-color 250ms ease,
+        box-shadow 250ms ease;
+}
+
+.about-stat-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(81, 162, 255, 0.35);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Keeps the stat cards hidden until their entrance animation begins. */
+.about-stats .col-12 {
+    opacity: 0;
+}
+
+/* Shows each stat card after the About information rows. */
+.about-stat-show {
+    animation: fadeUpScale 600ms ease forwards;
+}
+
+.about-stat-show:nth-child(1) {
+    animation-delay: 1000ms;
+}
+
+.about-stat-show:nth-child(2) {
+    animation-delay: 1100ms;
+}
+
+.about-stat-show:nth-child(3) {
+    animation-delay: 1200ms;
 }
 
 .about-stat-info {
