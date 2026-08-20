@@ -7905,3 +7905,656 @@ git push
 
 ---
 
+# Step 19 - About Section Animations
+
+After completing the Intro, Hero, ID card entrance, and navigation improvements, added scroll-based entrance animations and hover interactions to the About section.
+
+The goal was to make the About section feel more dynamic when the user scrolls down the page.
+
+The animation approach continues using only:
+
+```text
+React
+→ useState
+→ useEffect
+
+CSS
+→ @keyframes
+→ animation
+→ transition
+→ transform
+→ opacity
+```
+
+No additional scroll-animation library was added.
+
+---
+
+## Step 19.1 - Added About Animation State
+
+Imported:
+
+```jsx
+import { useEffect, useState } from "react";
+```
+
+Created state:
+
+```jsx
+// Tracks whether the About section should start its animations.
+const [aboutVisible, setAboutVisible] = useState(false);
+```
+
+The initial value is:
+
+```text
+false
+```
+
+which means the About entrance animations have not started yet.
+
+---
+
+## Step 19.2 - Added Scroll Detection With useEffect
+
+Created a scroll listener inside `useEffect()`.
+
+```jsx
+useEffect(() => {
+
+    // Runs whenever the user scrolls the page.
+    function handleScroll() {
+
+        // Starts the About animations once the user scrolls far enough down the page.
+        if (window.scrollY > 500) {
+            setAboutVisible(true);
+        }
+    }
+
+    // Listen for scrolling on the browser window.
+    window.addEventListener("scroll", handleScroll);
+
+    // Removes the scroll listener when the component is removed.
+    return () => {
+        window.removeEventListener("scroll", handleScroll);
+    };
+
+}, []);
+```
+
+`window.scrollY` returns how many pixels the user has scrolled down from the top of the page.
+
+The condition:
+
+```jsx
+if (window.scrollY > 500)
+```
+
+means:
+
+```text
+User scrolls more than 500px
+↓
+setAboutVisible(true)
+↓
+React rerenders About
+↓
+Animation classes are added
+```
+
+The cleanup function removes the scroll listener when the component is removed.
+
+---
+
+## Step 19.3 - Animated About Label
+
+Updated:
+
+```jsx
+<p className="about-label">
+```
+
+to:
+
+```jsx
+<p className={`about-label ${aboutVisible ? "about-show-item" : ""}`}>
+    ABOUT ME
+</p>
+```
+
+The label is hidden before the animation starts:
+
+```css
+.about-label {
+    color: #51A2FF;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2.4px;
+    margin-bottom: 12px;
+
+    /* Hide the About label before animations. */
+    opacity: 0;
+}
+```
+
+Added:
+
+```css
+/* Shows the About label when the user scrolls to the section. */
+.about-label.about-show-item {
+    animation: fadeUp 700ms ease forwards;
+}
+```
+
+The About label is the first element to appear.
+
+---
+
+## Step 19.4 - Animated About Title
+
+Updated:
+
+```jsx
+<h2 className="about-title">
+```
+
+to:
+
+```jsx
+<h2 className={`about-title ${aboutVisible ? "about-show-item" : ""}`}>
+    Get to <span>know me</span>
+</h2>
+```
+
+The title starts hidden:
+
+```css
+.about-title {
+    color: #FFFFFF;
+    font-family: "Manrope", sans-serif;
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 20px;
+
+    opacity: 0;
+}
+```
+
+Added:
+
+```css
+.about-title.about-show-item {
+    animation: fadeUp 700ms ease 150ms forwards;
+}
+```
+
+The title begins `150ms` after the label.
+
+---
+
+## Step 19.5 - Animated About Description
+
+Updated:
+
+```jsx
+<p className="about-description">
+```
+
+to:
+
+```jsx
+<p className={`about-description ${aboutVisible ? "about-show-item" : ""}`}>
+```
+
+The description starts hidden:
+
+```css
+.about-description {
+    color: #90A1B9;
+    font-family: "Inter", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.7;
+    max-width: 560px;
+    margin-bottom: 32px;
+
+    opacity: 0;
+}
+```
+
+Added:
+
+```css
+.about-description.about-show-item {
+    animation: fadeUp 700ms ease 300ms forwards;
+}
+```
+
+The description begins after the title.
+
+---
+
+## Step 19.6 - Animated About Information Rows
+
+Each About information row was updated from:
+
+```jsx
+<div className="about-info-item">
+```
+
+to:
+
+```jsx
+<div className={`about-info-item ${aboutVisible ? "about-info-show" : ""}`}>
+```
+
+This was applied to:
+
+```text
+Name
+Location
+Email
+Education
+Availability
+```
+
+The rows start hidden:
+
+```css
+.about-info-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 16px;
+
+    /* Keeps each information row hidden until its animation begins. */
+    opacity: 0;
+}
+```
+
+Added:
+
+```css
+/* Animates the information rows after the About description. */
+.about-info-show {
+    animation: fadeUp 600ms ease forwards;
+}
+```
+
+---
+
+## Step 19.7 - Added Staggered Info Row Delays
+
+Used `:nth-child()` to animate the About information rows one at a time.
+
+```css
+.about-info-show:nth-child(1) {
+    animation-delay: 450ms;
+}
+
+.about-info-show:nth-child(2) {
+    animation-delay: 550ms;
+}
+
+.about-info-show:nth-child(3) {
+    animation-delay: 650ms;
+}
+
+.about-info-show:nth-child(4) {
+    animation-delay: 750ms;
+}
+
+.about-info-show:nth-child(5) {
+    animation-delay: 850ms;
+}
+```
+
+The sequence becomes:
+
+```text
+450ms
+→ Name
+
+550ms
+→ Location
+
+650ms
+→ Email
+
+750ms
+→ Education
+
+850ms
+→ Availability
+```
+
+---
+
+## Step 19.8 - Animated About Stats Cards
+
+The three About stat columns were updated to receive an animation class.
+
+Example:
+
+```jsx
+<div className={`col-12 col-md-4 ${aboutVisible ? "about-stat-show" : ""}`}>
+```
+
+This was applied to:
+
+```text
+Technologies
+Projects Built
+Certifications
+```
+
+The stat columns start hidden:
+
+```css
+/* Keeps the stat cards hidden until their entrance animation begins. */
+.about-stats .col-12 {
+    opacity: 0;
+}
+```
+
+Added:
+
+```css
+/* Shows each stat card after the About information rows. */
+.about-stat-show {
+    animation: fadeUpScale 600ms ease forwards;
+}
+```
+
+---
+
+## Step 19.9 - Added Stat Card Stagger
+
+Added delays:
+
+```css
+.about-stat-show:nth-child(1) {
+    animation-delay: 1000ms;
+}
+
+.about-stat-show:nth-child(2) {
+    animation-delay: 1100ms;
+}
+
+.about-stat-show:nth-child(3) {
+    animation-delay: 1200ms;
+}
+```
+
+The stats appear one after another.
+
+---
+
+## Step 19.10 - Animated About Image
+
+Updated:
+
+```jsx
+<div className="about-image">
+```
+
+to:
+
+```jsx
+<div className={`about-image ${aboutVisible ? "about-image-show" : ""}`}>
+```
+
+The image starts hidden:
+
+```css
+.about-image {
+    width: 100%;
+    max-width: 430px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Keeps the image hidden until its entrance animation begins. */
+    opacity: 0;
+}
+```
+
+Created a reusable right-side entrance animation inside:
+
+```text
+src/styles/animations.css
+```
+
+```css
+/* Brings an element into view from the right side. */
+@keyframes fadeInRight {
+
+    from {
+        opacity: 0;
+        transform: translateX(40px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+```
+
+Applied it:
+
+```css
+/* Shows the About image when the About section animation starts. */
+.about-image.about-image-show {
+    animation: fadeInRight 900ms ease 400ms forwards;
+}
+```
+
+The image enters from the right while the About text begins appearing.
+
+---
+
+## Step 19.11 - Added About Info Hover Movement
+
+Added hover interaction to the About information rows.
+
+Updated:
+
+```css
+.about-info-item {
+    transition: transform 200ms ease;
+}
+```
+
+Added:
+
+```css
+.about-info-item:hover {
+    transform: translateX(5px);
+}
+```
+
+When hovered, the information row moves slightly to the right.
+
+---
+
+## Step 19.12 - Added Info Icon Hover Scale
+
+Updated the About information icons:
+
+```css
+.about-info-icon {
+    color: #2B7FFF;
+    font-size: 20px;
+    width: 24px;
+
+    transition: transform 200ms ease;
+}
+```
+
+Added:
+
+```css
+.about-info-item:hover .about-info-icon {
+    transform: scale(1.15);
+}
+```
+
+When the user hovers over an information row, the icon grows slightly.
+
+---
+
+## Step 19.13 - Added Stat Card Hover Interaction
+
+The stat cards already use a hover effect:
+
+```css
+.about-stat-card {
+    transition:
+        transform 250ms ease,
+        border-color 250ms ease,
+        box-shadow 250ms ease;
+}
+```
+
+Added:
+
+```css
+.about-stat-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(81, 162, 255, 0.35);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+```
+
+When hovered, the card:
+
+```text
+Moves upward
++
+Gets a brighter border
++
+Adds a shadow
+```
+
+The entrance animation is applied to the outer Bootstrap column while the hover transform is applied to the inner card.
+
+This prevents the entrance animation and hover transform from conflicting.
+
+---
+
+## Step 19.14 - Final About Animation Sequence
+
+The current sequence is:
+
+```text
+User scrolls past 500px
+↓
+aboutVisible becomes true
+
+0ms
+→ ABOUT ME label
+
+150ms
+→ About title
+
+300ms
+→ Description
+
+400ms
+→ About image
+
+450ms
+→ Name
+
+550ms
+→ Location
+
+650ms
+→ Email
+
+750ms
+→ Education
+
+850ms
+→ Availability
+
+1000ms
+→ Technologies stat
+
+1100ms
+→ Projects Built stat
+
+1200ms
+→ Certifications stat
+```
+
+The About section now combines:
+
+```text
+Scroll entrance animations
++
+Staggered content
++
+Image entrance
++
+Hover interactions
+```
+
+---
+
+## Step 19 Status
+
+Completed:
+
+```text
+About scroll state ✅
+Scroll listener ✅
+About label entrance ✅
+About title entrance ✅
+Description entrance ✅
+Info row stagger ✅
+Image entrance ✅
+Stat card stagger ✅
+Info hover movement ✅
+Icon hover scale ✅
+Stat card hover effect ✅
+```
+
+---
+
+## Git Checkpoint - About Animations
+
+Run:
+
+```bash
+git status
+git add .
+git commit -m "Add animated about section"
+git push
+```
+
+### Next
+
+Start:
+
+```text
+Step 20 - Portfolio Showcase Animations
+```
+
+Planned animation areas:
+
+```text
+Showcase label
+Showcase heading
+Description
+Tab buttons
+Project cards
+Skill cards
+Certification cards
+Hover effects
+```
+
+---

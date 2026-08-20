@@ -76,6 +76,13 @@
 
     /* Keeps each information row hidden until its animation begins. */
     opacity: 0;
+
+    /* Smooth movement when the user hovers over an information row. */
+    transition: transform 200ms ease;
+}
+
+.about-info-item:hover {
+    transform: translateX(5px);
 }
 
 /* Animates the information rows after the About description. */
@@ -121,6 +128,13 @@
     color: #2B7FFF;
     font-size: 20px;
     width: 24px;
+
+    /* Smooth icon movement on hover. */
+    transition: transform 200ms ease;
+}
+
+.about-info-item:hover .about-info-icon {
+    transform: scale(1.15);
 }
 
 .about-availability {
