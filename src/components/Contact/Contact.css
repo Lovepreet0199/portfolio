@@ -1,5 +1,12 @@
 .contact {
     background-color: #0B1422;
+
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+
+    background-size: 32px 32px;
+
     min-height: calc(100vh - 78px);
     padding: 70px 0;
 

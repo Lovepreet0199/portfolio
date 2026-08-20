@@ -248,6 +248,10 @@ export default function Hero({ introFinished }) {
                 </div>
 
             </div>
+            <div className="hero-scroll">
+                <span>SCROLL</span>
+                <i className="bi bi-arrow-down"></i>
+            </div>
         </section >
     );
 }

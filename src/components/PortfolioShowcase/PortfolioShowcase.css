@@ -1,6 +1,19 @@
 /* Main Portfolio Showcase section. */
 .portfolio-showcase {
     background-color: #081120;
+
+    background-image:
+        radial-gradient(circle at 85% 30%,
+            rgba(21, 93, 252, 0.07),
+            transparent 30%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+
+    background-size:
+        100% 100%,
+        32px 32px,
+        32px 32px;
+
     min-height: calc(100vh - 78px);
     padding: 70px 0;
 

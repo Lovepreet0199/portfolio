@@ -1,3 +1,15 @@
+/* Smooth scrolling when using navigation links. */
 html {
     scroll-behavior: smooth;
+}
+
+body {
+    background-color: #081120;
+
+    /* Subtle grid pattern across the portfolio. */
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+
+    background-size: 32px 32px;
 }
