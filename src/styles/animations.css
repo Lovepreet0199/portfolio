@@ -147,3 +147,29 @@
         transform: translateX(0);
     }
 }
+
+/* Moves the Guestbook form from the left while fading it in. */
+@keyframes guestbookSlideLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Moves the Recent Messages from the right while fading them in. */
+@keyframes guestbookSlideRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
