@@ -6553,3 +6553,611 @@ Step 16 - Hero Content Entrance Animations
 ```
 
 ---
+
+# Step 16 - Hero Content Entrance Animations
+
+After completing the hanging ID card entrance, added entrance animations to the left side of the Hero.
+
+The goal was to make the Hero content appear gradually instead of displaying everything at once.
+
+Planned order:
+
+```text
+Intro finishes
+↓
+Portfolio label appears
+↓
+Main title appears
+↓
+Developer role appears
+↓
+Description appears
+↓
+CTA buttons appear
+↓
+Social icons appear one by one
+```
+
+The existing reusable:
+
+```css
+@keyframes fadeUp
+```
+
+and:
+
+```css
+@keyframes fadeUpScale
+```
+
+animations were reused from:
+
+```text
+src/styles/animations.css
+```
+
+---
+
+## Step 16.1 - Delayed Typing Effect Until Intro Finishes
+
+The Hero typing effect originally started immediately when the page loaded.
+
+Because the Intro covers the Hero for several seconds, the typing animation could already be halfway through before the Hero became visible.
+
+Updated the existing `useEffect()` so it waits until:
+
+```text
+introFinished = true
+```
+
+Added:
+
+```jsx
+// Wait until the Intro animation is finished before starting typing effect.
+if (!introFinished) {
+    return;
+}
+```
+
+The beginning of the effect is now:
+
+```jsx
+useEffect(() => {
+
+    // Wait until the Intro animation is finished before starting typing effect.
+    if (!introFinished) {
+        return;
+    }
+
+    const currentRole = roles[roleIndex];
+
+    // Remaining typing logic...
+
+}, [charIndex, roleIndex, isDeleting, introFinished]);
+```
+
+Also added:
+
+```jsx
+introFinished
+```
+
+to the dependency array.
+
+The new flow is:
+
+```text
+Page loads
+↓
+introFinished = false
+↓
+Typing effect waits
+↓
+Intro finishes
+↓
+introFinished = true
+↓
+Typing effect begins from the first role
+```
+
+This ensures the typing animation starts when the user can actually see it.
+
+---
+
+## Step 16.2 - Animated Portfolio Label
+
+Updated:
+
+```jsx
+<p className="hero-label">
+    PORTFOLIO 2026
+</p>
+```
+
+to:
+
+```jsx
+<p className={`hero-label ${introFinished ? "hero-show" : ""}`}>
+    PORTFOLIO 2026
+</p>
+```
+
+Before the Intro finishes:
+
+```text
+hero-label
+```
+
+After the Intro finishes:
+
+```text
+hero-label hero-show
+```
+
+Added:
+
+```css
+.hero-label {
+    opacity: 0;
+}
+```
+
+and:
+
+```css
+.hero-label.hero-show {
+    animation: fadeUp 700ms ease forwards;
+}
+```
+
+The label is the first Hero text element to appear.
+
+---
+
+## Step 16.3 - Animated Main Hero Title
+
+Updated the Hero title:
+
+```jsx
+<h1 className={`hero-title ${introFinished ? "hero-show" : ""}`}>
+```
+
+The title contains:
+
+```text
+Hi, I'm
+Lovepreet
+Sandhu
+```
+
+Added:
+
+```css
+.hero-title {
+    margin-bottom: 14px;
+
+    /* Keeps the title hidden until the Intro finishes. */
+    opacity: 0;
+}
+```
+
+Added the entrance animation:
+
+```css
+.hero-title.hero-show {
+    animation: fadeUp 700ms ease 150ms forwards;
+}
+```
+
+The `150ms` delay makes the title appear shortly after the portfolio label.
+
+---
+
+## Step 16.4 - Animated Developer Role
+
+Updated:
+
+```jsx
+<h2 className="hero-role">
+```
+
+to:
+
+```jsx
+<h2 className={`hero-role ${introFinished ? "hero-show" : ""}`}>
+    {displayedText}
+</h2>
+```
+
+Added:
+
+```css
+.hero-role {
+    opacity: 0;
+}
+```
+
+Added:
+
+```css
+.hero-role.hero-show {
+    animation: fadeUp 700ms ease 300ms forwards;
+}
+```
+
+The role uses the same entrance style as the other Hero text to keep the animation consistent.
+
+After appearing, the existing typing animation continues controlling:
+
+```text
+Full-Stack Developer
+React Developer
+Node.js Developer
+MERN Stack Developer
+ASP.NET Developer
+```
+
+---
+
+## Step 16.5 - Animated Hero Description
+
+Updated:
+
+```jsx
+<p className="hero-description">
+```
+
+to:
+
+```jsx
+<p className={`hero-description ${introFinished ? "hero-show" : ""}`}>
+```
+
+Added:
+
+```css
+.hero-description {
+    opacity: 0;
+}
+```
+
+Added:
+
+```css
+.hero-description.hero-show {
+    animation: fadeUp 700ms ease 450ms forwards;
+}
+```
+
+The description appears after the role.
+
+---
+
+## Step 16.6 - Animated Hero CTA Buttons
+
+Updated:
+
+```jsx
+<div className="hero-actions">
+```
+
+to:
+
+```jsx
+<div className={`hero-actions ${introFinished ? "hero-actions-show" : ""}`}>
+```
+
+Added:
+
+```css
+.hero-actions {
+    opacity: 0;
+}
+```
+
+The buttons use the existing:
+
+```text
+fadeUpScale
+```
+
+animation instead of the normal text `fadeUp`.
+
+Added:
+
+```css
+.hero-actions-show {
+    animation: fadeUpScale 700ms ease 600ms forwards;
+}
+```
+
+This gives the buttons a slightly different entrance because they are interactive elements.
+
+The CTA buttons are:
+
+```text
+View My Work
+Download CV
+```
+
+---
+
+## Step 16.7 - Animated Social Icons
+
+Updated:
+
+```jsx
+<div className="hero-socials">
+```
+
+to:
+
+```jsx
+<div className={`hero-socials ${introFinished ? "hero-socials-show" : ""}`}>
+```
+
+The social links are:
+
+```text
+GitHub
+LinkedIn
+Email
+```
+
+The container remains hidden before the Intro finishes.
+
+```css
+.hero-socials {
+    opacity: 0;
+}
+```
+
+After the Intro finishes:
+
+```css
+.hero-socials-show {
+    opacity: 1;
+}
+```
+
+Each icon then receives the reusable:
+
+```text
+fadeUpScale
+```
+
+animation.
+
+```css
+.hero-socials-show .icons {
+    opacity: 0;
+    animation: fadeUpScale 500ms ease forwards;
+}
+```
+
+---
+
+## Step 16.8 - Added Staggered Social Icon Timing
+
+Used `:nth-child()` to make the social icons appear one at a time.
+
+```css
+.hero-socials-show .icons:nth-child(1) {
+    animation-delay: 750ms;
+}
+
+.hero-socials-show .icons:nth-child(2) {
+    animation-delay: 850ms;
+}
+
+.hero-socials-show .icons:nth-child(3) {
+    animation-delay: 950ms;
+}
+```
+
+The social entrance sequence is:
+
+```text
+GitHub
+↓ 100ms
+LinkedIn
+↓ 100ms
+Email
+```
+
+---
+
+## Step 16.9 - Added Hero Button Hover Effects
+
+Added hover feedback to the primary CTA button.
+
+```css
+.hero-primary-btn {
+    transition:
+        transform 200ms ease,
+        box-shadow 200ms ease;
+}
+
+.hero-primary-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(21, 93, 252, 0.3);
+}
+```
+
+This slightly lifts the button and adds a blue shadow.
+
+---
+
+## Step 16.10 - Added Secondary Button Hover Effect
+
+Added:
+
+```css
+.hero-secondary-btn {
+    transition:
+        transform 200ms ease,
+        border-color 200ms ease;
+}
+
+.hero-secondary-btn:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+```
+
+The secondary button keeps its outlined design while responding to pointer interaction.
+
+---
+
+## Step 16.11 - Added Social Icon Hover Effects
+
+Updated the `.icons` styling:
+
+```css
+.icons {
+    color: #62748E;
+    font-size: 20px;
+    text-decoration: none;
+
+    transition:
+        transform 200ms ease,
+        color 200ms ease;
+}
+```
+
+Added:
+
+```css
+.icons:hover {
+    transform: translateY(-3px);
+    color: #51A2FF;
+}
+```
+
+The social links now:
+
+```text
+Move upward slightly
++
+Change to the portfolio blue color
+```
+
+when hovered.
+
+---
+
+## Step 16.12 - Final Hero Entrance Timing
+
+The current Hero entrance sequence is:
+
+```text
+Intro finishes
+↓
+0ms
+Portfolio label begins
+
+150ms
+Main title begins
+
+300ms
+Developer role begins
+
+450ms
+Description begins
+
+600ms
+CTA buttons begin
+
+750ms
+GitHub begins
+
+850ms
+LinkedIn begins
+
+950ms
+Email begins
+```
+
+At the same time, the hanging developer badge performs its own drop and swing entrance.
+
+This makes the Hero feel active without giving every element a completely different animation style.
+
+---
+
+## Step 16.13 - Fixed Unused Import Warning
+
+An accidental import was added:
+
+```jsx
+import { i } from "motion/react-client";
+```
+
+The variable was not used, which caused:
+
+```text
+'i' is defined but never used
+```
+
+Removed the import.
+
+The HTML:
+
+```jsx
+<i className="bi bi-github"></i>
+```
+
+does not require importing `i`.
+
+---
+
+## Step 16 Status
+
+Completed:
+
+```text
+Typing waits for Intro ✅
+Portfolio label entrance ✅
+Hero title entrance ✅
+Developer role entrance ✅
+Description entrance ✅
+CTA entrance ✅
+Social icon stagger ✅
+Primary button hover ✅
+Secondary button hover ✅
+Social icon hover ✅
+ID badge entrance still working ✅
+ID badge dragging still working ✅
+```
+
+The Hero now has a complete opening sequence connected to the Welcome Intro.
+
+---
+
+## Git Checkpoint - Hero Content Entrance
+
+Run:
+
+```bash
+git status
+git add .
+git commit -m "Add animated hero content entrance"
+git push
+```
+
+### Next
+
+Continue with the next portfolio improvement feature.
+
+Possible next tasks:
+
+```text
+Project preview limit
+View More Projects
+Projects page
+Project Details page
+Scroll reveal animations
+QR code
+Final interaction polish
+```
+
+---

@@ -20,6 +20,10 @@ export default function Hero({ introFinished }) {
     const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
+        // Wait until the Intro animation is finished before starting typing effect.
+        if (!introFinished) {
+            return;
+        }
 
         const currentRole = roles[roleIndex];
 
@@ -65,7 +69,7 @@ export default function Hero({ introFinished }) {
             return () => clearTimeout(timer);
         }
 
-    }, [charIndex, roleIndex, isDeleting]);
+    }, [charIndex, roleIndex, isDeleting, introFinished]);
 
     // Stores the card's live horizontal and vertical position.
     // 0, 0 represents the card's original hanging position.
@@ -124,21 +128,23 @@ export default function Hero({ introFinished }) {
                         </span>
                     </div>
 
-                    <p className="hero-label">PORTFOLIO 2026</p>
+                    <p className={`hero-label ${introFinished ? "hero-show" : ""}`}>
+                        PORTFOLIO 2026
+                    </p>
 
-                    <h1 className="hero-title">
+                    <h1 className={`hero-title ${introFinished ? "hero-show" : ""}`}>
                         <span className="header-intro">Hi, I&apos;m</span>
                         <span className="hero-first-name">Lovepreet</span>
                         <span className="hero-last-name">Sandhu</span>
                     </h1>
 
-                    <h2 className="hero-role">{displayedText}</h2>
+                    <h2 className={`hero-role ${introFinished ? "hero-show" : ""}`}>{displayedText}</h2>
 
-                    <p className="hero-description">
+                    <p className={`hero-description ${introFinished ? "hero-show" : ""}`}>
                         I build <span className="hero-main-words">responsive</span>, <span className="hero-main-words">full-stack web applications</span> with a focus on <span className="hero-main-words">clean code</span>, <span className="hero-main-words">practical solutions</span>, and <span className="hero-main-words">great user experiences</span>.
                     </p>
 
-                    <div className="hero-actions">
+                    <div className={`hero-actions ${introFinished ? "hero-actions-show" : ""}`}>
 
                         <a href="#projects" className="hero-primary-btn">
                             View My Work
@@ -152,7 +158,7 @@ export default function Hero({ introFinished }) {
 
                     </div>
 
-                    <div className="hero-socials">
+                    <div className={`hero-socials ${introFinished ? "hero-socials-show" : ""}`}>
 
                         <a href="#" className="icons" aria-label="Github">
                             <i className="bi bi-github"></i>
