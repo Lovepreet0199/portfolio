@@ -130,7 +130,8 @@ a {
     display: none;
 }
 
-.mobile-lets-talk-btn {
+/* Hidden on desktop. */
+.nav-list .mobile-lets-talk-btn {
     display: none;
 }
 

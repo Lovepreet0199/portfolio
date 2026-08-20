@@ -6,7 +6,7 @@
         linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
 
     background-size: 32px 32px;
-    
+
     min-height: calc(100vh - 78px);
 
     border-top: 1px solid rgba(255, 255, 255, 0.06);
@@ -47,6 +47,19 @@
 }
 
 .about-title span {
+    color: #51A2FF;
+}
+
+/* Keeps the About email link consistent with the other information values. */
+.about-info-value a {
+    color: #E2E8F0;
+    text-decoration: none;
+
+    transition: color 250ms ease;
+}
+
+/* Highlights the email when the user hovers over it. */
+.about-info-value a:hover {
     color: #51A2FF;
 }
 

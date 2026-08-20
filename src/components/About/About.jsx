@@ -76,7 +76,7 @@ export default function About() {
                             <div className={`about-info-item ${aboutVisible ? "about-info-show" : ""}`}>
                                 <i className="bi bi-envelope about-info-icon"></i>
                                 <span className="about-info-label">Email</span>
-                                <span className="about-info-value">Love.sandhu8@gmail.com</span>
+                                <span className="about-info-value"> <a href="mailto:Love.sandhu8@gmail.com">Love.sandhu8@gmail.com</a></span>
                             </div>
 
                             <div className={`about-info-item ${aboutVisible ? "about-info-show" : ""}`}>

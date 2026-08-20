@@ -123,6 +123,16 @@
     margin: 0;
 }
 
+.contact-detail p a {
+    color: #E2E8F0;
+    text-decoration: none;
+
+    transition: color 250ms ease;
+}
+
+.contact-detail p a:hover {
+    color: #51A2FF;
+}
 
 /* SOCIAL LINKS */
 

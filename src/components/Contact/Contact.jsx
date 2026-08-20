@@ -150,7 +150,11 @@ export default function Contact() {
 
                                     <div>
                                         <span>Email</span>
-                                        <p>Love.sandhu8@gmail.com</p>
+                                        <p>
+                                            <a href="mailto:Love.sandhu8@gmail.com">
+                                                Love.sandhu8@gmail.com
+                                            </a>
+                                        </p>
                                     </div>
                                 </div>
 
@@ -159,7 +163,11 @@ export default function Contact() {
 
                                     <div>
                                         <span>Phone</span>
-                                        <p>+1 437-213-1495</p>
+                                        <p>
+                                            <a href="tel:+14372131495">
+                                                +1 437-213-1495
+                                            </a>
+                                        </p>
                                     </div>
                                 </div>
 
@@ -176,15 +184,15 @@ export default function Contact() {
 
                             <div className="contact-socials">
 
-                                <a href="#" aria-label="GitHub">
+                                <a href="https://github.com/Lovepreet0199" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                                     <i className="bi bi-github"></i>
                                 </a>
 
-                                <a href="#" aria-label="LinkedIn">
+                                <a href="https://www.linkedin.com/in/lovepreet-singh-sandhu-567345164/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                                     <i className="bi bi-linkedin"></i>
                                 </a>
 
-                                <a href="#" aria-label="Email">
+                                <a href="mailto:Love.sandhu8@gmail.com" aria-label="Email">
                                     <i className="bi bi-envelope"></i>
                                 </a>
 

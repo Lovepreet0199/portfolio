@@ -7,6 +7,7 @@ export default function Projects() {
     const [projects, setProjects] = useState([]);
     const [showAllProjects, setShowAllProjects] = useState(false);
 
+
     useEffect(() => {
 
         fetch(`${import.meta.env.VITE_API_URL}/api/projects`)
@@ -52,8 +53,8 @@ export default function Projects() {
 
                     <i
                         className={`bi ${showAllProjects
-                                ? "bi-chevron-up"
-                                : "bi-chevron-down"
+                            ? "bi-chevron-up"
+                            : "bi-chevron-down"
                             }`}
                     ></i>
                 </button>
