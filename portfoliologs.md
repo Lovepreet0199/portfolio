@@ -22324,3 +22324,651 @@ Next:
 Contact POST API
 Guestbook GET/POST API
 ```
+
+# Step 28 - Contact Form Submit Loading and Error Handling
+
+## Goal
+
+Improve the Contact form API experience so users get clear feedback while their message is being sent.
+
+The Contact form already had:
+
+```text
+Form state ✅
+Client-side validation ✅
+Email validation ✅
+POST request ✅
+Backend error handling ✅
+Success message ✅
+Form reset ✅
+```
+
+This step added a dedicated submitting state so the user cannot accidentally submit the form multiple times.
+
+---
+
+# Existing Contact Form State
+
+The component already used:
+
+```jsx
+const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+});
+
+const [error, setError] = useState("");
+
+const [success, setSuccess] = useState("");
+```
+
+The form data is controlled through React state.
+
+---
+
+# Submitting State
+
+Added:
+
+```jsx
+// Tracks whether the contact form is currently being submitted.
+const [submitting, setSubmitting] = useState(false);
+```
+
+Purpose:
+
+```text
+submitting = false
+→ No API request is currently running.
+
+submitting = true
+→ Contact form is currently sending data.
+```
+
+---
+
+# Client-Side Validation
+
+The existing validation was kept.
+
+Empty-field check:
+
+```jsx
+if (
+    formData.name === "" ||
+    formData.email === "" ||
+    formData.subject === "" ||
+    formData.message === ""
+) {
+    setError("Please fill in all fields");
+    return;
+}
+```
+
+Email validation:
+
+```jsx
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+if (!emailPattern.test(formData.email)) {
+    setError("Please enter a valid email address.");
+    return;
+}
+```
+
+The API request only starts after these validation checks pass.
+
+---
+
+# Start Submitting State
+
+Added:
+
+```jsx
+// Starts the submitting state after validation passes.
+setSubmitting(true);
+```
+
+This is placed after the validation checks.
+
+That is important because:
+
+```text
+Invalid form
+↓
+return
+↓
+No API request
+↓
+submitting stays false
+```
+
+But when validation succeeds:
+
+```text
+Validation passes
+↓
+setSubmitting(true)
+↓
+POST request starts
+```
+
+---
+
+# Contact POST Request
+
+The existing Contact API request was maintained:
+
+```jsx
+const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/contact`,
+    {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+    }
+);
+```
+
+This sends the Contact form data as JSON.
+
+Flow:
+
+```text
+formData
+↓
+JSON.stringify(formData)
+↓
+POST /api/contact
+↓
+Backend receives message
+```
+
+---
+
+# Reading Backend Response
+
+The API response is converted using:
+
+```jsx
+const data = await response.json();
+```
+
+The backend response can then be used for:
+
+```text
+Success messages
+Error messages
+```
+
+---
+
+# Backend Error Handling
+
+Existing logic:
+
+```jsx
+if (!response.ok) {
+    setError(data.message);
+    setSuccess("");
+    return;
+}
+```
+
+Meaning:
+
+```text
+Response unsuccessful
+↓
+Show backend error message
+↓
+Clear previous success message
+↓
+Stop success logic
+```
+
+---
+
+# Successful Submission
+
+Existing success logic:
+
+```jsx
+setError("");
+setSuccess(data.message);
+```
+
+After a successful submission:
+
+```text
+Old error is cleared
+Success message is displayed
+```
+
+---
+
+# Form Reset
+
+The existing form reset was kept:
+
+```jsx
+setFormData({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+});
+```
+
+After successful submission, the fields return to empty values.
+
+---
+
+# Network / Unexpected Error Handling
+
+The Contact form already used `try/catch`:
+
+```jsx
+catch (error) {
+
+    console.error("Contact form error: ", error);
+
+    setError("Unable to send message.");
+    setSuccess("");
+}
+```
+
+Two different outputs are used:
+
+```text
+console.error()
+→ Gives technical information for debugging.
+
+setError()
+→ Gives the portfolio visitor a user-friendly message.
+```
+
+---
+
+# Finally Block
+
+Added:
+
+```jsx
+finally {
+
+    // Runs whether the request succeeds or fails.
+    setSubmitting(false);
+}
+```
+
+`finally` runs after:
+
+```text
+Success
+OR
+Failure
+```
+
+Therefore the submitting state always resets.
+
+Flow:
+
+```text
+setSubmitting(true)
+↓
+POST request
+↓
+Success OR error
+↓
+finally
+↓
+setSubmitting(false)
+```
+
+---
+
+# Submit Button Disabled State
+
+Updated the Contact button from:
+
+```jsx
+<button type="submit" className="contact-submit">
+    Send Message
+    <i className="bi bi-send"></i>
+</button>
+```
+
+to:
+
+```jsx
+<button
+    type="submit"
+    className="contact-submit"
+    disabled={submitting}
+>
+    {submitting ? "Sending..." : "Send Message"}
+
+    <i className="bi bi-send"></i>
+</button>
+```
+
+---
+
+# `disabled={submitting}`
+
+Used:
+
+```jsx
+disabled={submitting}
+```
+
+When:
+
+```text
+submitting = false
+→ button is enabled
+
+submitting = true
+→ button is disabled
+```
+
+This prevents duplicate submissions while the API request is running.
+
+---
+
+# Dynamic Button Text
+
+Added:
+
+```jsx
+{submitting ? "Sending..." : "Send Message"}
+```
+
+This uses a ternary operator.
+
+```text
+submitting = false
+→ Send Message
+
+submitting = true
+→ Sending...
+```
+
+This gives the visitor immediate feedback that the form is being processed.
+
+---
+
+# Contact Submit Button CSS
+
+The existing button already used:
+
+```css
+.contact-submit {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 14px 20px;
+
+    color: #FFFFFF;
+    background-color: #155DFC;
+
+    border: none;
+    border-radius: 10px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+```
+
+The interaction styles were updated to support the disabled state.
+
+---
+
+# Button Transition
+
+Updated:
+
+```css
+.contact-submit {
+    transition:
+        transform 250ms ease,
+        box-shadow 250ms ease,
+        opacity 250ms ease;
+}
+```
+
+The opacity transition helps the disabled state feel smoother.
+
+---
+
+# Enabled Hover State
+
+Updated the hover selector from:
+
+```css
+.contact-submit:hover
+```
+
+to:
+
+```css
+.contact-submit:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(21, 93, 252, 0.3);
+}
+```
+
+Meaning:
+
+```text
+Button enabled
+→ hover animation works
+
+Button disabled
+→ hover animation does not run
+```
+
+---
+
+# Disabled Button Styling
+
+Added:
+
+```css
+/* Shows that the contact form is currently being submitted. */
+.contact-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+    box-shadow: none;
+}
+```
+
+This visually tells the user that the form is currently processing.
+
+---
+
+# Contact Submission Flow
+
+```text
+User fills form
+        ↓
+Clicks Send Message
+        ↓
+Prevent normal browser form submit
+        ↓
+Check empty fields
+        ↓
+Check email format
+        ↓
+Validation succeeds
+        ↓
+setSubmitting(true)
+        ↓
+Button disabled
+        ↓
+Text becomes "Sending..."
+        ↓
+POST /api/contact
+        ↓
+        ├── SUCCESS
+        │      ↓
+        │ Clear error
+        │      ↓
+        │ Show success message
+        │      ↓
+        │ Reset form
+        │
+        └── FAILURE
+               ↓
+          Show error message
+               ↓
+          Clear success message
+        ↓
+finally
+        ↓
+setSubmitting(false)
+        ↓
+Button enabled again
+        ↓
+Text returns to "Send Message"
+```
+
+---
+
+# Contact Form API States
+
+```text
+Idle
+→ Send Message
+
+Validation Error
+→ Show validation message
+
+Submitting
+→ Button disabled
+→ Sending...
+
+Backend Error
+→ Show backend error message
+
+Network Error
+→ Unable to send message.
+
+Success
+→ Show success message
+→ Reset form
+```
+
+---
+
+# Step 28 Status
+
+```text
+Contact form POST API ✅
+Controlled form state ✅
+Empty-field validation ✅
+Email validation ✅
+Backend response handling ✅
+Backend error message ✅
+Network error handling ✅
+Success message ✅
+Form reset ✅
+Submitting state ✅
+Duplicate-submit prevention ✅
+Disabled submit button ✅
+Dynamic Sending... text ✅
+finally block ✅
+Disabled button CSS ✅
+Disabled hover protection ✅
+```
+
+---
+
+# Files Updated
+
+```text
+Contact.jsx
+Contact.css
+```
+
+---
+
+# Concepts Practiced
+
+```text
+useState()
+Controlled forms
+Form validation
+async / await
+fetch()
+POST requests
+JSON.stringify()
+response.ok
+response.json()
+try
+catch
+finally
+Conditional rendering
+Ternary operator
+disabled attribute
+State-driven buttons
+Duplicate-submit prevention
+API success handling
+API error handling
+```
+
+---
+
+# Git Checkpoint - Contact Form API Handling
+
+Check changes:
+
+```bash
+git status
+```
+
+Stage:
+
+```bash
+git add .
+```
+
+Commit:
+
+```bash
+git commit -m "Improve contact form API handling"
+```
+
+Push:
+
+```bash
+git push
+```
+
+---
+
+# Current API Handling Status
+
+```text
+Projects GET API ✅
+Skills GET API ✅
+Certifications GET API ✅
+Contact POST API ✅
+
+Next:
+Guestbook GET API
+Guestbook POST API
+```

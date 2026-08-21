@@ -6,6 +6,8 @@ export default function Contact() {
     // Tracks whether the Contact section should start its animations.
     const [contactVisible, setContactVisible] = useState(false);
 
+
+
     useEffect(() => {
 
         function handleScroll() {
@@ -49,6 +51,9 @@ export default function Contact() {
 
     const [success, setSuccess] = useState("");
 
+    //Track whether the contact form is currently being submitted.
+    const [submitting, setSubmitting] = useState(false);
+
     function handleChange(event) {
         setFormData({
             ...formData,
@@ -72,6 +77,9 @@ export default function Contact() {
             setError("Please enter a valid email address.");
             return;
         }
+
+        //Starts the submitting state after validation passes.
+        setSubmitting(true);
 
         try {
             const response = await fetch(
@@ -107,6 +115,10 @@ export default function Contact() {
 
             setError("Unable to send message.");
             setSuccess("");
+        } finally {
+
+            //Runs whether the request succeeds or fails.
+            setSubmitting(false);
         }
     }
 
@@ -295,9 +307,13 @@ export default function Contact() {
                                     </div>
                                 )}
 
-                                <button type="submit" className="contact-submit">
-                                    Send Message
-                                    <i className="bi bi-send"></i>
+                                <button
+                                    type="submit"
+                                    className="contact-submit"
+                                    disabled={submitting}
+                                >
+                                    {submitting ? "Sending..." : "Send Message"}
+                                    < i className="bi bi-send"></i>
                                 </button>
 
                             </form>
@@ -308,6 +324,6 @@ export default function Contact() {
                 </div>
             </div>
 
-        </section>
+        </section >
     );
 }
