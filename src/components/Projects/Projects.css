@@ -90,7 +90,7 @@
 
 /* MOBILE */
 
-@media (max-width: 768px) {
+@media (max-width: 991px) {
 
     /* On smaller screens I show one project card per row instead of two. */
     .projects-grid {
