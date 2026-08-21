@@ -83,6 +83,27 @@
     text-decoration: none;
 }
 
+/* Makes it clear that the certificate image can be opened. */
+.certification-image-link {
+    display: block;
+    cursor: pointer;
+}
+
+.certification-image-link img {
+    transition: transform 250ms ease;
+}
+
+/* Slightly enlarges the certificate when the user hovers over it. */
+.certification-image-link:hover img {
+    transform: scale(1.03);
+}
+
+/* Shows keyboard users that the certificate image is selected. */
+.certification-image-link:focus-visible {
+    outline: 2px solid #51A2FF;
+    outline-offset: 4px;
+}
+
 @media (max-width: 576px) {
 
     /* Lets certificate images use their natural height on smaller screens. */
