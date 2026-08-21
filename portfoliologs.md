@@ -21642,3 +21642,685 @@ Accessibility check
 Deployment preparation
 Final README update
 ```
+
+# Step 27 - Certifications API Loading and Error Handling
+
+## Goal
+
+Add complete API state handling to the Certifications section.
+
+The Certifications component now handles:
+
+```text
+Loading
+Error
+Empty
+Success
+```
+
+---
+
+# Certifications State
+
+Existing state:
+
+```jsx
+const [certifications, setCertifications] = useState([]);
+const [showAllCertifications, setShowAllCertifications] = useState(false);
+```
+
+Added:
+
+```jsx
+// Tracks whether certifications are still being loaded from the API.
+const [loading, setLoading] = useState(true);
+
+// Stores an error message if the Certifications API request fails.
+const [error, setError] = useState("");
+```
+
+Purpose:
+
+```text
+certifications
+→ Stores certification data returned by the API.
+
+showAllCertifications
+→ Controls whether 2 or all certifications are displayed.
+
+loading
+→ Tracks whether the API request is still running.
+
+error
+→ Stores a user-friendly error message.
+```
+
+---
+
+# Certifications API Request
+
+Updated the existing `fetch()` request:
+
+```jsx
+useEffect(() => {
+
+    // Sends a GET request to the Certifications API.
+    fetch(`${import.meta.env.VITE_API_URL}/api/certifications`)
+
+        // Runs when the server sends back a response.
+        .then((response) => {
+
+            // Checks whether the HTTP response was unsuccessful.
+            if (!response.ok) {
+
+                // Stops the normal Promise chain and sends the error to .catch().
+                throw new Error("Unable to load certifications.");
+            }
+
+            // Converts the JSON response into JavaScript data.
+            return response.json();
+        })
+
+        // Runs after the JSON has been successfully converted.
+        .then((data) => {
+
+            // Stores certifications returned by the API in React state.
+            setCertifications(data);
+        })
+
+        // Runs if the API request or any previous step fails.
+        .catch((error) => {
+
+            // Shows the actual error in the console for debugging.
+            console.error("Certifications fetch error: ", error);
+
+            // Stores a user-friendly error message.
+            setError("Unable to load certifications");
+        })
+
+        // Runs whether the request succeeds or fails.
+        .finally(() => {
+
+            // Tells React that loading is finished.
+            setLoading(false);
+        });
+
+}, []);
+```
+
+---
+
+# HTTP Error Check
+
+Added:
+
+```jsx
+if (!response.ok) {
+    throw new Error("Unable to load certifications.");
+}
+```
+
+`fetch()` does not automatically reject HTTP errors such as:
+
+```text
+404
+500
+503
+```
+
+Therefore the response is manually checked.
+
+```text
+response.ok
+→ successful HTTP response
+
+!response.ok
+→ unsuccessful HTTP response
+```
+
+If unsuccessful:
+
+```jsx
+throw new Error("Unable to load certifications.");
+```
+
+moves execution to `.catch()`.
+
+---
+
+# Successful API Response
+
+After a successful response:
+
+```jsx
+return response.json();
+```
+
+converts the JSON response into JavaScript data.
+
+Then:
+
+```jsx
+.then((data) => {
+    setCertifications(data);
+})
+```
+
+stores the returned certifications in state.
+
+Flow:
+
+```text
+API response
+↓
+response.json()
+↓
+data
+↓
+setCertifications(data)
+↓
+React re-render
+```
+
+---
+
+# Error Handling
+
+Added:
+
+```jsx
+.catch((error) => {
+
+    console.error("Certifications fetch error: ", error);
+
+    setError("Unable to load certifications");
+})
+```
+
+Two error outputs are used:
+
+```text
+console.error()
+→ Technical information for development/debugging.
+
+setError()
+→ Simple error message for the portfolio visitor.
+```
+
+---
+
+# Loading Completion
+
+Added:
+
+```jsx
+.finally(() => {
+    setLoading(false);
+});
+```
+
+`.finally()` runs whether the request succeeds or fails.
+
+```text
+Request starts
+↓
+loading = true
+↓
+Success OR Error
+↓
+.finally()
+↓
+loading = false
+```
+
+---
+
+# Loading UI
+
+Added:
+
+```jsx
+{loading && (
+    <p className="certifications-status">
+        Loading Certifications...
+    </p>
+)}
+```
+
+While the API request is running:
+
+```text
+Loading Certifications...
+```
+
+is displayed.
+
+---
+
+# Error UI
+
+Added:
+
+```jsx
+{error && (
+    <p className="certifications-status certifications-error">
+        {error}
+    </p>
+)}
+```
+
+If the API fails, the visitor sees:
+
+```text
+Unable to load certifications
+```
+
+---
+
+# Empty Certifications State
+
+Added:
+
+```jsx
+{!loading && !error && certifications.length === 0 && (
+    <p className="certifications-status">
+        No certifications available right now.
+    </p>
+)}
+```
+
+This handles a successful API request that returns:
+
+```js
+[]
+```
+
+Instead of leaving the section blank, the portfolio displays:
+
+```text
+No certifications available right now.
+```
+
+---
+
+# Successful Certifications Rendering
+
+The normal Certifications UI now only renders when:
+
+```jsx
+!loading && !error && certifications.length > 0
+```
+
+Used:
+
+```jsx
+{!loading && !error && certifications.length > 0 && (
+    <>
+        ...
+    </>
+)}
+```
+
+All three conditions must be true:
+
+```text
+Loading finished
+AND
+No error
+AND
+At least one certification exists
+```
+
+---
+
+# React Fragment
+
+The successful state contains two sibling elements:
+
+```text
+Certifications grid
+View More button
+```
+
+They are grouped using:
+
+```jsx
+<>
+    ...
+</>
+```
+
+The Fragment groups multiple JSX elements without adding an unnecessary HTML wrapper to the DOM.
+
+---
+
+# Certifications Slice and Map
+
+Existing rendering logic was maintained:
+
+```jsx
+{certifications
+    .slice(
+        0,
+        showAllCertifications
+            ? certifications.length
+            : 2
+    )
+    .map((certification) => {
+        return (
+            <CertificationCard
+                key={certification._id}
+                title={certification.title}
+                issuer={certification.issuer}
+                date={certification.date}
+                image={certification.imageUrl}
+                credentialLink={certification.credentialLink}
+            />
+        );
+    })}
+```
+
+Flow:
+
+```text
+certifications array
+↓
+.slice()
+↓
+Choose 2 or all certifications
+↓
+.map()
+↓
+Turn each certification into a CertificationCard
+```
+
+---
+
+# View More Logic
+
+The button continues to render only when:
+
+```jsx
+certifications.length > 2
+```
+
+Used:
+
+```jsx
+{certifications.length > 2 && (
+    <button>
+        ...
+    </button>
+)}
+```
+
+The button toggles:
+
+```jsx
+setShowAllCertifications(!showAllCertifications)
+```
+
+Flow:
+
+```text
+false
+↓
+Show first 2 certifications
+↓
+Click View More
+↓
+true
+↓
+Show all certifications
+↓
+Click Show Less
+↓
+false
+↓
+Show first 2 again
+```
+
+---
+
+# Certifications Status CSS
+
+Added:
+
+```css
+/* Shared message style for loading, error, and empty Certifications API states. */
+.certifications-status {
+    margin: 32px 0;
+    padding: 16px 20px;
+
+    color: #CBD5E1;
+    background: rgba(15, 23, 42, 0.7);
+
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+
+    text-align: center;
+}
+```
+
+Used for:
+
+```text
+Loading Certifications...
+No certifications available right now.
+```
+
+---
+
+# Certifications Error CSS
+
+Added:
+
+```css
+/* Extra styling only when the Certifications API fails. */
+.certifications-error {
+    color: #FCA5A5;
+    background: rgba(127, 29, 29, 0.18);
+    border-color: rgba(248, 113, 113, 0.3);
+}
+```
+
+The error element receives both:
+
+```jsx
+className="certifications-status certifications-error"
+```
+
+Meaning:
+
+```text
+certifications-status
+→ Base status appearance
+
+certifications-error
+→ Error-specific color overrides
+```
+
+---
+
+# Certifications API Flow
+
+```text
+Certifications component mounts
+        ↓
+loading = true
+        ↓
+GET /api/certifications
+        ↓
+        ├── SUCCESS
+        │      ↓
+        │ response.ok
+        │      ↓
+        │ response.json()
+        │      ↓
+        │ setCertifications(data)
+        │      ↓
+        │ .finally()
+        │      ↓
+        │ loading = false
+        │      ↓
+        │
+        │ certifications.length > 0
+        │      ↓
+        │ Show certification cards
+        │
+        │ OR
+        │
+        │ certifications.length === 0
+        │      ↓
+        │ Show empty message
+        │
+        └── FAILURE
+               ↓
+         !response.ok / network error
+               ↓
+         throw new Error()
+               ↓
+             .catch()
+               ↓
+       setError("Unable to load certifications")
+               ↓
+             .finally()
+               ↓
+          loading = false
+               ↓
+          Show error message
+```
+
+---
+
+# Consistent GET API Handling
+
+All three portfolio GET API sections now use the same pattern:
+
+```text
+PROJECTS
+├── Loading ✅
+├── Error ✅
+├── Empty ✅
+└── Success ✅
+
+SKILLS
+├── Loading ✅
+├── Error ✅
+├── Empty ✅
+└── Success ✅
+
+CERTIFICATIONS
+├── Loading ✅
+├── Error ✅
+├── Empty ✅
+└── Success ✅
+```
+
+---
+
+# Step 27 Status
+
+```text
+Certifications loading state ✅
+Certifications error state ✅
+Certifications empty state ✅
+response.ok check ✅
+throw new Error() ✅
+.catch() ✅
+.finally() ✅
+Developer console error ✅
+User-friendly error message ✅
+Conditional rendering ✅
+React Fragment ✅
+Existing slice() logic maintained ✅
+Existing map() logic maintained ✅
+Existing View More functionality maintained ✅
+Status CSS ✅
+Error CSS ✅
+Consistent API state design ✅
+```
+
+---
+
+# Files Updated
+
+```text
+Certifications.jsx
+Certifications.css
+```
+
+---
+
+# Concepts Reinforced
+
+```text
+useState()
+useEffect()
+fetch()
+response.ok
+response.json()
+Promises
+.then()
+.catch()
+.finally()
+throw new Error()
+Conditional rendering
+&& operator
+! operator
+React Fragment
+Array slice()
+Array map()
+React keys
+API loading states
+API error states
+API empty states
+State-driven UI
+```
+
+---
+
+# Git Checkpoint
+
+Check changes:
+
+```bash
+git status
+```
+
+Stage:
+
+```bash
+git add .
+```
+
+Commit:
+
+```bash
+git commit -m "Add certification API loading and error states"
+```
+
+Push:
+
+```bash
+git push
+```
+
+---
+
+# Current API Handling Status
+
+```text
+Projects GET API ✅
+Skills GET API ✅
+Certifications GET API ✅
+
+Next:
+Contact POST API
+Guestbook GET/POST API
+```
