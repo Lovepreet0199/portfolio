@@ -1,6 +1,6 @@
 # Lovepreet Sandhu Portfolio
 
-React portfolio created for HTTP5222 Assignment 2.
+React portfolio
 
 ## Live Website
 
