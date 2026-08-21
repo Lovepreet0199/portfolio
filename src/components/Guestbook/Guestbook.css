@@ -155,8 +155,18 @@
     cursor: pointer;
 }
 
-.guestbook-submit:hover {
+.guestbook-submit:not(:disabled):hover {
     background-color: #1447E6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(21, 93, 252, 0.3);
+}
+
+/* Shows that the Guestbook form is currently being submitted. */
+.guestbook-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+    box-shadow: none;
 }
 
 .guestbook-comments {
@@ -281,13 +291,40 @@
     transition:
         transform 250ms ease,
         background-color 250ms ease,
-        box-shadow 250ms ease;
+        box-shadow 250ms ease,
+        opacity 250ms ease;
 }
 
 .guestbook-submit:hover {
     background-color: #1447E6;
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(21, 93, 252, 0.3);
+}
+
+/* Shared message style for loading and empty Guestbook states. */
+.guestbook-status {
+    margin: 16px 0;
+    padding: 16px 20px;
+
+    color: #CBD5E1;
+    background: rgba(15, 23, 42, 0.7);
+
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+
+    text-align: center;
+}
+
+/* Extra styling when the Guestbook messages fail to load. */
+.guestbook-error {
+    color: #FCA5A5;
+    background: rgba(127, 29, 29, 0.18);
+    border-color: rgba(248, 113, 113, 0.3);
 }
 
 @media (max-width: 768px) {

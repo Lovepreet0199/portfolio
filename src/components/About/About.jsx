@@ -6,6 +6,39 @@ export default function About() {
     // Tracks whether the About section should start its animations.
     const [aboutVisible, setAboutVisible] = useState(false);
 
+    const [aboutStats, setAboutStats] = useState([]);
+    const [loadingStats, setLoadingStats] = useState(true);
+    const [statsError, setStatsError] = useState("");
+
+    useEffect(() => {
+
+        // Loads the live About statistics from the API.
+        fetch(`${import.meta.env.VITE_API_URL}/api/about-stats`)
+
+            .then((response) => {
+
+                if (!response.ok) {
+                    throw new Error("Unable to load About stats.");
+                }
+
+                return response.json();
+            })
+
+            .then((data) => {
+                setAboutStats(data);
+            })
+
+            .catch((error) => {
+                console.error("About stats fetch error: ", error);
+                setStatsError("Unable to load About stats.");
+            })
+
+            .finally(() => {
+                setLoadingStats(false);
+            });
+
+    }, []);
+
     useEffect(() => {
 
         // Runs whenever the user scrolls the page.
@@ -113,44 +146,47 @@ export default function About() {
 
                 <div className="about-stats row">
 
-                    <div className={`col-12 col-md-4 ${aboutVisible ? "about-stat-show" : ""}`}>
-                        <div className="about-stat-card">
+                    {loadingStats && (
+                        <p className="about-stats-status">
+                            Loading stats...
+                        </p>
+                    )}
 
-                            <div className="about-stat-info">
-                                <i className="bi bi-code-slash"></i>
-                                <p>Technologies</p>
-                            </div>
+                    {statsError && (
+                        <p className="about-stats-status about-stats-error">
+                            {statsError}
+                        </p>
+                    )}
 
-                            <h3>20+</h3>
+                    {!loadingStats && !statsError && aboutStats.length === 0 && (
+                        <p className="about-stats-status">
+                            No stats available right now.
+                        </p>
+                    )}
 
-                        </div>
-                    </div>
+                    {!loadingStats && !statsError && aboutStats.length > 0 && (
+                        <>
+                            {aboutStats.map((stat) => {
+                                return (
+                                    <div
+                                        key={stat.label}
+                                        className={`col-12 col-md-4 ${aboutVisible ? "about-stat-show" : ""}`}
+                                    >
+                                        <div className="about-stat-card">
 
-                    <div className={`col-12 col-md-4 ${aboutVisible ? "about-stat-show" : ""}`}>
-                        <div className="about-stat-card">
+                                            <div className="about-stat-info">
+                                                <i className={`bi ${stat.icon}`}></i>
+                                                <p>{stat.label}</p>
+                                            </div>
 
-                            <div className="about-stat-info">
-                                <i className="bi bi-folder"></i>
-                                <p>Projects Built</p>
-                            </div>
+                                            <h3>{stat.value}+</h3>
 
-                            <h3>10+</h3>
-
-                        </div>
-                    </div>
-
-                    <div className={`col-12 col-md-4 ${aboutVisible ? "about-stat-show" : ""}`}>
-                        <div className="about-stat-card">
-
-                            <div className="about-stat-info">
-                                <i className="bi bi-mortarboard"></i>
-                                <p>Certifications</p>
-                            </div>
-
-                            <h3>7+</h3>
-
-                        </div>
-                    </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </>
+                    )}
 
                 </div>
             </div>

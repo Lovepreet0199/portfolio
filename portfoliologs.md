@@ -19704,3 +19704,4832 @@ Accessibility check
 Deployment preparation
 Final README update
 ```
+
+# Step 25 - Projects API Loading and Error Handling
+
+## Goal
+
+Improve the Projects section so the UI properly handles all API states:
+
+```text
+Loading
+Success
+Error
+Empty projects
+```
+
+Previously, the Projects component fetched project data from the API but did not clearly handle loading or failed requests.
+
+---
+
+# Projects API
+
+The portfolio Projects section loads its project data from the deployed backend API.
+
+Environment variable:
+
+```env
+VITE_API_URL=<portfolio-api-url>
+```
+
+API request:
+
+```js
+fetch(`${import.meta.env.VITE_API_URL}/api/projects`)
+```
+
+This keeps the API URL outside the component and allows different URLs to be used for development and production.
+
+---
+
+# Projects State
+
+The component now uses four pieces of state:
+
+```jsx
+const [projects, setProjects] = useState([]);
+const [showAllProjects, setShowAllProjects] = useState(false);
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState("");
+```
+
+Purpose:
+
+```text
+projects
+Stores the projects returned by the API.
+
+showAllProjects
+Controls whether the first two projects or all projects are displayed.
+
+loading
+Tracks whether the API request is still running.
+
+error
+Stores a user-friendly message if loading the projects fails.
+```
+
+---
+
+# Loading State
+
+Added:
+
+```jsx
+const [loading, setLoading] = useState(true);
+```
+
+It starts as:
+
+```js
+true
+```
+
+because when the component first loads, the API request has not finished yet.
+
+The UI checks:
+
+```jsx
+{loading && (
+    <p className="projects-status">
+        Loading Projects...
+    </p>
+)}
+```
+
+Meaning:
+
+```text
+If loading is true
+→ display "Loading Projects..."
+```
+
+---
+
+# Error State
+
+Added:
+
+```jsx
+const [error, setError] = useState("");
+```
+
+An empty string means there is currently no error.
+
+If the API request fails:
+
+```jsx
+setError("Unable to load projects");
+```
+
+The UI checks:
+
+```jsx
+{error && (
+    <p className="projects-status projects-error">
+        {error}
+    </p>
+)}
+```
+
+Meaning:
+
+```text
+If error contains a value
+→ display the error message
+```
+
+---
+
+# Fetch Request
+
+The Projects API request is run inside `useEffect()`:
+
+```jsx
+useEffect(() => {
+
+    fetch(`${import.meta.env.VITE_API_URL}/api/projects`)
+
+        .then((response) => {
+
+            if (!response.ok) {
+                throw new Error("Unable to load projects.");
+            }
+
+            return response.json();
+        })
+
+        .then((data) => {
+            setProjects(data);
+        })
+
+        .catch((error) => {
+
+            console.error("Projects fetch error: ", error);
+
+            setError("Unable to load projects");
+        })
+
+        .finally(() => {
+            setLoading(false);
+        });
+
+}, []);
+```
+
+---
+
+# Checking `response.ok`
+
+`fetch()` does not automatically treat HTTP errors such as:
+
+```text
+404
+500
+503
+```
+
+as rejected Promises.
+
+Because of this, the response must be checked manually:
+
+```jsx
+if (!response.ok) {
+    throw new Error("Unable to load projects.");
+}
+```
+
+`response.ok` is true for successful HTTP responses.
+
+The `!` means NOT.
+
+Therefore:
+
+```js
+!response.ok
+```
+
+means:
+
+```text
+The response was NOT successful.
+```
+
+When this happens:
+
+```jsx
+throw new Error("Unable to load projects.");
+```
+
+stops the normal Promise chain and transfers control to `.catch()`.
+
+---
+
+# Converting JSON
+
+After a successful response:
+
+```jsx
+return response.json();
+```
+
+converts the JSON returned by the API into JavaScript data.
+
+That data is passed to the next `.then()`:
+
+```jsx
+.then((data) => {
+    setProjects(data);
+})
+```
+
+The API project array is therefore stored inside React state.
+
+---
+
+# Catching API Errors
+
+Added:
+
+```jsx
+.catch((error) => {
+
+    console.error("Projects fetch error: ", error);
+
+    setError("Unable to load projects");
+})
+```
+
+Two different things happen here.
+
+Developer debugging:
+
+```jsx
+console.error("Projects fetch error: ", error);
+```
+
+This allows the real JavaScript/API error to be inspected in the browser console.
+
+User feedback:
+
+```jsx
+setError("Unable to load projects");
+```
+
+This gives visitors a simple message instead of displaying technical error information.
+
+---
+
+# `.finally()`
+
+Added:
+
+```jsx
+.finally(() => {
+    setLoading(false);
+});
+```
+
+`.finally()` runs whether the request:
+
+```text
+Succeeds
+or
+Fails
+```
+
+Therefore loading always ends after the request finishes.
+
+Flow:
+
+```text
+Component loads
+↓
+loading = true
+↓
+API request starts
+↓
+Request succeeds OR fails
+↓
+.finally()
+↓
+loading = false
+```
+
+---
+
+# Successful Projects Rendering
+
+Normal project content should only appear when:
+
+```text
+The request is finished
+AND
+there is no error
+```
+
+Added:
+
+```jsx
+{!loading && !error && (
+    <>
+        ...
+    </>
+)}
+```
+
+Meaning:
+
+```text
+!loading
+→ loading is false
+
+!error
+→ there is no error
+
+&&
+→ both conditions must be true
+```
+
+Therefore:
+
+```text
+Not loading AND no error
+→ display Projects UI
+```
+
+---
+
+# React Fragment
+
+The successful state contains both:
+
+```text
+Projects grid
+View More button
+```
+
+They need to be grouped together.
+
+Instead of adding an unnecessary `<div>`, a React Fragment is used:
+
+```jsx
+<>
+    ...
+</>
+```
+
+A Fragment groups multiple JSX elements without creating another HTML element in the DOM.
+
+Example:
+
+```jsx
+<>
+    <div className="projects-grid">
+        ...
+    </div>
+
+    <button>
+        View More
+    </button>
+</>
+```
+
+---
+
+# Project Array Rendering
+
+Projects are rendered using:
+
+```jsx
+{projects
+    .slice(0, showAllProjects ? projects.length : 2)
+    .map((project) => {
+        return (
+            <ProjectCard
+                key={project._id}
+                title={project.title}
+                type={project.type}
+                description={project.description}
+                technologies={project.technologies}
+                image={project.imageUrl}
+                githubLink={project.githubLink}
+                liveLink={project.liveLink}
+            />
+        );
+    })}
+```
+
+The logic has two main stages:
+
+```text
+.slice()
+↓
+Select which projects should be displayed
+
+.map()
+↓
+Turn every selected project into a ProjectCard
+```
+
+---
+
+# `.slice()`
+
+Used:
+
+```jsx
+.slice(0, showAllProjects ? projects.length : 2)
+```
+
+When:
+
+```js
+showAllProjects === false
+```
+
+the expression becomes:
+
+```jsx
+.slice(0, 2)
+```
+
+Only the first two projects are selected.
+
+When:
+
+```js
+showAllProjects === true
+```
+
+it becomes:
+
+```jsx
+.slice(0, projects.length)
+```
+
+All projects are selected.
+
+---
+
+# `.map()`
+
+After `.slice()` chooses the projects, `.map()` loops through them.
+
+```jsx
+.map((project) => {
+```
+
+`project` represents the current project object.
+
+Example:
+
+```js
+project = {
+    _id: "...",
+    title: "PhotoScout",
+    description: "...",
+    technologies: [...]
+}
+```
+
+Properties are accessed using:
+
+```js
+project.title
+project.description
+project.technologies
+```
+
+They are passed to `ProjectCard` as props:
+
+```jsx
+<ProjectCard
+    title={project.title}
+    description={project.description}
+/>
+```
+
+Flow:
+
+```text
+API
+↓
+projects array
+↓
+slice selected projects
+↓
+map each project
+↓
+create ProjectCard
+↓
+pass project properties as props
+```
+
+---
+
+# React Key
+
+Each mapped component receives:
+
+```jsx
+key={project._id}
+```
+
+MongoDB `_id` values are unique.
+
+React uses the key to identify each rendered ProjectCard.
+
+This becomes important when projects are:
+
+```text
+Added
+Removed
+Changed
+Reordered
+```
+
+---
+
+# View More Button Condition
+
+The View More button should only exist when there are more than two projects.
+
+Added:
+
+```jsx
+{projects.length > 2 && (
+    <button>
+        ...
+    </button>
+)}
+```
+
+Meaning:
+
+```text
+If projects.length > 2
+→ display button
+
+Otherwise
+→ display nothing
+```
+
+Example:
+
+```text
+2 projects
+2 > 2 = false
+No View More button
+
+5 projects
+5 > 2 = true
+Show View More button
+```
+
+---
+
+# View More Toggle
+
+Button:
+
+```jsx
+onClick={() => setShowAllProjects(!showAllProjects)}
+```
+
+The `!` changes the Boolean to its opposite.
+
+```text
+false → true
+true → false
+```
+
+Initially:
+
+```js
+showAllProjects = false
+```
+
+Click:
+
+```js
+setShowAllProjects(!false);
+```
+
+becomes:
+
+```js
+setShowAllProjects(true);
+```
+
+React re-renders.
+
+The `.slice()` expression now sees:
+
+```js
+showAllProjects = true
+```
+
+and displays all projects.
+
+Clicking again changes:
+
+```text
+true → false
+```
+
+and the list returns to the first two projects.
+
+---
+
+# Dynamic Button Text
+
+Added:
+
+```jsx
+{showAllProjects
+    ? "Show Less"
+    : "View More Projects"}
+```
+
+Meaning:
+
+```text
+showAllProjects = false
+→ View More Projects
+
+showAllProjects = true
+→ Show Less
+```
+
+---
+
+# Dynamic Chevron
+
+Added:
+
+```jsx
+<i
+    className={`bi ${
+        showAllProjects
+            ? "bi-chevron-up"
+            : "bi-chevron-down"
+    }`}
+></i>
+```
+
+When collapsed:
+
+```text
+View More Projects ↓
+```
+
+When expanded:
+
+```text
+Show Less ↑
+```
+
+---
+
+# Dynamic Projects Grid Class
+
+The grid uses:
+
+```jsx
+<div
+    className={`projects-grid ${
+        showAllProjects
+            ? "projects-grid-expanded"
+            : ""
+    }`}
+>
+```
+
+Collapsed:
+
+```html
+<div class="projects-grid">
+```
+
+Expanded:
+
+```html
+<div class="projects-grid projects-grid-expanded">
+```
+
+This allows CSS to apply different animation/layout behaviour when the project list expands.
+
+---
+
+# Empty Projects State
+
+A successful API request could return:
+
+```js
+[]
+```
+
+In that case:
+
+```js
+projects.length === 0
+```
+
+Instead of displaying an empty section, show:
+
+```jsx
+{!loading && !error && projects.length === 0 && (
+    <p className="projects-status">
+        No projects available right now.
+    </p>
+)}
+```
+
+The normal grid should then check:
+
+```jsx
+!loading && !error && projects.length > 0
+```
+
+This gives the Projects component four clear UI states:
+
+```text
+1. Loading
+2. Error
+3. Empty
+4. Success
+```
+
+---
+
+# Final Projects.jsx
+
+```jsx
+import "./Projects.css";
+import ProjectCard from "../ProjectCard/ProjectCard";
+import { useState, useEffect } from "react";
+
+export default function Projects() {
+
+    const [projects, setProjects] = useState([]);
+    const [showAllProjects, setShowAllProjects] = useState(false);
+
+    // Track whether the projects are still being loaded from the API.
+    const [loading, setLoading] = useState(true);
+
+    // Stores an error message if the API request fails.
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+
+        // Sends a GET request to the Projects API.
+        fetch(`${import.meta.env.VITE_API_URL}/api/projects`)
+
+            // Runs when the server sends back a response.
+            .then((response) => {
+
+                // Checks if the HTTP response was unsuccessful such as 404, 500, etc.
+                if (!response.ok) {
+
+                    // Stops the normal Promise chain and sends the error to .catch().
+                    throw new Error("Unable to load projects.");
+                }
+
+                // Converts the JSON response into JavaScript data
+                // and passes it to the next .then().
+                return response.json();
+            })
+
+            // Runs after the JSON has been successfully converted.
+            .then((data) => {
+
+                // Stores the projects returned by the API in React state.
+                setProjects(data);
+            })
+
+            // Runs if the API request or any previous step fails.
+            .catch((error) => {
+
+                // Displays the actual error in the browser console for debugging.
+                console.error("Projects fetch error: ", error);
+
+                // Stores a user-friendly error message in React state.
+                setError("Unable to load projects");
+            })
+
+            // Runs after the request finishes whether it succeeded or failed.
+            .finally(() => {
+
+                // Tells React that the API request is no longer loading.
+                setLoading(false);
+            });
+
+    }, []);
+
+    return (
+        <div className="projects" id="projects">
+
+            {/* Shows a message while projects are being fetched from the API. */}
+            {loading && (
+                <p className="projects-status">
+                    Loading Projects...
+                </p>
+            )}
+
+            {/* Shows an error message if the API request fails. */}
+            {error && (
+                <p className="projects-status projects-error">
+                    {error}
+                </p>
+            )}
+
+            {/* Shows a message if the API works but there are no projects. */}
+            {!loading && !error && projects.length === 0 && (
+                <p className="projects-status">
+                    No projects available right now.
+                </p>
+            )}
+
+            {/* Shows the projects after loading succeeds. */}
+            {!loading && !error && projects.length > 0 && (
+                <>
+                    <div
+                        className={`projects-grid ${
+                            showAllProjects
+                                ? "projects-grid-expanded"
+                                : ""
+                        }`}
+                    >
+
+                        {projects
+                            .slice(
+                                0,
+                                showAllProjects
+                                    ? projects.length
+                                    : 2
+                            )
+                            .map((project) => {
+                                return (
+                                    <ProjectCard
+                                        key={project._id}
+                                        title={project.title}
+                                        type={project.type}
+                                        description={project.description}
+                                        technologies={project.technologies}
+                                        image={project.imageUrl}
+                                        githubLink={project.githubLink}
+                                        liveLink={project.liveLink}
+                                    />
+                                );
+                            })}
+
+                    </div>
+
+                    {/* Only shows the button when there are more than 2 projects. */}
+                    {projects.length > 2 && (
+                        <button
+                            type="button"
+                            className="projects-view-more-btn"
+                            onClick={() =>
+                                setShowAllProjects(!showAllProjects)
+                            }
+                        >
+                            {showAllProjects
+                                ? "Show Less"
+                                : "View More Projects"}
+
+                            <i
+                                className={`bi ${
+                                    showAllProjects
+                                        ? "bi-chevron-up"
+                                        : "bi-chevron-down"
+                                }`}
+                            ></i>
+                        </button>
+                    )}
+                </>
+            )}
+
+        </div>
+    );
+}
+```
+
+---
+
+# Step 25 Status
+
+```text
+Projects API integration ✅
+
+Environment API URL ✅
+
+Projects state ✅
+
+Loading state ✅
+
+HTTP response checking ✅
+
+response.ok handling ✅
+
+JSON conversion ✅
+
+API error catching ✅
+
+Developer console error ✅
+
+User-friendly error message ✅
+
+.finally() loading reset ✅
+
+Success-state conditional rendering ✅
+
+Empty-state handling ✅
+
+React Fragment ✅
+
+Projects array mapping ✅
+
+Projects array slicing ✅
+
+ProjectCard props ✅
+
+React key using MongoDB _id ✅
+
+View More conditional rendering ✅
+
+View More / Show Less state toggle ✅
+
+Dynamic button label ✅
+
+Dynamic chevron ✅
+
+Expanded grid class ✅
+```
+
+---
+
+# API State Flow
+
+```text
+Projects component mounts
+        ↓
+loading = true
+        ↓
+GET /api/projects
+        ↓
+        ├── Success
+        │      ↓
+        │ response.json()
+        │      ↓
+        │ setProjects(data)
+        │      ↓
+        │ .finally()
+        │      ↓
+        │ loading = false
+        │      ↓
+        │ Projects render
+        │
+        └── Failure
+               ↓
+          throw Error / fetch error
+               ↓
+            .catch()
+               ↓
+        setError("Unable to load projects")
+               ↓
+            .finally()
+               ↓
+          loading = false
+               ↓
+        Error message renders
+```
+
+---
+
+# Concepts Practiced
+
+```text
+useState()
+
+useEffect()
+
+fetch()
+
+Promises
+
+.then()
+
+.catch()
+
+.finally()
+
+response.ok
+
+throw new Error()
+
+response.json()
+
+Environment variables
+
+Conditional rendering
+
+&& operator
+
+! operator
+
+Ternary operator
+
+React Fragments
+
+Array .slice()
+
+Array .map()
+
+React keys
+
+Component props
+
+State-driven UI
+
+API loading states
+
+API error states
+
+API empty states
+```
+
+---
+
+# Git Checkpoint - Projects API Error Handling
+
+Before committing:
+
+```bash
+git status
+```
+
+Then:
+
+```bash
+git add .
+```
+
+Commit:
+
+```bash
+git commit -m "Add project API loading and error states"
+```
+
+Push:
+
+```bash
+git push
+```
+
+---
+
+# Current Portfolio Final Cleanup
+
+```text
+Footer polish
+Real GitHub link
+Real LinkedIn link
+Email links
+Resume / CV file
+Final mobile testing
+Projects API loading state ✅
+Projects API error state ✅
+Projects API empty state ✅
+Other API loading/error states
+Accessibility check
+Deployment preparation
+Final README update
+```
+
+# Step 25.1 - Projects API Status Styling
+
+Added CSS styling for the Projects API loading, error, and empty states.
+
+---
+
+## Projects Status Message
+
+Added a shared class:
+
+```css
+/* Shared message style for loading, error, and empty project states. */
+.projects-status {
+    margin: 32px 0;
+    padding: 16px 20px;
+
+    color: #CBD5E1;
+    background: rgba(15, 23, 42, 0.7);
+
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+
+    text-align: center;
+}
+```
+
+This class is shared by:
+
+```text
+Loading Projects...
+No projects available right now.
+Unable to load projects
+```
+
+The loading and empty states use the normal status appearance.
+
+---
+
+## Projects Error Styling
+
+Added an additional error class:
+
+```css
+/* Extra styling only when the Projects API fails. */
+.projects-error {
+    color: #FCA5A5;
+    background: rgba(127, 29, 29, 0.18);
+    border-color: rgba(248, 113, 113, 0.3);
+}
+```
+
+The JSX uses both classes:
+
+```jsx
+<p className="projects-status projects-error">
+    {error}
+</p>
+```
+
+This means:
+
+```text
+projects-status
+↓
+Provides the base status styling
+
+projects-error
+↓
+Overrides the colors for an error
+```
+
+The error therefore receives a subtle red appearance while still matching the dark portfolio design.
+
+---
+
+## Class Name Fix
+
+Made sure the loading state also uses:
+
+```jsx
+className="projects-status"
+```
+
+instead of:
+
+```jsx
+className="project-status"
+```
+
+This keeps the loading, error, and empty states consistent.
+
+---
+
+# Projects API UI States
+
+The Projects section now visually supports all four API states:
+
+```text
+1. Loading
+   ↓
+   Neutral status message
+
+2. Error
+   ↓
+   Red error status message
+
+3. Empty
+   ↓
+   Neutral "No projects available" message
+
+4. Success
+   ↓
+   Project cards + View More functionality
+```
+
+---
+
+# Step 25.1 Status
+
+```text
+Projects loading styling ✅
+Projects error styling ✅
+Projects empty-state styling ✅
+Shared projects-status class ✅
+Error-specific projects-error class ✅
+Status class naming corrected ✅
+Dark portfolio styling maintained ✅
+```
+
+---
+
+# Files Updated
+
+```text
+Projects.jsx
+Projects.css
+```
+
+---
+
+# Git Checkpoint
+
+```bash
+git status
+git add .
+git commit -m "Add project API loading and error states"
+git push
+```
+
+# Step 26 - Skills API Loading and Error Handling
+
+## Goal
+
+Add complete API state handling to the Skills section so the portfolio can properly display:
+
+```text
+Loading
+Success
+Error
+Empty skills
+```
+
+Previously, the Skills component fetched data from the API but did not handle failed requests or loading states.
+
+---
+
+# Skills State
+
+The Skills component already stored API data using:
+
+```jsx
+const [skills, setSkills] = useState([]);
+```
+
+Added:
+
+```jsx
+// Tracks whether the skills are still being loaded from the API.
+const [loading, setLoading] = useState(true);
+
+// Stores an error message if the Skills API request fails.
+const [error, setError] = useState("");
+```
+
+Purpose:
+
+```text
+skills
+→ Stores the skills returned by the API.
+
+loading
+→ Tracks whether the API request is still running.
+
+error
+→ Stores a user-friendly message if the request fails.
+```
+
+---
+
+# Skills API Request
+
+The Skills API request runs inside `useEffect()`:
+
+```jsx
+useEffect(() => {
+
+    // Sends a GET request to the Skills API.
+    fetch(`${import.meta.env.VITE_API_URL}/api/skills`)
+
+        // Runs when the server sends back a response.
+        .then((response) => {
+
+            // Checks whether the HTTP response was unsuccessful.
+            if (!response.ok) {
+
+                // Stops the normal Promise chain and sends the error to .catch().
+                throw new Error("Unable to load skills.");
+            }
+
+            // Converts the JSON response into JavaScript data.
+            return response.json();
+        })
+
+        // Runs after the JSON has been successfully converted.
+        .then((data) => {
+
+            // Stores the skills returned by the API in React state.
+            setSkills(data);
+        })
+
+        // Runs if the API request or any previous step fails.
+        .catch((error) => {
+
+            // Shows the actual error in the browser console for debugging.
+            console.error("Skills fetch error: ", error);
+
+            // Stores a user-friendly error message.
+            setError("Unable to load skills");
+        })
+
+        // Runs whether the request succeeds or fails.
+        .finally(() => {
+
+            // Tells React that loading is finished.
+            setLoading(false);
+        });
+
+}, []);
+```
+
+---
+
+# HTTP Response Check
+
+Added:
+
+```jsx
+if (!response.ok) {
+    throw new Error("Unable to load skills.");
+}
+```
+
+`fetch()` does not automatically reject HTTP errors such as:
+
+```text
+404
+500
+503
+```
+
+Because of this, `response.ok` is checked manually.
+
+```text
+response.ok = true
+→ request was successful
+
+!response.ok = true
+→ request was unsuccessful
+```
+
+If the response fails:
+
+```jsx
+throw new Error("Unable to load skills.");
+```
+
+sends the request flow to `.catch()`.
+
+---
+
+# Successful Response
+
+After a successful response:
+
+```jsx
+return response.json();
+```
+
+converts the API JSON into JavaScript data.
+
+The next `.then()` receives that data:
+
+```jsx
+.then((data) => {
+    setSkills(data);
+})
+```
+
+The skills array is then stored in React state.
+
+---
+
+# Error Handling
+
+Added:
+
+```jsx
+.catch((error) => {
+
+    console.error("Skills fetch error: ", error);
+
+    setError("Unable to load skills");
+})
+```
+
+Two different error outputs are used:
+
+```text
+console.error()
+→ Gives the developer the real technical error.
+
+setError()
+→ Gives the portfolio visitor a clean user-friendly message.
+```
+
+---
+
+# Loading Completion
+
+Added:
+
+```jsx
+.finally(() => {
+    setLoading(false);
+});
+```
+
+`.finally()` runs whether the request:
+
+```text
+Succeeds
+or
+Fails
+```
+
+Flow:
+
+```text
+Component loads
+↓
+loading = true
+↓
+Skills API request
+↓
+Success OR Failure
+↓
+.finally()
+↓
+loading = false
+```
+
+---
+
+# Loading State UI
+
+Added:
+
+```jsx
+{loading && (
+    <p className="skills-status">
+        Loading Skills...
+    </p>
+)}
+```
+
+Meaning:
+
+```text
+If loading is true
+→ show Loading Skills...
+```
+
+---
+
+# Error State UI
+
+Added:
+
+```jsx
+{error && (
+    <p className="skills-status skills-error">
+        {error}
+    </p>
+)}
+```
+
+This displays:
+
+```text
+Unable to load skills
+```
+
+when the API request fails.
+
+---
+
+# Empty Skills State
+
+Added:
+
+```jsx
+{!loading && !error && skills.length === 0 && (
+    <p className="skills-status">
+        No skills available right now.
+    </p>
+)}
+```
+
+This handles the case where:
+
+```text
+API request succeeds
+BUT
+the API returns an empty array []
+```
+
+Instead of showing an empty section, the visitor sees a useful message.
+
+---
+
+# Successful Skills Rendering
+
+The four skill categories should only render when:
+
+```text
+Loading is finished
+No error exists
+Skills exist
+```
+
+Added:
+
+```jsx
+{!loading && !error && skills.length > 0 && (
+    <>
+        ...
+    </>
+)}
+```
+
+Meaning:
+
+```text
+!loading
+→ loading is false
+
+!error
+→ no error exists
+
+skills.length > 0
+→ at least one skill exists
+```
+
+All three conditions must be true.
+
+---
+
+# React Fragment
+
+The successful state contains four sibling sections:
+
+```text
+Frontend
+Backend
+Databases
+Tools
+```
+
+They are grouped using a Fragment:
+
+```jsx
+<>
+    ...
+</>
+```
+
+This allows multiple JSX elements to be grouped without adding an unnecessary `<div>` to the DOM.
+
+---
+
+# Skills Filtering and Mapping
+
+The existing Skills rendering was kept.
+
+Example:
+
+```jsx
+{skills
+    .filter((skill) => skill.category === "Front-End")
+    .map((skill) => {
+        return (
+            <SkillCard
+                key={skill._id}
+                name={skill.name}
+                category={skill.category}
+                icon={skill.icon}
+            />
+        );
+    })}
+```
+
+Flow:
+
+```text
+skills array
+↓
+.filter()
+↓
+Select skills belonging to a category
+↓
+.map()
+↓
+Turn each skill object into a SkillCard
+```
+
+Example:
+
+```text
+Front-End
+↓
+Filter only Front-End skills
+↓
+React
+JavaScript
+HTML
+CSS
+↓
+Create SkillCard for each
+```
+
+---
+
+# Skills API Status Styling
+
+Added shared status styling:
+
+```css
+/* Shared message style for loading, error, and empty Skills API states. */
+.skills-status {
+    margin: 32px 0;
+    padding: 16px 20px;
+
+    color: #CBD5E1;
+    background: rgba(15, 23, 42, 0.7);
+
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+
+    text-align: center;
+}
+```
+
+This style is shared by:
+
+```text
+Loading Skills...
+No skills available right now.
+```
+
+---
+
+# Skills Error Styling
+
+Added:
+
+```css
+/* Extra styling only when the Skills API fails. */
+.skills-error {
+    color: #FCA5A5;
+    background: rgba(127, 29, 29, 0.18);
+    border-color: rgba(248, 113, 113, 0.3);
+}
+```
+
+The JSX uses:
+
+```jsx
+<p className="skills-status skills-error">
+    {error}
+</p>
+```
+
+Meaning:
+
+```text
+skills-status
+→ Base API status styling
+
+skills-error
+→ Adds the red error appearance
+```
+
+---
+
+# Skills API UI Flow
+
+```text
+Skills component mounts
+        ↓
+loading = true
+        ↓
+GET /api/skills
+        ↓
+        ├── Success
+        │      ↓
+        │ response.json()
+        │      ↓
+        │ setSkills(data)
+        │      ↓
+        │ .finally()
+        │      ↓
+        │ loading = false
+        │      ↓
+        │
+        │ skills.length > 0
+        │      ↓
+        │ Render skill categories
+        │
+        │ OR
+        │
+        │ skills.length === 0
+        │      ↓
+        │ Show empty message
+        │
+        └── Failure
+               ↓
+          throw Error / fetch error
+               ↓
+             .catch()
+               ↓
+       setError("Unable to load skills")
+               ↓
+             .finally()
+               ↓
+          loading = false
+               ↓
+         Show error message
+```
+
+---
+
+# Skills API States
+
+```text
+1. Loading
+   ↓
+   Loading Skills...
+
+2. Error
+   ↓
+   Unable to load skills
+
+3. Empty
+   ↓
+   No skills available right now.
+
+4. Success
+   ↓
+   Frontend
+   Backend
+   Databases
+   Tools
+```
+
+---
+
+# Step 26 Status
+
+```text
+Skills API integration ✅
+Skills loading state ✅
+Skills error state ✅
+Skills empty state ✅
+response.ok check ✅
+HTTP error handling ✅
+throw new Error() ✅
+.catch() ✅
+.finally() ✅
+Developer console error ✅
+User-friendly error message ✅
+Conditional rendering ✅
+Success-state rendering ✅
+React Fragment ✅
+Existing filter() logic maintained ✅
+Existing map() logic maintained ✅
+Skills loading styling ✅
+Skills error styling ✅
+Skills empty-state styling ✅
+```
+
+---
+
+# Projects Small Fix
+
+Also completed the missing Projects empty API state:
+
+```jsx
+{!loading && !error && projects.length === 0 && (
+    <p className="projects-status">
+        No projects available right now.
+    </p>
+)}
+```
+
+Projects now also support:
+
+```text
+Loading ✅
+Error ✅
+Empty ✅
+Success ✅
+```
+
+---
+
+# Files Updated
+
+```text
+Projects.jsx
+Projects.css
+Skills.jsx
+Skills.css
+```
+
+---
+
+# Concepts Practiced
+
+```text
+useState()
+useEffect()
+fetch()
+Promises
+.then()
+.catch()
+.finally()
+response.ok
+throw new Error()
+response.json()
+Conditional rendering
+&& operator
+! operator
+React Fragments
+Array filter()
+Array map()
+React keys
+API loading states
+API error states
+API empty states
+State-driven UI
+```
+
+---
+
+# Git Checkpoint - Projects and Skills API States
+
+Run:
+
+```bash
+git status
+```
+
+Then:
+
+```bash
+git add .
+```
+
+Commit:
+
+```bash
+git commit -m "Add API loading and error states"
+```
+
+Push:
+
+```bash
+git push
+```
+
+---
+
+# Current Final Cleanup
+
+```text
+Projects API loading state ✅
+Projects API error state ✅
+Projects API empty state ✅
+
+Skills API loading state ✅
+Skills API error state ✅
+Skills API empty state ✅
+
+Remaining API-driven sections
+Footer polish
+Real GitHub link
+Real LinkedIn link
+Email links
+Resume / CV file
+Final mobile testing
+Accessibility check
+Deployment preparation
+Final README update
+```
+
+# Step 27 - Certifications API Loading and Error Handling
+
+## Goal
+
+Add complete API state handling to the Certifications section.
+
+The Certifications component now handles:
+
+```text
+Loading
+Error
+Empty
+Success
+```
+
+---
+
+# Certifications State
+
+Existing state:
+
+```jsx
+const [certifications, setCertifications] = useState([]);
+const [showAllCertifications, setShowAllCertifications] = useState(false);
+```
+
+Added:
+
+```jsx
+// Tracks whether certifications are still being loaded from the API.
+const [loading, setLoading] = useState(true);
+
+// Stores an error message if the Certifications API request fails.
+const [error, setError] = useState("");
+```
+
+Purpose:
+
+```text
+certifications
+→ Stores certification data returned by the API.
+
+showAllCertifications
+→ Controls whether 2 or all certifications are displayed.
+
+loading
+→ Tracks whether the API request is still running.
+
+error
+→ Stores a user-friendly error message.
+```
+
+---
+
+# Certifications API Request
+
+Updated the existing `fetch()` request:
+
+```jsx
+useEffect(() => {
+
+    // Sends a GET request to the Certifications API.
+    fetch(`${import.meta.env.VITE_API_URL}/api/certifications`)
+
+        // Runs when the server sends back a response.
+        .then((response) => {
+
+            // Checks whether the HTTP response was unsuccessful.
+            if (!response.ok) {
+
+                // Stops the normal Promise chain and sends the error to .catch().
+                throw new Error("Unable to load certifications.");
+            }
+
+            // Converts the JSON response into JavaScript data.
+            return response.json();
+        })
+
+        // Runs after the JSON has been successfully converted.
+        .then((data) => {
+
+            // Stores certifications returned by the API in React state.
+            setCertifications(data);
+        })
+
+        // Runs if the API request or any previous step fails.
+        .catch((error) => {
+
+            // Shows the actual error in the console for debugging.
+            console.error("Certifications fetch error: ", error);
+
+            // Stores a user-friendly error message.
+            setError("Unable to load certifications");
+        })
+
+        // Runs whether the request succeeds or fails.
+        .finally(() => {
+
+            // Tells React that loading is finished.
+            setLoading(false);
+        });
+
+}, []);
+```
+
+---
+
+# HTTP Error Check
+
+Added:
+
+```jsx
+if (!response.ok) {
+    throw new Error("Unable to load certifications.");
+}
+```
+
+`fetch()` does not automatically reject HTTP errors such as:
+
+```text
+404
+500
+503
+```
+
+Therefore the response is manually checked.
+
+```text
+response.ok
+→ successful HTTP response
+
+!response.ok
+→ unsuccessful HTTP response
+```
+
+If unsuccessful:
+
+```jsx
+throw new Error("Unable to load certifications.");
+```
+
+moves execution to `.catch()`.
+
+---
+
+# Successful API Response
+
+After a successful response:
+
+```jsx
+return response.json();
+```
+
+converts the JSON response into JavaScript data.
+
+Then:
+
+```jsx
+.then((data) => {
+    setCertifications(data);
+})
+```
+
+stores the returned certifications in state.
+
+Flow:
+
+```text
+API response
+↓
+response.json()
+↓
+data
+↓
+setCertifications(data)
+↓
+React re-render
+```
+
+---
+
+# Error Handling
+
+Added:
+
+```jsx
+.catch((error) => {
+
+    console.error("Certifications fetch error: ", error);
+
+    setError("Unable to load certifications");
+})
+```
+
+Two error outputs are used:
+
+```text
+console.error()
+→ Technical information for development/debugging.
+
+setError()
+→ Simple error message for the portfolio visitor.
+```
+
+---
+
+# Loading Completion
+
+Added:
+
+```jsx
+.finally(() => {
+    setLoading(false);
+});
+```
+
+`.finally()` runs whether the request succeeds or fails.
+
+```text
+Request starts
+↓
+loading = true
+↓
+Success OR Error
+↓
+.finally()
+↓
+loading = false
+```
+
+---
+
+# Loading UI
+
+Added:
+
+```jsx
+{loading && (
+    <p className="certifications-status">
+        Loading Certifications...
+    </p>
+)}
+```
+
+While the API request is running:
+
+```text
+Loading Certifications...
+```
+
+is displayed.
+
+---
+
+# Error UI
+
+Added:
+
+```jsx
+{error && (
+    <p className="certifications-status certifications-error">
+        {error}
+    </p>
+)}
+```
+
+If the API fails, the visitor sees:
+
+```text
+Unable to load certifications
+```
+
+---
+
+# Empty Certifications State
+
+Added:
+
+```jsx
+{!loading && !error && certifications.length === 0 && (
+    <p className="certifications-status">
+        No certifications available right now.
+    </p>
+)}
+```
+
+This handles a successful API request that returns:
+
+```js
+[]
+```
+
+Instead of leaving the section blank, the portfolio displays:
+
+```text
+No certifications available right now.
+```
+
+---
+
+# Successful Certifications Rendering
+
+The normal Certifications UI now only renders when:
+
+```jsx
+!loading && !error && certifications.length > 0
+```
+
+Used:
+
+```jsx
+{!loading && !error && certifications.length > 0 && (
+    <>
+        ...
+    </>
+)}
+```
+
+All three conditions must be true:
+
+```text
+Loading finished
+AND
+No error
+AND
+At least one certification exists
+```
+
+---
+
+# React Fragment
+
+The successful state contains two sibling elements:
+
+```text
+Certifications grid
+View More button
+```
+
+They are grouped using:
+
+```jsx
+<>
+    ...
+</>
+```
+
+The Fragment groups multiple JSX elements without adding an unnecessary HTML wrapper to the DOM.
+
+---
+
+# Certifications Slice and Map
+
+Existing rendering logic was maintained:
+
+```jsx
+{certifications
+    .slice(
+        0,
+        showAllCertifications
+            ? certifications.length
+            : 2
+    )
+    .map((certification) => {
+        return (
+            <CertificationCard
+                key={certification._id}
+                title={certification.title}
+                issuer={certification.issuer}
+                date={certification.date}
+                image={certification.imageUrl}
+                credentialLink={certification.credentialLink}
+            />
+        );
+    })}
+```
+
+Flow:
+
+```text
+certifications array
+↓
+.slice()
+↓
+Choose 2 or all certifications
+↓
+.map()
+↓
+Turn each certification into a CertificationCard
+```
+
+---
+
+# View More Logic
+
+The button continues to render only when:
+
+```jsx
+certifications.length > 2
+```
+
+Used:
+
+```jsx
+{certifications.length > 2 && (
+    <button>
+        ...
+    </button>
+)}
+```
+
+The button toggles:
+
+```jsx
+setShowAllCertifications(!showAllCertifications)
+```
+
+Flow:
+
+```text
+false
+↓
+Show first 2 certifications
+↓
+Click View More
+↓
+true
+↓
+Show all certifications
+↓
+Click Show Less
+↓
+false
+↓
+Show first 2 again
+```
+
+---
+
+# Certifications Status CSS
+
+Added:
+
+```css
+/* Shared message style for loading, error, and empty Certifications API states. */
+.certifications-status {
+    margin: 32px 0;
+    padding: 16px 20px;
+
+    color: #CBD5E1;
+    background: rgba(15, 23, 42, 0.7);
+
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+
+    text-align: center;
+}
+```
+
+Used for:
+
+```text
+Loading Certifications...
+No certifications available right now.
+```
+
+---
+
+# Certifications Error CSS
+
+Added:
+
+```css
+/* Extra styling only when the Certifications API fails. */
+.certifications-error {
+    color: #FCA5A5;
+    background: rgba(127, 29, 29, 0.18);
+    border-color: rgba(248, 113, 113, 0.3);
+}
+```
+
+The error element receives both:
+
+```jsx
+className="certifications-status certifications-error"
+```
+
+Meaning:
+
+```text
+certifications-status
+→ Base status appearance
+
+certifications-error
+→ Error-specific color overrides
+```
+
+---
+
+# Certifications API Flow
+
+```text
+Certifications component mounts
+        ↓
+loading = true
+        ↓
+GET /api/certifications
+        ↓
+        ├── SUCCESS
+        │      ↓
+        │ response.ok
+        │      ↓
+        │ response.json()
+        │      ↓
+        │ setCertifications(data)
+        │      ↓
+        │ .finally()
+        │      ↓
+        │ loading = false
+        │      ↓
+        │
+        │ certifications.length > 0
+        │      ↓
+        │ Show certification cards
+        │
+        │ OR
+        │
+        │ certifications.length === 0
+        │      ↓
+        │ Show empty message
+        │
+        └── FAILURE
+               ↓
+         !response.ok / network error
+               ↓
+         throw new Error()
+               ↓
+             .catch()
+               ↓
+       setError("Unable to load certifications")
+               ↓
+             .finally()
+               ↓
+          loading = false
+               ↓
+          Show error message
+```
+
+---
+
+# Consistent GET API Handling
+
+All three portfolio GET API sections now use the same pattern:
+
+```text
+PROJECTS
+├── Loading ✅
+├── Error ✅
+├── Empty ✅
+└── Success ✅
+
+SKILLS
+├── Loading ✅
+├── Error ✅
+├── Empty ✅
+└── Success ✅
+
+CERTIFICATIONS
+├── Loading ✅
+├── Error ✅
+├── Empty ✅
+└── Success ✅
+```
+
+---
+
+# Step 27 Status
+
+```text
+Certifications loading state ✅
+Certifications error state ✅
+Certifications empty state ✅
+response.ok check ✅
+throw new Error() ✅
+.catch() ✅
+.finally() ✅
+Developer console error ✅
+User-friendly error message ✅
+Conditional rendering ✅
+React Fragment ✅
+Existing slice() logic maintained ✅
+Existing map() logic maintained ✅
+Existing View More functionality maintained ✅
+Status CSS ✅
+Error CSS ✅
+Consistent API state design ✅
+```
+
+---
+
+# Files Updated
+
+```text
+Certifications.jsx
+Certifications.css
+```
+
+---
+
+# Concepts Reinforced
+
+```text
+useState()
+useEffect()
+fetch()
+response.ok
+response.json()
+Promises
+.then()
+.catch()
+.finally()
+throw new Error()
+Conditional rendering
+&& operator
+! operator
+React Fragment
+Array slice()
+Array map()
+React keys
+API loading states
+API error states
+API empty states
+State-driven UI
+```
+
+---
+
+# Git Checkpoint
+
+Check changes:
+
+```bash
+git status
+```
+
+Stage:
+
+```bash
+git add .
+```
+
+Commit:
+
+```bash
+git commit -m "Add certification API loading and error states"
+```
+
+Push:
+
+```bash
+git push
+```
+
+---
+
+# Current API Handling Status
+
+```text
+Projects GET API ✅
+Skills GET API ✅
+Certifications GET API ✅
+
+Next:
+Contact POST API
+Guestbook GET/POST API
+```
+
+# Step 28 - Contact Form Submit Loading and Error Handling
+
+## Goal
+
+Improve the Contact form API experience so users get clear feedback while their message is being sent.
+
+The Contact form already had:
+
+```text
+Form state ✅
+Client-side validation ✅
+Email validation ✅
+POST request ✅
+Backend error handling ✅
+Success message ✅
+Form reset ✅
+```
+
+This step added a dedicated submitting state so the user cannot accidentally submit the form multiple times.
+
+---
+
+# Existing Contact Form State
+
+The component already used:
+
+```jsx
+const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+});
+
+const [error, setError] = useState("");
+
+const [success, setSuccess] = useState("");
+```
+
+The form data is controlled through React state.
+
+---
+
+# Submitting State
+
+Added:
+
+```jsx
+// Tracks whether the contact form is currently being submitted.
+const [submitting, setSubmitting] = useState(false);
+```
+
+Purpose:
+
+```text
+submitting = false
+→ No API request is currently running.
+
+submitting = true
+→ Contact form is currently sending data.
+```
+
+---
+
+# Client-Side Validation
+
+The existing validation was kept.
+
+Empty-field check:
+
+```jsx
+if (
+    formData.name === "" ||
+    formData.email === "" ||
+    formData.subject === "" ||
+    formData.message === ""
+) {
+    setError("Please fill in all fields");
+    return;
+}
+```
+
+Email validation:
+
+```jsx
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+if (!emailPattern.test(formData.email)) {
+    setError("Please enter a valid email address.");
+    return;
+}
+```
+
+The API request only starts after these validation checks pass.
+
+---
+
+# Start Submitting State
+
+Added:
+
+```jsx
+// Starts the submitting state after validation passes.
+setSubmitting(true);
+```
+
+This is placed after the validation checks.
+
+That is important because:
+
+```text
+Invalid form
+↓
+return
+↓
+No API request
+↓
+submitting stays false
+```
+
+But when validation succeeds:
+
+```text
+Validation passes
+↓
+setSubmitting(true)
+↓
+POST request starts
+```
+
+---
+
+# Contact POST Request
+
+The existing Contact API request was maintained:
+
+```jsx
+const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/contact`,
+    {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+    }
+);
+```
+
+This sends the Contact form data as JSON.
+
+Flow:
+
+```text
+formData
+↓
+JSON.stringify(formData)
+↓
+POST /api/contact
+↓
+Backend receives message
+```
+
+---
+
+# Reading Backend Response
+
+The API response is converted using:
+
+```jsx
+const data = await response.json();
+```
+
+The backend response can then be used for:
+
+```text
+Success messages
+Error messages
+```
+
+---
+
+# Backend Error Handling
+
+Existing logic:
+
+```jsx
+if (!response.ok) {
+    setError(data.message);
+    setSuccess("");
+    return;
+}
+```
+
+Meaning:
+
+```text
+Response unsuccessful
+↓
+Show backend error message
+↓
+Clear previous success message
+↓
+Stop success logic
+```
+
+---
+
+# Successful Submission
+
+Existing success logic:
+
+```jsx
+setError("");
+setSuccess(data.message);
+```
+
+After a successful submission:
+
+```text
+Old error is cleared
+Success message is displayed
+```
+
+---
+
+# Form Reset
+
+The existing form reset was kept:
+
+```jsx
+setFormData({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+});
+```
+
+After successful submission, the fields return to empty values.
+
+---
+
+# Network / Unexpected Error Handling
+
+The Contact form already used `try/catch`:
+
+```jsx
+catch (error) {
+
+    console.error("Contact form error: ", error);
+
+    setError("Unable to send message.");
+    setSuccess("");
+}
+```
+
+Two different outputs are used:
+
+```text
+console.error()
+→ Gives technical information for debugging.
+
+setError()
+→ Gives the portfolio visitor a user-friendly message.
+```
+
+---
+
+# Finally Block
+
+Added:
+
+```jsx
+finally {
+
+    // Runs whether the request succeeds or fails.
+    setSubmitting(false);
+}
+```
+
+`finally` runs after:
+
+```text
+Success
+OR
+Failure
+```
+
+Therefore the submitting state always resets.
+
+Flow:
+
+```text
+setSubmitting(true)
+↓
+POST request
+↓
+Success OR error
+↓
+finally
+↓
+setSubmitting(false)
+```
+
+---
+
+# Submit Button Disabled State
+
+Updated the Contact button from:
+
+```jsx
+<button type="submit" className="contact-submit">
+    Send Message
+    <i className="bi bi-send"></i>
+</button>
+```
+
+to:
+
+```jsx
+<button
+    type="submit"
+    className="contact-submit"
+    disabled={submitting}
+>
+    {submitting ? "Sending..." : "Send Message"}
+
+    <i className="bi bi-send"></i>
+</button>
+```
+
+---
+
+# `disabled={submitting}`
+
+Used:
+
+```jsx
+disabled={submitting}
+```
+
+When:
+
+```text
+submitting = false
+→ button is enabled
+
+submitting = true
+→ button is disabled
+```
+
+This prevents duplicate submissions while the API request is running.
+
+---
+
+# Dynamic Button Text
+
+Added:
+
+```jsx
+{submitting ? "Sending..." : "Send Message"}
+```
+
+This uses a ternary operator.
+
+```text
+submitting = false
+→ Send Message
+
+submitting = true
+→ Sending...
+```
+
+This gives the visitor immediate feedback that the form is being processed.
+
+---
+
+# Contact Submit Button CSS
+
+The existing button already used:
+
+```css
+.contact-submit {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 14px 20px;
+
+    color: #FFFFFF;
+    background-color: #155DFC;
+
+    border: none;
+    border-radius: 10px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+```
+
+The interaction styles were updated to support the disabled state.
+
+---
+
+# Button Transition
+
+Updated:
+
+```css
+.contact-submit {
+    transition:
+        transform 250ms ease,
+        box-shadow 250ms ease,
+        opacity 250ms ease;
+}
+```
+
+The opacity transition helps the disabled state feel smoother.
+
+---
+
+# Enabled Hover State
+
+Updated the hover selector from:
+
+```css
+.contact-submit:hover
+```
+
+to:
+
+```css
+.contact-submit:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(21, 93, 252, 0.3);
+}
+```
+
+Meaning:
+
+```text
+Button enabled
+→ hover animation works
+
+Button disabled
+→ hover animation does not run
+```
+
+---
+
+# Disabled Button Styling
+
+Added:
+
+```css
+/* Shows that the contact form is currently being submitted. */
+.contact-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+    box-shadow: none;
+}
+```
+
+This visually tells the user that the form is currently processing.
+
+---
+
+# Contact Submission Flow
+
+```text
+User fills form
+        ↓
+Clicks Send Message
+        ↓
+Prevent normal browser form submit
+        ↓
+Check empty fields
+        ↓
+Check email format
+        ↓
+Validation succeeds
+        ↓
+setSubmitting(true)
+        ↓
+Button disabled
+        ↓
+Text becomes "Sending..."
+        ↓
+POST /api/contact
+        ↓
+        ├── SUCCESS
+        │      ↓
+        │ Clear error
+        │      ↓
+        │ Show success message
+        │      ↓
+        │ Reset form
+        │
+        └── FAILURE
+               ↓
+          Show error message
+               ↓
+          Clear success message
+        ↓
+finally
+        ↓
+setSubmitting(false)
+        ↓
+Button enabled again
+        ↓
+Text returns to "Send Message"
+```
+
+---
+
+# Contact Form API States
+
+```text
+Idle
+→ Send Message
+
+Validation Error
+→ Show validation message
+
+Submitting
+→ Button disabled
+→ Sending...
+
+Backend Error
+→ Show backend error message
+
+Network Error
+→ Unable to send message.
+
+Success
+→ Show success message
+→ Reset form
+```
+
+---
+
+# Step 28 Status
+
+```text
+Contact form POST API ✅
+Controlled form state ✅
+Empty-field validation ✅
+Email validation ✅
+Backend response handling ✅
+Backend error message ✅
+Network error handling ✅
+Success message ✅
+Form reset ✅
+Submitting state ✅
+Duplicate-submit prevention ✅
+Disabled submit button ✅
+Dynamic Sending... text ✅
+finally block ✅
+Disabled button CSS ✅
+Disabled hover protection ✅
+```
+
+---
+
+# Files Updated
+
+```text
+Contact.jsx
+Contact.css
+```
+
+---
+
+# Concepts Practiced
+
+```text
+useState()
+Controlled forms
+Form validation
+async / await
+fetch()
+POST requests
+JSON.stringify()
+response.ok
+response.json()
+try
+catch
+finally
+Conditional rendering
+Ternary operator
+disabled attribute
+State-driven buttons
+Duplicate-submit prevention
+API success handling
+API error handling
+```
+
+---
+
+# Git Checkpoint - Contact Form API Handling
+
+Check changes:
+
+```bash
+git status
+```
+
+Stage:
+
+```bash
+git add .
+```
+
+Commit:
+
+```bash
+git commit -m "Improve contact form API handling"
+```
+
+Push:
+
+```bash
+git push
+```
+
+---
+
+# Current API Handling Status
+
+```text
+Projects GET API ✅
+Skills GET API ✅
+Certifications GET API ✅
+Contact POST API ✅
+
+Next:
+Guestbook GET API
+Guestbook POST API
+```
+
+# Step 29 - Guestbook GET and POST API Error Handling
+
+## Goal
+
+Complete API state handling for the Guestbook.
+
+Unlike the previous sections, Guestbook uses both:
+
+```text
+GET
+→ Load existing Guestbook messages
+
+POST
+→ Submit a new Guestbook message
+```
+
+The Guestbook now handles:
+
+```text
+GET loading state
+GET error state
+GET empty state
+GET success state
+
+POST validation
+POST submitting state
+POST error state
+POST success state
+Duplicate-submit prevention
+```
+
+---
+
+# Existing Guestbook Data
+
+The Guestbook already stored form data using:
+
+```jsx
+const [guestData, setGuestData] = useState({
+    guestName: "",
+    guestMessage: ""
+});
+```
+
+Existing Guestbook messages were stored using:
+
+```jsx
+const [guestbookEntries, setGuestbookEntries] = useState([]);
+```
+
+The component also already had:
+
+```jsx
+const [error, setError] = useState("");
+
+const [success, setSuccess] = useState("");
+```
+
+These are used for the Guestbook form submission.
+
+---
+
+# New Guestbook API States
+
+Added:
+
+```jsx
+// Tracks whether Guestbook messages are still being loaded.
+const [loading, setLoading] = useState(true);
+
+// Tracks whether a new Guestbook entry is currently being submitted.
+const [submitting, setSubmitting] = useState(false);
+
+// Stores an error specifically for loading Guestbook messages.
+const [loadError, setLoadError] = useState("");
+```
+
+We keep GET and POST errors separate.
+
+```text
+loadError
+→ Problem loading Recent Messages
+
+error
+→ Problem submitting the Guestbook form
+```
+
+This prevents two different API operations from sharing the same error state.
+
+---
+
+# Guestbook GET Request
+
+Updated the initial Guestbook request:
+
+```jsx
+useEffect(() => {
+
+    // Sends a GET request to load Guestbook messages.
+    fetch(`${import.meta.env.VITE_API_URL}/api/guestbook`)
+
+        .then((response) => {
+
+            // Checks whether the HTTP response was unsuccessful.
+            if (!response.ok) {
+                throw new Error("Unable to load Guestbook messages.");
+            }
+
+            return response.json();
+        })
+
+        .then((data) => {
+
+            // Stores the Guestbook messages returned by the API.
+            setGuestbookEntries(data);
+        })
+
+        .catch((error) => {
+
+            // Shows the real error in the browser console.
+            console.error("Guestbook fetch error: ", error);
+
+            // Stores a user-friendly loading error.
+            setLoadError("Unable to load Guestbook messages.");
+        })
+
+        .finally(() => {
+
+            // Tells React that the initial Guestbook loading is finished.
+            setLoading(false);
+        });
+
+}, []);
+```
+
+---
+
+# Guestbook GET Flow
+
+```text
+Component mounts
+↓
+loading = true
+↓
+GET /api/guestbook
+↓
+┌─────────────────┬─────────────────┐
+│ SUCCESS         │ FAILURE         │
+│                 │                 │
+│ response.json() │ .catch()        │
+│ ↓               │ ↓               │
+│ set entries     │ setLoadError()  │
+└─────────────────┴─────────────────┘
+          ↓
+       .finally()
+          ↓
+setLoading(false)
+```
+
+---
+
+# Guestbook Loading State
+
+Added:
+
+```jsx
+{loading && (
+    <p className="guestbook-status">
+        Loading messages...
+    </p>
+)}
+```
+
+While the GET request is running:
+
+```text
+Loading messages...
+```
+
+is displayed.
+
+---
+
+# Guestbook GET Error State
+
+Added:
+
+```jsx
+{loadError && (
+    <p className="guestbook-status guestbook-error">
+        {loadError}
+    </p>
+)}
+```
+
+If loading Recent Messages fails:
+
+```text
+Unable to load Guestbook messages.
+```
+
+is displayed.
+
+---
+
+# Guestbook Empty State
+
+Added:
+
+```jsx
+{!loading && !loadError && guestbookEntries.length === 0 && (
+    <p className="guestbook-status">
+        No messages yet. Be the first to sign the Guestbook.
+    </p>
+)}
+```
+
+This handles a successful API response containing:
+
+```js
+[]
+```
+
+Instead of showing an empty Recent Messages section, the visitor gets a useful message.
+
+---
+
+# Successful Guestbook Rendering
+
+Guestbook cards now render only when:
+
+```jsx
+!loading && !loadError && guestbookEntries.length > 0
+```
+
+Used:
+
+```jsx
+{!loading && !loadError && guestbookEntries.length > 0 && (
+    <>
+        {guestbookEntries.map((entry) => {
+            return (
+                <GuestbookCard
+                    key={entry._id}
+                    name={entry.guestName}
+                    message={entry.guestMessage}
+                    date={new Date(entry.createdAt).toLocaleDateString()}
+                />
+            );
+        })}
+    </>
+)}
+```
+
+Flow:
+
+```text
+Guestbook entries
+↓
+.map()
+↓
+Each API entry
+↓
+GuestbookCard
+```
+
+---
+
+# Guestbook Message Count
+
+Previously, the count could temporarily display:
+
+```text
+0 Messages
+```
+
+while the API request was still loading.
+
+Updated it so the count only appears after a successful GET request:
+
+```jsx
+{!loading && !loadError && (
+    <span className="guestbook-count">
+        {guestbookEntries.length}{" "}
+        {guestbookEntries.length === 1 ? "Message" : "Messages"}
+    </span>
+)}
+```
+
+The existing ternary continues to handle singular/plural text:
+
+```text
+1
+→ 1 Message
+
+2
+→ 2 Messages
+```
+
+---
+
+# Guestbook GET Status CSS
+
+Added:
+
+```css
+/* Shared message style for loading and empty Guestbook states. */
+.guestbook-status {
+    margin: 16px 0;
+    padding: 16px 20px;
+
+    color: #CBD5E1;
+    background: rgba(15, 23, 42, 0.7);
+
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+
+    text-align: center;
+}
+```
+
+Used for:
+
+```text
+Loading messages...
+No messages yet...
+```
+
+---
+
+# Guestbook GET Error CSS
+
+Added:
+
+```css
+/* Extra styling when the Guestbook messages fail to load. */
+.guestbook-error {
+    color: #FCA5A5;
+    background: rgba(127, 29, 29, 0.18);
+    border-color: rgba(248, 113, 113, 0.3);
+}
+```
+
+This visually separates API errors from normal status messages.
+
+---
+
+# Existing Guestbook POST Validation
+
+The existing validation was maintained:
+
+```jsx
+if (guestData.guestName === "" || guestData.guestMessage === "") {
+    setError("Please fill in all fields");
+    setSuccess("");
+    return;
+}
+```
+
+If either field is empty:
+
+```text
+Show validation error
+↓
+return
+↓
+Do not send POST request
+```
+
+---
+
+# Guestbook Submitting State
+
+After validation succeeds, added:
+
+```jsx
+// Starts the submitting state after validation passes.
+setSubmitting(true);
+```
+
+This is deliberately placed after validation.
+
+```text
+Invalid form
+→ submitting stays false
+
+Valid form
+→ submitting becomes true
+→ POST request starts
+```
+
+---
+
+# Existing Guestbook POST Request
+
+The Guestbook already sent data using:
+
+```jsx
+const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/guestbook`,
+    {
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(guestData)
+    }
+);
+```
+
+Flow:
+
+```text
+guestData
+↓
+JSON.stringify()
+↓
+POST /api/guestbook
+↓
+Backend stores Guestbook entry
+```
+
+---
+
+# Guestbook POST Response
+
+The response is converted using:
+
+```jsx
+const data = await response.json();
+```
+
+Then checked using:
+
+```jsx
+if (!response.ok) {
+    setError(data.message);
+    setSuccess("");
+    return;
+}
+```
+
+If successful:
+
+```jsx
+setError("");
+setSuccess(data.message);
+```
+
+---
+
+# Guestbook Form Reset
+
+After successful submission:
+
+```jsx
+setGuestData({
+    guestName: "",
+    guestMessage: ""
+});
+```
+
+This clears the form.
+
+---
+
+# Refresh Recent Messages
+
+After successfully submitting a new Guestbook entry, the Guestbook GET endpoint is requested again:
+
+```jsx
+const guestbookResponse = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/guestbook`
+);
+
+const guestbookData = await guestbookResponse.json();
+
+setGuestbookEntries(guestbookData);
+```
+
+This refreshes the Recent Messages area so the newly submitted entry can appear without reloading the entire page.
+
+---
+
+# Guestbook POST Error Handling
+
+Existing `catch()`:
+
+```jsx
+catch (error) {
+
+    console.error("Guestbook form error: ", error);
+
+    setError("Unable to submit Guestbook entry.");
+    setSuccess("");
+}
+```
+
+Purpose:
+
+```text
+console.error()
+→ Technical debugging information
+
+setError()
+→ User-friendly message
+```
+
+---
+
+# Guestbook Finally Block
+
+Added:
+
+```jsx
+finally {
+
+    // Runs whether the Guestbook submission succeeds or fails.
+    setSubmitting(false);
+}
+```
+
+This guarantees the button returns to its normal state.
+
+```text
+POST starts
+↓
+submitting = true
+↓
+Success OR failure
+↓
+finally
+↓
+submitting = false
+```
+
+---
+
+# Guestbook Submit Button
+
+Updated:
+
+```jsx
+<button
+    type="submit"
+    className="guestbook-submit"
+    disabled={submitting}
+>
+    {submitting ? "Signing..." : "Sign Guestbook"}
+
+    <i className="bi bi-chat-left-text"></i>
+</button>
+```
+
+---
+
+# Prevent Duplicate Submissions
+
+Added:
+
+```jsx
+disabled={submitting}
+```
+
+Meaning:
+
+```text
+submitting = false
+→ Button enabled
+
+submitting = true
+→ Button disabled
+```
+
+This prevents visitors from rapidly submitting the same Guestbook entry multiple times.
+
+---
+
+# Dynamic Button Text
+
+Added:
+
+```jsx
+{submitting ? "Signing..." : "Sign Guestbook"}
+```
+
+Meaning:
+
+```text
+Normal
+→ Sign Guestbook
+
+POST request running
+→ Signing...
+```
+
+---
+
+# Guestbook Button CSS
+
+Updated the button transition:
+
+```css
+.guestbook-submit {
+    transition:
+        transform 250ms ease,
+        background-color 250ms ease,
+        box-shadow 250ms ease,
+        opacity 250ms ease;
+}
+```
+
+---
+
+# Enabled Button Hover
+
+Updated:
+
+```css
+.guestbook-submit:not(:disabled):hover {
+    background-color: #1447E6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(21, 93, 252, 0.3);
+}
+```
+
+The hover animation now only runs when the button is enabled.
+
+---
+
+# Disabled Button CSS
+
+Added:
+
+```css
+/* Shows that the Guestbook form is currently being submitted. */
+.guestbook-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+    box-shadow: none;
+}
+```
+
+When submitting:
+
+```text
+Button disabled
+↓
+Reduced opacity
+↓
+No hover movement
+↓
+Not-allowed cursor
+```
+
+---
+
+# Complete Guestbook Flow
+
+```text
+PAGE LOAD
+│
+├── GET /api/guestbook
+│
+├── Loading...
+│
+│
+├── Success
+│   ├── Entries exist
+│   │   → Render GuestbookCards
+│   │
+│   └── Empty array
+│       → Show empty message
+│
+└── Failure
+    → Show GET error
+
+
+FORM SUBMISSION
+│
+├── Validate fields
+│
+├── Invalid
+│   → Show validation error
+│
+└── Valid
+    ↓
+    submitting = true
+    ↓
+    Disable button
+    ↓
+    "Signing..."
+    ↓
+    POST /api/guestbook
+    ↓
+    ├── Success
+    │   ├── Show success
+    │   ├── Reset form
+    │   └── Reload Guestbook messages
+    │
+    └── Failure
+        → Show submission error
+    ↓
+    finally
+    ↓
+    submitting = false
+    ↓
+    Enable button
+```
+
+---
+
+# Step 29 Status
+
+```text
+Guestbook GET API ✅
+GET loading state ✅
+GET response.ok check ✅
+GET error handling ✅
+GET empty state ✅
+GET success state ✅
+Guestbook count loading protection ✅
+
+Guestbook POST API ✅
+POST validation ✅
+POST backend error handling ✅
+POST network error handling ✅
+POST success handling ✅
+Form reset ✅
+Recent Messages refresh ✅
+Submitting state ✅
+Duplicate-submit prevention ✅
+Dynamic Signing... text ✅
+finally block ✅
+Disabled button styling ✅
+```
+
+---
+
+# Files Updated
+
+```text
+Guestbook.jsx
+Guestbook.css
+```
+
+---
+
+# Concepts Practiced
+
+```text
+GET requests
+POST requests
+useState()
+useEffect()
+fetch()
+async / await
+Promises
+response.ok
+response.json()
+.then()
+.catch()
+.finally()
+try / catch / finally
+JSON.stringify()
+Conditional rendering
+Array map()
+Array length
+React Fragment
+Ternary operator
+Controlled forms
+Loading states
+Error states
+Empty states
+Success states
+Submitting states
+Disabled buttons
+State-driven UI
+```
+
+---
+
+# Portfolio API Handling Status
+
+```text
+Projects GET API
+├── Loading ✅
+├── Error ✅
+├── Empty ✅
+└── Success ✅
+
+Skills GET API
+├── Loading ✅
+├── Error ✅
+├── Empty ✅
+└── Success ✅
+
+Certifications GET API
+├── Loading ✅
+├── Error ✅
+├── Empty ✅
+└── Success ✅
+
+Contact POST API
+├── Validation ✅
+├── Submitting ✅
+├── Error ✅
+├── Success ✅
+└── Duplicate-submit protection ✅
+
+Guestbook GET API
+├── Loading ✅
+├── Error ✅
+├── Empty ✅
+└── Success ✅
+
+Guestbook POST API
+├── Validation ✅
+├── Submitting ✅
+├── Error ✅
+├── Success ✅
+├── Refresh messages ✅
+└── Duplicate-submit protection ✅
+```
+
+---
+
+# Git Checkpoint - Guestbook API Handling
+
+Check:
+
+```bash
+git status
+```
+
+Stage:
+
+```bash
+git add .
+```
+
+Commit:
+
+```bash
+git commit -m "Improve guestbook API handling"
+```
+
+Push:
+
+```bash
+git push
+```
+
+---
+
+# Current Portfolio Cleanup Status
+
+```text
+API loading states ✅
+API error states ✅
+API empty states ✅
+POST submitting states ✅
+Duplicate-submit protection ✅
+
+Next:
+Final portfolio cleanup
+Accessibility check
+Final mobile testing
+Footer / real links
+Resume file
+Deployment preparation
+README update
+```
+
+# Step 30 - Dynamic About Statistics
+
+## Goal
+
+Remove the hardcoded statistics from the About section and calculate them dynamically using the existing portfolio data.
+
+Previously, the About section contained:
+
+```text
+Technologies → 20+
+Projects Built → 10+
+Certifications → 7+
+```
+
+These values were manually written inside `About.jsx`.
+
+The goal was to make them automatically update whenever projects, skills, or certifications change.
+
+---
+
+# Previous Hardcoded About Stats
+
+The About section previously contained three separate hardcoded cards:
+
+```jsx
+<div className="about-stat-card">
+
+    <div className="about-stat-info">
+        <i className="bi bi-code-slash"></i>
+        <p>Technologies</p>
+    </div>
+
+    <h3>20+</h3>
+
+</div>
+```
+
+Similar cards were manually created for:
+
+```text
+Projects Built
+Certifications
+```
+
+Problem:
+
+```text
+Add new project
+↓
+About count stays the same
+↓
+Manually edit React
+
+Add new skill
+↓
+About count stays the same
+↓
+Manually edit React
+```
+
+---
+
+# Better Approach
+
+The backend already has access to:
+
+```js
+db.getProjects()
+db.getSkills()
+db.getCertifications()
+```
+
+Instead of creating another MongoDB collection, the About statistics can be calculated from the existing data.
+
+This avoids storing duplicate information.
+
+```text
+Projects collection
+↓
+projects.length
+
+Skills collection
+↓
+skills.length
+
+Certifications collection
+↓
+certifications.length
+```
+
+---
+
+# New About Stats API
+
+Added a new endpoint to the Express backend:
+
+```js
+// -----------------------------------------ABOUT STATS API (GET)-------------------------------------------------
+
+// Returns live portfolio totals for the About section.
+app.get("/api/about-stats", async (request, response) => {
+
+    const projects = await db.getProjects();
+    const skills = await db.getSkills();
+    const certifications = await db.getCertifications();
+
+    response.json([
+        {
+            label: "Technologies",
+            value: skills.length,
+            icon: "bi-code-slash"
+        },
+        {
+            label: "Projects Built",
+            value: projects.length,
+            icon: "bi-folder"
+        },
+        {
+            label: "Certifications",
+            value: certifications.length,
+            icon: "bi-mortarboard"
+        }
+    ]);
+});
+```
+
+No new MongoDB collection was required.
+
+No new `db.js` functions were required.
+
+---
+
+# API Response
+
+The endpoint:
+
+```text
+GET /api/about-stats
+```
+
+returns data similar to:
+
+```json
+[
+    {
+        "label": "Technologies",
+        "value": 20,
+        "icon": "bi-code-slash"
+    },
+    {
+        "label": "Projects Built",
+        "value": 10,
+        "icon": "bi-folder"
+    },
+    {
+        "label": "Certifications",
+        "value": 7,
+        "icon": "bi-mortarboard"
+    }
+]
+```
+
+---
+
+# Admin Dashboard Update
+
+Added the new API to the Available API Endpoints section:
+
+```pug
+li.apiItem
+    a.apiLink(href="/api/about-stats") /api/about-stats
+```
+
+The dashboard stat cards were not changed because About Stats is not a separate database resource.
+
+It is calculated using:
+
+```text
+Projects
+Skills
+Certifications
+```
+
+The dashboard helper text was also updated to better describe all available management features.
+
+---
+
+# React About State
+
+Added state for the dynamic statistics:
+
+```jsx
+const [aboutStats, setAboutStats] = useState([]);
+
+const [loadingStats, setLoadingStats] = useState(true);
+
+const [statsError, setStatsError] = useState("");
+```
+
+Purpose:
+
+```text
+aboutStats
+→ Stores API statistics
+
+loadingStats
+→ Tracks whether statistics are loading
+
+statsError
+→ Stores an error if the API request fails
+```
+
+---
+
+# Fetch About Statistics
+
+Added another `useEffect()` to `About.jsx`:
+
+```jsx
+useEffect(() => {
+
+    // Loads the live About statistics from the API.
+    fetch(`${import.meta.env.VITE_API_URL}/api/about-stats`)
+
+        .then((response) => {
+
+            if (!response.ok) {
+                throw new Error("Unable to load About stats.");
+            }
+
+            return response.json();
+        })
+
+        .then((data) => {
+            setAboutStats(data);
+        })
+
+        .catch((error) => {
+            console.error("About stats fetch error: ", error);
+            setStatsError("Unable to load About stats.");
+        })
+
+        .finally(() => {
+            setLoadingStats(false);
+        });
+
+}, []);
+```
+
+---
+
+# About API Flow
+
+```text
+About component loads
+↓
+loadingStats = true
+↓
+GET /api/about-stats
+↓
+        ┌───────────────┬───────────────┐
+        │ SUCCESS       │ FAILURE       │
+        │               │               │
+        │ response.json │ catch()       │
+        │ ↓             │ ↓             │
+        │ setAboutStats │ setStatsError │
+        └───────────────┴───────────────┘
+                  ↓
+               finally()
+                  ↓
+       setLoadingStats(false)
+```
+
+---
+
+# Dynamic About Cards
+
+Removed the three hardcoded cards.
+
+The API data is now rendered using:
+
+```jsx
+{aboutStats.map((stat) => {
+    return (
+        <div
+            key={stat.label}
+            className={`col-12 col-md-4 ${aboutVisible ? "about-stat-show" : ""}`}
+        >
+            <div className="about-stat-card">
+
+                <div className="about-stat-info">
+                    <i className={`bi ${stat.icon}`}></i>
+                    <p>{stat.label}</p>
+                </div>
+
+                <h3>{stat.value}+</h3>
+
+            </div>
+        </div>
+    );
+})}
+```
+
+---
+
+# Dynamic Icon Class
+
+The API returns:
+
+```js
+icon: "bi-folder"
+```
+
+React combines it with the Bootstrap Icons base class:
+
+```jsx
+<i className={`bi ${stat.icon}`}></i>
+```
+
+Result:
+
+```html
+<i class="bi bi-folder"></i>
+```
+
+---
+
+# React Key
+
+Used:
+
+```jsx
+key={stat.label}
+```
+
+The About Stats objects are calculated by the API and are not MongoDB documents, so they do not contain MongoDB `_id` values.
+
+The labels are unique:
+
+```text
+Technologies
+Projects Built
+Certifications
+```
+
+so they can be used as React keys.
+
+---
+
+# Keeping the `+` Design
+
+The backend returns the actual numeric count:
+
+```js
+value: projects.length
+```
+
+React adds the visual `+`:
+
+```jsx
+<h3>{stat.value}+</h3>
+```
+
+Example:
+
+```text
+Database contains 11 projects
+
+projects.length
+→ 11
+
+React
+→ 11+
+```
+
+---
+
+# About Loading State
+
+Added:
+
+```jsx
+{loadingStats && (
+    <p className="about-stats-status">
+        Loading stats...
+    </p>
+)}
+```
+
+---
+
+# About Error State
+
+Added:
+
+```jsx
+{statsError && (
+    <p className="about-stats-status about-stats-error">
+        {statsError}
+    </p>
+)}
+```
+
+---
+
+# About Empty State
+
+Added:
+
+```jsx
+{!loadingStats && !statsError && aboutStats.length === 0 && (
+    <p className="about-stats-status">
+        No stats available right now.
+    </p>
+)}
+```
+
+---
+
+# About Success State
+
+The cards only render when:
+
+```jsx
+!loadingStats &&
+!statsError &&
+aboutStats.length > 0
+```
+
+This prevents the cards from rendering during loading or error states.
+
+---
+
+# About Status CSS
+
+Added:
+
+```css
+/* Shared message style for loading and empty About stats states. */
+.about-stats-status {
+    width: 100%;
+    margin: 16px 0;
+    padding: 16px 20px;
+
+    color: #CBD5E1;
+    background: rgba(15, 23, 42, 0.7);
+
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+
+    text-align: center;
+}
+
+/* Extra styling when the About stats API fails. */
+.about-stats-error {
+    color: #FCA5A5;
+    background: rgba(127, 29, 29, 0.18);
+    border-color: rgba(248, 113, 113, 0.3);
+}
+```
+
+---
+
+# Automatic Updating
+
+The About cards no longer need manual number changes.
+
+Example:
+
+```text
+Current Projects
+10
+↓
+Add project through Admin
+↓
+Database contains 11 projects
+↓
+/api/about-stats returns 11
+↓
+React displays 11+
+```
+
+The same applies to:
+
+```text
+Skills
+Certifications
+```
+
+---
+
+# Mobile Hero Scroll Fix
+
+A separate mobile visual issue was also fixed.
+
+Problem:
+
+```text
+Hero social icons
++
+SCROLL indicator
+↓
+Overlapping on mobile
+```
+
+The Scroll indicator is useful on desktop but unnecessary on smaller screens.
+
+Added inside:
+
+```css
+@media (max-width: 768px)
+```
+
+the following:
+
+```css
+/* Hides the Hero scroll indicator on mobile devices. */
+.hero-scroll {
+    display: none;
+}
+```
+
+Result:
+
+```text
+Desktop
+→ Scroll indicator visible
+
+Mobile
+→ Scroll indicator hidden
+→ No social icon overlap
+→ Cleaner Hero layout
+```
+
+---
+
+# Step 30 Status
+
+```text
+Hardcoded About stat values removed ✅
+About Stats GET API created ✅
+Existing database data reused ✅
+No duplicate MongoDB collection ✅
+No new db.js methods required ✅
+Dynamic project count ✅
+Dynamic skill count ✅
+Dynamic certification count ✅
+Dynamic Bootstrap icons ✅
+React map() rendering ✅
+Loading state ✅
+Error state ✅
+Empty state ✅
+Success state ✅
+Status CSS ✅
+Admin API endpoint list updated ✅
+Mobile Hero scroll indicator hidden ✅
+Mobile social overlap fixed ✅
+```
+
+---
+
+# Files Updated
+
+Backend:
+
+```text
+index.js
+views/index.pug
+```
+
+React Portfolio:
+
+```text
+About.jsx
+About.css
+Hero.css
+```
+
+---
+
+# Concepts Practiced
+
+```text
+Derived data
+Reusing existing database data
+API endpoints
+Array length
+GET requests
+useState()
+useEffect()
+fetch()
+response.ok
+response.json()
+Promises
+.then()
+.catch()
+.finally()
+Conditional rendering
+Array map()
+React keys
+Dynamic class names
+Bootstrap Icons
+Loading states
+Error states
+Empty states
+Responsive CSS
+```
+
+---
+
+# Current Portfolio API Status
+
+```text
+Projects API ✅
+Skills API ✅
+Certifications API ✅
+About Stats API ✅
+Contact API ✅
+Guestbook API ✅
+
+Projects loading/error/empty handling ✅
+Skills loading/error/empty handling ✅
+Certifications loading/error/empty handling ✅
+About loading/error/empty handling ✅
+Contact submitting/error handling ✅
+Guestbook loading/submitting/error handling ✅
+```
+
+---
+
+# Later - Cloudflare API
+
+The portfolio is currently using the existing Express backend.
+
+The separate Cloudflare API work will be integrated later.
+
+When that migration happens, remember to also add:
+
+```text
+GET /api/about-stats
+```
+
+to the Cloudflare API so the dynamic About statistics continue working.
+
+---
+
+# Git Checkpoint
+
+The backend and frontend are separate projects, so commit each repository separately.
+
+## Backend
+
+```bash
+git status
+
+git add .
+
+git commit -m "Add dynamic About stats API"
+
+git push
+```
+
+## React Portfolio
+
+```bash
+git status
+
+git add .
+
+git commit -m "Make About stats dynamic"
+
+git push
+```

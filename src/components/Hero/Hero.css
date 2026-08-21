@@ -556,7 +556,13 @@
         margin-top: 0;
     }
 
+    /* Hides the Hero scroll indicator on mobile devices. */
+    .hero-scroll {
+        display: none;
+    }
+
     .hero {
-        padding-bottom: 40px;
+        padding-top: 40px;
+        padding-bottom: 32px;
     }
 }
