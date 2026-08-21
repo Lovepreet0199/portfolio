@@ -157,3 +157,65 @@
     }
 
 }
+
+/* MOBILE */
+
+@media (max-width: 576px) {
+
+    .project-card {
+        border-radius: 14px;
+    }
+
+    /* A shorter image keeps the project card from becoming too tall on mobile. */
+    .project-image {
+        height: 175px;
+    }
+
+    .project-content {
+        padding: 16px;
+    }
+
+    /*
+        I stack the project title and type on mobile because there is not enough horizontal space for both.
+    */
+    .project-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+
+        margin-bottom: 12px;
+    }
+
+    .project-card-header h3 {
+        font-size: 18px;
+    }
+
+    .project-type {
+        font-size: 11px;
+        padding: 4px 9px;
+    }
+
+    .project-description {
+        font-size: 13px;
+        line-height: 1.6;
+        margin-bottom: 16px;
+    }
+
+    .project-technologies {
+        gap: 6px;
+        margin-bottom: 18px;
+    }
+
+    .project-technologies span {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+
+    .project-links {
+        width: 100%;
+
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+}
