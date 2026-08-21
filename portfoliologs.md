@@ -22972,3 +22972,886 @@ Next:
 Guestbook GET API
 Guestbook POST API
 ```
+
+# Step 29 - Guestbook GET and POST API Error Handling
+
+## Goal
+
+Complete API state handling for the Guestbook.
+
+Unlike the previous sections, Guestbook uses both:
+
+```text
+GET
+→ Load existing Guestbook messages
+
+POST
+→ Submit a new Guestbook message
+```
+
+The Guestbook now handles:
+
+```text
+GET loading state
+GET error state
+GET empty state
+GET success state
+
+POST validation
+POST submitting state
+POST error state
+POST success state
+Duplicate-submit prevention
+```
+
+---
+
+# Existing Guestbook Data
+
+The Guestbook already stored form data using:
+
+```jsx
+const [guestData, setGuestData] = useState({
+    guestName: "",
+    guestMessage: ""
+});
+```
+
+Existing Guestbook messages were stored using:
+
+```jsx
+const [guestbookEntries, setGuestbookEntries] = useState([]);
+```
+
+The component also already had:
+
+```jsx
+const [error, setError] = useState("");
+
+const [success, setSuccess] = useState("");
+```
+
+These are used for the Guestbook form submission.
+
+---
+
+# New Guestbook API States
+
+Added:
+
+```jsx
+// Tracks whether Guestbook messages are still being loaded.
+const [loading, setLoading] = useState(true);
+
+// Tracks whether a new Guestbook entry is currently being submitted.
+const [submitting, setSubmitting] = useState(false);
+
+// Stores an error specifically for loading Guestbook messages.
+const [loadError, setLoadError] = useState("");
+```
+
+We keep GET and POST errors separate.
+
+```text
+loadError
+→ Problem loading Recent Messages
+
+error
+→ Problem submitting the Guestbook form
+```
+
+This prevents two different API operations from sharing the same error state.
+
+---
+
+# Guestbook GET Request
+
+Updated the initial Guestbook request:
+
+```jsx
+useEffect(() => {
+
+    // Sends a GET request to load Guestbook messages.
+    fetch(`${import.meta.env.VITE_API_URL}/api/guestbook`)
+
+        .then((response) => {
+
+            // Checks whether the HTTP response was unsuccessful.
+            if (!response.ok) {
+                throw new Error("Unable to load Guestbook messages.");
+            }
+
+            return response.json();
+        })
+
+        .then((data) => {
+
+            // Stores the Guestbook messages returned by the API.
+            setGuestbookEntries(data);
+        })
+
+        .catch((error) => {
+
+            // Shows the real error in the browser console.
+            console.error("Guestbook fetch error: ", error);
+
+            // Stores a user-friendly loading error.
+            setLoadError("Unable to load Guestbook messages.");
+        })
+
+        .finally(() => {
+
+            // Tells React that the initial Guestbook loading is finished.
+            setLoading(false);
+        });
+
+}, []);
+```
+
+---
+
+# Guestbook GET Flow
+
+```text
+Component mounts
+↓
+loading = true
+↓
+GET /api/guestbook
+↓
+┌─────────────────┬─────────────────┐
+│ SUCCESS         │ FAILURE         │
+│                 │                 │
+│ response.json() │ .catch()        │
+│ ↓               │ ↓               │
+│ set entries     │ setLoadError()  │
+└─────────────────┴─────────────────┘
+          ↓
+       .finally()
+          ↓
+setLoading(false)
+```
+
+---
+
+# Guestbook Loading State
+
+Added:
+
+```jsx
+{loading && (
+    <p className="guestbook-status">
+        Loading messages...
+    </p>
+)}
+```
+
+While the GET request is running:
+
+```text
+Loading messages...
+```
+
+is displayed.
+
+---
+
+# Guestbook GET Error State
+
+Added:
+
+```jsx
+{loadError && (
+    <p className="guestbook-status guestbook-error">
+        {loadError}
+    </p>
+)}
+```
+
+If loading Recent Messages fails:
+
+```text
+Unable to load Guestbook messages.
+```
+
+is displayed.
+
+---
+
+# Guestbook Empty State
+
+Added:
+
+```jsx
+{!loading && !loadError && guestbookEntries.length === 0 && (
+    <p className="guestbook-status">
+        No messages yet. Be the first to sign the Guestbook.
+    </p>
+)}
+```
+
+This handles a successful API response containing:
+
+```js
+[]
+```
+
+Instead of showing an empty Recent Messages section, the visitor gets a useful message.
+
+---
+
+# Successful Guestbook Rendering
+
+Guestbook cards now render only when:
+
+```jsx
+!loading && !loadError && guestbookEntries.length > 0
+```
+
+Used:
+
+```jsx
+{!loading && !loadError && guestbookEntries.length > 0 && (
+    <>
+        {guestbookEntries.map((entry) => {
+            return (
+                <GuestbookCard
+                    key={entry._id}
+                    name={entry.guestName}
+                    message={entry.guestMessage}
+                    date={new Date(entry.createdAt).toLocaleDateString()}
+                />
+            );
+        })}
+    </>
+)}
+```
+
+Flow:
+
+```text
+Guestbook entries
+↓
+.map()
+↓
+Each API entry
+↓
+GuestbookCard
+```
+
+---
+
+# Guestbook Message Count
+
+Previously, the count could temporarily display:
+
+```text
+0 Messages
+```
+
+while the API request was still loading.
+
+Updated it so the count only appears after a successful GET request:
+
+```jsx
+{!loading && !loadError && (
+    <span className="guestbook-count">
+        {guestbookEntries.length}{" "}
+        {guestbookEntries.length === 1 ? "Message" : "Messages"}
+    </span>
+)}
+```
+
+The existing ternary continues to handle singular/plural text:
+
+```text
+1
+→ 1 Message
+
+2
+→ 2 Messages
+```
+
+---
+
+# Guestbook GET Status CSS
+
+Added:
+
+```css
+/* Shared message style for loading and empty Guestbook states. */
+.guestbook-status {
+    margin: 16px 0;
+    padding: 16px 20px;
+
+    color: #CBD5E1;
+    background: rgba(15, 23, 42, 0.7);
+
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+
+    text-align: center;
+}
+```
+
+Used for:
+
+```text
+Loading messages...
+No messages yet...
+```
+
+---
+
+# Guestbook GET Error CSS
+
+Added:
+
+```css
+/* Extra styling when the Guestbook messages fail to load. */
+.guestbook-error {
+    color: #FCA5A5;
+    background: rgba(127, 29, 29, 0.18);
+    border-color: rgba(248, 113, 113, 0.3);
+}
+```
+
+This visually separates API errors from normal status messages.
+
+---
+
+# Existing Guestbook POST Validation
+
+The existing validation was maintained:
+
+```jsx
+if (guestData.guestName === "" || guestData.guestMessage === "") {
+    setError("Please fill in all fields");
+    setSuccess("");
+    return;
+}
+```
+
+If either field is empty:
+
+```text
+Show validation error
+↓
+return
+↓
+Do not send POST request
+```
+
+---
+
+# Guestbook Submitting State
+
+After validation succeeds, added:
+
+```jsx
+// Starts the submitting state after validation passes.
+setSubmitting(true);
+```
+
+This is deliberately placed after validation.
+
+```text
+Invalid form
+→ submitting stays false
+
+Valid form
+→ submitting becomes true
+→ POST request starts
+```
+
+---
+
+# Existing Guestbook POST Request
+
+The Guestbook already sent data using:
+
+```jsx
+const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/guestbook`,
+    {
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(guestData)
+    }
+);
+```
+
+Flow:
+
+```text
+guestData
+↓
+JSON.stringify()
+↓
+POST /api/guestbook
+↓
+Backend stores Guestbook entry
+```
+
+---
+
+# Guestbook POST Response
+
+The response is converted using:
+
+```jsx
+const data = await response.json();
+```
+
+Then checked using:
+
+```jsx
+if (!response.ok) {
+    setError(data.message);
+    setSuccess("");
+    return;
+}
+```
+
+If successful:
+
+```jsx
+setError("");
+setSuccess(data.message);
+```
+
+---
+
+# Guestbook Form Reset
+
+After successful submission:
+
+```jsx
+setGuestData({
+    guestName: "",
+    guestMessage: ""
+});
+```
+
+This clears the form.
+
+---
+
+# Refresh Recent Messages
+
+After successfully submitting a new Guestbook entry, the Guestbook GET endpoint is requested again:
+
+```jsx
+const guestbookResponse = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/guestbook`
+);
+
+const guestbookData = await guestbookResponse.json();
+
+setGuestbookEntries(guestbookData);
+```
+
+This refreshes the Recent Messages area so the newly submitted entry can appear without reloading the entire page.
+
+---
+
+# Guestbook POST Error Handling
+
+Existing `catch()`:
+
+```jsx
+catch (error) {
+
+    console.error("Guestbook form error: ", error);
+
+    setError("Unable to submit Guestbook entry.");
+    setSuccess("");
+}
+```
+
+Purpose:
+
+```text
+console.error()
+→ Technical debugging information
+
+setError()
+→ User-friendly message
+```
+
+---
+
+# Guestbook Finally Block
+
+Added:
+
+```jsx
+finally {
+
+    // Runs whether the Guestbook submission succeeds or fails.
+    setSubmitting(false);
+}
+```
+
+This guarantees the button returns to its normal state.
+
+```text
+POST starts
+↓
+submitting = true
+↓
+Success OR failure
+↓
+finally
+↓
+submitting = false
+```
+
+---
+
+# Guestbook Submit Button
+
+Updated:
+
+```jsx
+<button
+    type="submit"
+    className="guestbook-submit"
+    disabled={submitting}
+>
+    {submitting ? "Signing..." : "Sign Guestbook"}
+
+    <i className="bi bi-chat-left-text"></i>
+</button>
+```
+
+---
+
+# Prevent Duplicate Submissions
+
+Added:
+
+```jsx
+disabled={submitting}
+```
+
+Meaning:
+
+```text
+submitting = false
+→ Button enabled
+
+submitting = true
+→ Button disabled
+```
+
+This prevents visitors from rapidly submitting the same Guestbook entry multiple times.
+
+---
+
+# Dynamic Button Text
+
+Added:
+
+```jsx
+{submitting ? "Signing..." : "Sign Guestbook"}
+```
+
+Meaning:
+
+```text
+Normal
+→ Sign Guestbook
+
+POST request running
+→ Signing...
+```
+
+---
+
+# Guestbook Button CSS
+
+Updated the button transition:
+
+```css
+.guestbook-submit {
+    transition:
+        transform 250ms ease,
+        background-color 250ms ease,
+        box-shadow 250ms ease,
+        opacity 250ms ease;
+}
+```
+
+---
+
+# Enabled Button Hover
+
+Updated:
+
+```css
+.guestbook-submit:not(:disabled):hover {
+    background-color: #1447E6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(21, 93, 252, 0.3);
+}
+```
+
+The hover animation now only runs when the button is enabled.
+
+---
+
+# Disabled Button CSS
+
+Added:
+
+```css
+/* Shows that the Guestbook form is currently being submitted. */
+.guestbook-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+    box-shadow: none;
+}
+```
+
+When submitting:
+
+```text
+Button disabled
+↓
+Reduced opacity
+↓
+No hover movement
+↓
+Not-allowed cursor
+```
+
+---
+
+# Complete Guestbook Flow
+
+```text
+PAGE LOAD
+│
+├── GET /api/guestbook
+│
+├── Loading...
+│
+│
+├── Success
+│   ├── Entries exist
+│   │   → Render GuestbookCards
+│   │
+│   └── Empty array
+│       → Show empty message
+│
+└── Failure
+    → Show GET error
+
+
+FORM SUBMISSION
+│
+├── Validate fields
+│
+├── Invalid
+│   → Show validation error
+│
+└── Valid
+    ↓
+    submitting = true
+    ↓
+    Disable button
+    ↓
+    "Signing..."
+    ↓
+    POST /api/guestbook
+    ↓
+    ├── Success
+    │   ├── Show success
+    │   ├── Reset form
+    │   └── Reload Guestbook messages
+    │
+    └── Failure
+        → Show submission error
+    ↓
+    finally
+    ↓
+    submitting = false
+    ↓
+    Enable button
+```
+
+---
+
+# Step 29 Status
+
+```text
+Guestbook GET API ✅
+GET loading state ✅
+GET response.ok check ✅
+GET error handling ✅
+GET empty state ✅
+GET success state ✅
+Guestbook count loading protection ✅
+
+Guestbook POST API ✅
+POST validation ✅
+POST backend error handling ✅
+POST network error handling ✅
+POST success handling ✅
+Form reset ✅
+Recent Messages refresh ✅
+Submitting state ✅
+Duplicate-submit prevention ✅
+Dynamic Signing... text ✅
+finally block ✅
+Disabled button styling ✅
+```
+
+---
+
+# Files Updated
+
+```text
+Guestbook.jsx
+Guestbook.css
+```
+
+---
+
+# Concepts Practiced
+
+```text
+GET requests
+POST requests
+useState()
+useEffect()
+fetch()
+async / await
+Promises
+response.ok
+response.json()
+.then()
+.catch()
+.finally()
+try / catch / finally
+JSON.stringify()
+Conditional rendering
+Array map()
+Array length
+React Fragment
+Ternary operator
+Controlled forms
+Loading states
+Error states
+Empty states
+Success states
+Submitting states
+Disabled buttons
+State-driven UI
+```
+
+---
+
+# Portfolio API Handling Status
+
+```text
+Projects GET API
+├── Loading ✅
+├── Error ✅
+├── Empty ✅
+└── Success ✅
+
+Skills GET API
+├── Loading ✅
+├── Error ✅
+├── Empty ✅
+└── Success ✅
+
+Certifications GET API
+├── Loading ✅
+├── Error ✅
+├── Empty ✅
+└── Success ✅
+
+Contact POST API
+├── Validation ✅
+├── Submitting ✅
+├── Error ✅
+├── Success ✅
+└── Duplicate-submit protection ✅
+
+Guestbook GET API
+├── Loading ✅
+├── Error ✅
+├── Empty ✅
+└── Success ✅
+
+Guestbook POST API
+├── Validation ✅
+├── Submitting ✅
+├── Error ✅
+├── Success ✅
+├── Refresh messages ✅
+└── Duplicate-submit protection ✅
+```
+
+---
+
+# Git Checkpoint - Guestbook API Handling
+
+Check:
+
+```bash
+git status
+```
+
+Stage:
+
+```bash
+git add .
+```
+
+Commit:
+
+```bash
+git commit -m "Improve guestbook API handling"
+```
+
+Push:
+
+```bash
+git push
+```
+
+---
+
+# Current Portfolio Cleanup Status
+
+```text
+API loading states ✅
+API error states ✅
+API empty states ✅
+POST submitting states ✅
+Duplicate-submit protection ✅
+
+Next:
+Final portfolio cleanup
+Accessibility check
+Final mobile testing
+Footer / real links
+Resume file
+Deployment preparation
+README update
+```
+

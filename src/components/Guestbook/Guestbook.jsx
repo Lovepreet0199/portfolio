@@ -50,6 +50,15 @@ export default function Guestbook() {
 
     const [success, setSuccess] = useState("");
 
+    // Tracks whether Guestbook messages are still being loaded.
+    const [loading, setLoading] = useState(true);
+
+    // Tracks whether a new Guestbook entry is currently being submitted.
+    const [submitting, setSubmitting] = useState(false);
+
+    // Stores an error specifically for loading Guestbook messages.
+    const [loadError, setLoadError] = useState("");
+
     function handleChange(event) {
         setGuestData({
             ...guestData,
@@ -58,10 +67,39 @@ export default function Guestbook() {
     }
 
     useEffect(() => {
+
+        // Sends a GET request to load Guestbook messages.
         fetch(`${import.meta.env.VITE_API_URL}/api/guestbook`)
-            .then((response) => response.json())
+
+            .then((response) => {
+
+                // Checks whether the HTTP response was unsuccessful.
+                if (!response.ok) {
+                    throw new Error("Unable to load Guestbook messages.");
+                }
+
+                return response.json();
+            })
+
             .then((data) => {
+
+                // Stores the Guestbook messages returned by the API.
                 setGuestbookEntries(data);
+            })
+
+            .catch((error) => {
+
+                // Shows the real error in the browser console.
+                console.error("Guestbook fetch error: ", error);
+
+                // Stores a user-friendly loading error.
+                setLoadError("Unable to load Guestbook messages.");
+            })
+
+            .finally(() => {
+
+                // Tells React that the initial Guestbook loading is finished.
+                setLoading(false);
             });
 
     }, []);
@@ -74,6 +112,9 @@ export default function Guestbook() {
             setSuccess("");
             return;
         }
+
+        // Starts the submitting state after validation passes.
+        setSubmitting(true);
 
         try {
             const response = await fetch(
@@ -118,6 +159,9 @@ export default function Guestbook() {
 
             setError("Unable to submit Guestbook entry.");
             setSuccess("");
+        } finally {
+            // Runs whether the Guestbook submission succeeds or fails.
+            setSubmitting(false);
         }
 
     }
@@ -207,8 +251,13 @@ export default function Guestbook() {
                                     </div>
                                 )}
 
-                                <button type="submit" className="guestbook-submit">
-                                    Sign Guestbook
+                                <button
+                                    type="submit"
+                                    className="guestbook-submit"
+                                    disabled={submitting}
+                                >
+                                    {submitting ? "Signing..." : "Sign Guestbook"}
+
                                     <i className="bi bi-chat-left-text"></i>
                                 </button>
 
@@ -225,21 +274,47 @@ export default function Guestbook() {
                                     <p>Messages left by visitors.</p>
                                 </div>
 
-                                <span className="guestbook-count">
-                                    {guestbookEntries.length} {guestbookEntries.length === 1 ? "Message" : "Messages"}
-                                </span>
+                                {!loading && !loadError && (
+                                    <span className="guestbook-count">
+                                        {guestbookEntries.length}{" "}
+                                        {guestbookEntries.length === 1 ? "Message" : "Messages"}
+                                    </span>
+                                )}
                             </div>
 
-                            {guestbookEntries.map((entry) => {
-                                return (
-                                    <GuestbookCard
-                                        key={entry._id}
-                                        name={entry.guestName}
-                                        message={entry.guestMessage}
-                                        date={new Date(entry.createdAt).toLocaleDateString()}
-                                    />
-                                );
-                            })}
+                            {loading && (
+                                <p className="guestbook-status">
+                                    Loading messages...
+                                </p>
+                            )}
+
+                            {loadError && (
+                                <p className="guestbook-status guestbook-error">
+                                    {loadError}
+                                </p>
+                            )}
+
+                            {!loading && !loadError && guestbookEntries.length === 0 && (
+                                <p className="guestbook-status">
+                                    No messages yet. Be the first to sign the Guestbook.
+                                </p>
+                            )}
+
+                            {!loading && !loadError && guestbookEntries.length > 0 && (
+                                <>
+                                    {guestbookEntries.map((entry) => {
+                                        return (
+                                            <GuestbookCard
+                                                key={entry._id}
+                                                name={entry.guestName}
+                                                message={entry.guestMessage}
+                                                date={new Date(entry.createdAt).toLocaleDateString()}
+                                            />
+                                        );
+                                    })}
+                                </>
+                            )}
+
                         </div>
                     </div>
 
