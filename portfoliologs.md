@@ -20807,3 +20807,838 @@ Accessibility check
 Deployment preparation
 Final README update
 ```
+
+# Step 25.1 - Projects API Status Styling
+
+Added CSS styling for the Projects API loading, error, and empty states.
+
+---
+
+## Projects Status Message
+
+Added a shared class:
+
+```css
+/* Shared message style for loading, error, and empty project states. */
+.projects-status {
+    margin: 32px 0;
+    padding: 16px 20px;
+
+    color: #CBD5E1;
+    background: rgba(15, 23, 42, 0.7);
+
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+
+    text-align: center;
+}
+```
+
+This class is shared by:
+
+```text
+Loading Projects...
+No projects available right now.
+Unable to load projects
+```
+
+The loading and empty states use the normal status appearance.
+
+---
+
+## Projects Error Styling
+
+Added an additional error class:
+
+```css
+/* Extra styling only when the Projects API fails. */
+.projects-error {
+    color: #FCA5A5;
+    background: rgba(127, 29, 29, 0.18);
+    border-color: rgba(248, 113, 113, 0.3);
+}
+```
+
+The JSX uses both classes:
+
+```jsx
+<p className="projects-status projects-error">
+    {error}
+</p>
+```
+
+This means:
+
+```text
+projects-status
+↓
+Provides the base status styling
+
+projects-error
+↓
+Overrides the colors for an error
+```
+
+The error therefore receives a subtle red appearance while still matching the dark portfolio design.
+
+---
+
+## Class Name Fix
+
+Made sure the loading state also uses:
+
+```jsx
+className="projects-status"
+```
+
+instead of:
+
+```jsx
+className="project-status"
+```
+
+This keeps the loading, error, and empty states consistent.
+
+---
+
+# Projects API UI States
+
+The Projects section now visually supports all four API states:
+
+```text
+1. Loading
+   ↓
+   Neutral status message
+
+2. Error
+   ↓
+   Red error status message
+
+3. Empty
+   ↓
+   Neutral "No projects available" message
+
+4. Success
+   ↓
+   Project cards + View More functionality
+```
+
+---
+
+# Step 25.1 Status
+
+```text
+Projects loading styling ✅
+Projects error styling ✅
+Projects empty-state styling ✅
+Shared projects-status class ✅
+Error-specific projects-error class ✅
+Status class naming corrected ✅
+Dark portfolio styling maintained ✅
+```
+
+---
+
+# Files Updated
+
+```text
+Projects.jsx
+Projects.css
+```
+
+---
+
+# Git Checkpoint
+
+```bash
+git status
+git add .
+git commit -m "Add project API loading and error states"
+git push
+```
+
+# Step 26 - Skills API Loading and Error Handling
+
+## Goal
+
+Add complete API state handling to the Skills section so the portfolio can properly display:
+
+```text
+Loading
+Success
+Error
+Empty skills
+```
+
+Previously, the Skills component fetched data from the API but did not handle failed requests or loading states.
+
+---
+
+# Skills State
+
+The Skills component already stored API data using:
+
+```jsx
+const [skills, setSkills] = useState([]);
+```
+
+Added:
+
+```jsx
+// Tracks whether the skills are still being loaded from the API.
+const [loading, setLoading] = useState(true);
+
+// Stores an error message if the Skills API request fails.
+const [error, setError] = useState("");
+```
+
+Purpose:
+
+```text
+skills
+→ Stores the skills returned by the API.
+
+loading
+→ Tracks whether the API request is still running.
+
+error
+→ Stores a user-friendly message if the request fails.
+```
+
+---
+
+# Skills API Request
+
+The Skills API request runs inside `useEffect()`:
+
+```jsx
+useEffect(() => {
+
+    // Sends a GET request to the Skills API.
+    fetch(`${import.meta.env.VITE_API_URL}/api/skills`)
+
+        // Runs when the server sends back a response.
+        .then((response) => {
+
+            // Checks whether the HTTP response was unsuccessful.
+            if (!response.ok) {
+
+                // Stops the normal Promise chain and sends the error to .catch().
+                throw new Error("Unable to load skills.");
+            }
+
+            // Converts the JSON response into JavaScript data.
+            return response.json();
+        })
+
+        // Runs after the JSON has been successfully converted.
+        .then((data) => {
+
+            // Stores the skills returned by the API in React state.
+            setSkills(data);
+        })
+
+        // Runs if the API request or any previous step fails.
+        .catch((error) => {
+
+            // Shows the actual error in the browser console for debugging.
+            console.error("Skills fetch error: ", error);
+
+            // Stores a user-friendly error message.
+            setError("Unable to load skills");
+        })
+
+        // Runs whether the request succeeds or fails.
+        .finally(() => {
+
+            // Tells React that loading is finished.
+            setLoading(false);
+        });
+
+}, []);
+```
+
+---
+
+# HTTP Response Check
+
+Added:
+
+```jsx
+if (!response.ok) {
+    throw new Error("Unable to load skills.");
+}
+```
+
+`fetch()` does not automatically reject HTTP errors such as:
+
+```text
+404
+500
+503
+```
+
+Because of this, `response.ok` is checked manually.
+
+```text
+response.ok = true
+→ request was successful
+
+!response.ok = true
+→ request was unsuccessful
+```
+
+If the response fails:
+
+```jsx
+throw new Error("Unable to load skills.");
+```
+
+sends the request flow to `.catch()`.
+
+---
+
+# Successful Response
+
+After a successful response:
+
+```jsx
+return response.json();
+```
+
+converts the API JSON into JavaScript data.
+
+The next `.then()` receives that data:
+
+```jsx
+.then((data) => {
+    setSkills(data);
+})
+```
+
+The skills array is then stored in React state.
+
+---
+
+# Error Handling
+
+Added:
+
+```jsx
+.catch((error) => {
+
+    console.error("Skills fetch error: ", error);
+
+    setError("Unable to load skills");
+})
+```
+
+Two different error outputs are used:
+
+```text
+console.error()
+→ Gives the developer the real technical error.
+
+setError()
+→ Gives the portfolio visitor a clean user-friendly message.
+```
+
+---
+
+# Loading Completion
+
+Added:
+
+```jsx
+.finally(() => {
+    setLoading(false);
+});
+```
+
+`.finally()` runs whether the request:
+
+```text
+Succeeds
+or
+Fails
+```
+
+Flow:
+
+```text
+Component loads
+↓
+loading = true
+↓
+Skills API request
+↓
+Success OR Failure
+↓
+.finally()
+↓
+loading = false
+```
+
+---
+
+# Loading State UI
+
+Added:
+
+```jsx
+{loading && (
+    <p className="skills-status">
+        Loading Skills...
+    </p>
+)}
+```
+
+Meaning:
+
+```text
+If loading is true
+→ show Loading Skills...
+```
+
+---
+
+# Error State UI
+
+Added:
+
+```jsx
+{error && (
+    <p className="skills-status skills-error">
+        {error}
+    </p>
+)}
+```
+
+This displays:
+
+```text
+Unable to load skills
+```
+
+when the API request fails.
+
+---
+
+# Empty Skills State
+
+Added:
+
+```jsx
+{!loading && !error && skills.length === 0 && (
+    <p className="skills-status">
+        No skills available right now.
+    </p>
+)}
+```
+
+This handles the case where:
+
+```text
+API request succeeds
+BUT
+the API returns an empty array []
+```
+
+Instead of showing an empty section, the visitor sees a useful message.
+
+---
+
+# Successful Skills Rendering
+
+The four skill categories should only render when:
+
+```text
+Loading is finished
+No error exists
+Skills exist
+```
+
+Added:
+
+```jsx
+{!loading && !error && skills.length > 0 && (
+    <>
+        ...
+    </>
+)}
+```
+
+Meaning:
+
+```text
+!loading
+→ loading is false
+
+!error
+→ no error exists
+
+skills.length > 0
+→ at least one skill exists
+```
+
+All three conditions must be true.
+
+---
+
+# React Fragment
+
+The successful state contains four sibling sections:
+
+```text
+Frontend
+Backend
+Databases
+Tools
+```
+
+They are grouped using a Fragment:
+
+```jsx
+<>
+    ...
+</>
+```
+
+This allows multiple JSX elements to be grouped without adding an unnecessary `<div>` to the DOM.
+
+---
+
+# Skills Filtering and Mapping
+
+The existing Skills rendering was kept.
+
+Example:
+
+```jsx
+{skills
+    .filter((skill) => skill.category === "Front-End")
+    .map((skill) => {
+        return (
+            <SkillCard
+                key={skill._id}
+                name={skill.name}
+                category={skill.category}
+                icon={skill.icon}
+            />
+        );
+    })}
+```
+
+Flow:
+
+```text
+skills array
+↓
+.filter()
+↓
+Select skills belonging to a category
+↓
+.map()
+↓
+Turn each skill object into a SkillCard
+```
+
+Example:
+
+```text
+Front-End
+↓
+Filter only Front-End skills
+↓
+React
+JavaScript
+HTML
+CSS
+↓
+Create SkillCard for each
+```
+
+---
+
+# Skills API Status Styling
+
+Added shared status styling:
+
+```css
+/* Shared message style for loading, error, and empty Skills API states. */
+.skills-status {
+    margin: 32px 0;
+    padding: 16px 20px;
+
+    color: #CBD5E1;
+    background: rgba(15, 23, 42, 0.7);
+
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+
+    text-align: center;
+}
+```
+
+This style is shared by:
+
+```text
+Loading Skills...
+No skills available right now.
+```
+
+---
+
+# Skills Error Styling
+
+Added:
+
+```css
+/* Extra styling only when the Skills API fails. */
+.skills-error {
+    color: #FCA5A5;
+    background: rgba(127, 29, 29, 0.18);
+    border-color: rgba(248, 113, 113, 0.3);
+}
+```
+
+The JSX uses:
+
+```jsx
+<p className="skills-status skills-error">
+    {error}
+</p>
+```
+
+Meaning:
+
+```text
+skills-status
+→ Base API status styling
+
+skills-error
+→ Adds the red error appearance
+```
+
+---
+
+# Skills API UI Flow
+
+```text
+Skills component mounts
+        ↓
+loading = true
+        ↓
+GET /api/skills
+        ↓
+        ├── Success
+        │      ↓
+        │ response.json()
+        │      ↓
+        │ setSkills(data)
+        │      ↓
+        │ .finally()
+        │      ↓
+        │ loading = false
+        │      ↓
+        │
+        │ skills.length > 0
+        │      ↓
+        │ Render skill categories
+        │
+        │ OR
+        │
+        │ skills.length === 0
+        │      ↓
+        │ Show empty message
+        │
+        └── Failure
+               ↓
+          throw Error / fetch error
+               ↓
+             .catch()
+               ↓
+       setError("Unable to load skills")
+               ↓
+             .finally()
+               ↓
+          loading = false
+               ↓
+         Show error message
+```
+
+---
+
+# Skills API States
+
+```text
+1. Loading
+   ↓
+   Loading Skills...
+
+2. Error
+   ↓
+   Unable to load skills
+
+3. Empty
+   ↓
+   No skills available right now.
+
+4. Success
+   ↓
+   Frontend
+   Backend
+   Databases
+   Tools
+```
+
+---
+
+# Step 26 Status
+
+```text
+Skills API integration ✅
+Skills loading state ✅
+Skills error state ✅
+Skills empty state ✅
+response.ok check ✅
+HTTP error handling ✅
+throw new Error() ✅
+.catch() ✅
+.finally() ✅
+Developer console error ✅
+User-friendly error message ✅
+Conditional rendering ✅
+Success-state rendering ✅
+React Fragment ✅
+Existing filter() logic maintained ✅
+Existing map() logic maintained ✅
+Skills loading styling ✅
+Skills error styling ✅
+Skills empty-state styling ✅
+```
+
+---
+
+# Projects Small Fix
+
+Also completed the missing Projects empty API state:
+
+```jsx
+{!loading && !error && projects.length === 0 && (
+    <p className="projects-status">
+        No projects available right now.
+    </p>
+)}
+```
+
+Projects now also support:
+
+```text
+Loading ✅
+Error ✅
+Empty ✅
+Success ✅
+```
+
+---
+
+# Files Updated
+
+```text
+Projects.jsx
+Projects.css
+Skills.jsx
+Skills.css
+```
+
+---
+
+# Concepts Practiced
+
+```text
+useState()
+useEffect()
+fetch()
+Promises
+.then()
+.catch()
+.finally()
+response.ok
+throw new Error()
+response.json()
+Conditional rendering
+&& operator
+! operator
+React Fragments
+Array filter()
+Array map()
+React keys
+API loading states
+API error states
+API empty states
+State-driven UI
+```
+
+---
+
+# Git Checkpoint - Projects and Skills API States
+
+Run:
+
+```bash
+git status
+```
+
+Then:
+
+```bash
+git add .
+```
+
+Commit:
+
+```bash
+git commit -m "Add API loading and error states"
+```
+
+Push:
+
+```bash
+git push
+```
+
+---
+
+# Current Final Cleanup
+
+```text
+Projects API loading state ✅
+Projects API error state ✅
+Projects API empty state ✅
+
+Skills API loading state ✅
+Skills API error state ✅
+Skills API empty state ✅
+
+Remaining API-driven sections
+Footer polish
+Real GitHub link
+Real LinkedIn link
+Email links
+Resume / CV file
+Final mobile testing
+Accessibility check
+Deployment preparation
+Final README update
+```

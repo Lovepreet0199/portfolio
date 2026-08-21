@@ -75,6 +75,13 @@ export default function Projects() {
                 </p>
             )}
 
+            {!loading && !error && projects.length === 0 && (
+                <p className="projects-status">
+                    No Projects available right now.
+                </p>
+            )}
+
+
             {/* Shows the projects after loading succeeds. */}
             {!loading && !error && (
                 <>
