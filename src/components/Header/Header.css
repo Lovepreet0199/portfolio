@@ -26,6 +26,9 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22);
 
     backdrop-filter: blur(12px);
+
+    /* Smoothly changes the Header shape when the mobile menu opens. */
+    transition: border-radius 300ms ease;
 }
 
 
@@ -159,6 +162,8 @@
 }
 
 
+/* TABLET AND MOBILE */
+
 @media (max-width: 991px) {
 
     .menu-toggle {
@@ -186,18 +191,25 @@
         border-radius: 2px;
     }
 
-    /* I position the mobile menu underneath the floating Header. */
+    /*
+        I position the mobile menu directly under the floating Header
+        so both parts look like one connected navigation.
+    */
     .main-navigation {
         position: absolute;
-        top: calc(100% + 18px);
-        left: 50%;
 
-        width: 100vw;
-        padding: 24px;
+        top: calc(100% - 1px);
+        left: 0;
+
+        width: 100%;
+
+        padding: 20px 18px 22px;
 
         background-color: #081120;
 
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        border-top: none;
+        border-radius: 0 0 22px 22px;
 
         box-shadow: 0 18px 30px rgba(0, 0, 0, 0.35);
 
@@ -205,13 +217,12 @@
         opacity: 0;
         visibility: hidden;
 
-        /* -50% keeps it centered and -40px gives it the upward close effect. */
-        transform: translate(-50%, -40px);
+        transform: translateY(-20px);
 
         transition:
-            opacity 350ms ease,
-            transform 350ms ease,
-            visibility 350ms ease;
+            opacity 300ms ease,
+            transform 300ms ease,
+            visibility 300ms ease;
     }
 
     /* This class is added when the hamburger button opens the menu. */
@@ -219,7 +230,15 @@
         opacity: 1;
         visibility: visible;
 
-        transform: translate(-50%, 0);
+        transform: translateY(0);
+    }
+
+    /*
+        When the menu is open I remove the bottom rounded corners
+        from the Header so it connects smoothly to the dropdown.
+    */
+    .site-header .container.header-menu-open {
+        border-radius: 28px 28px 0 0;
     }
 
     .nav-list {
