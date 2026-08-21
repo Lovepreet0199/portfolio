@@ -1,4 +1,4 @@
-/* Smooth scrolling when using navigation links. */
+/* Makes navigation links scroll smoothly to each section. */
 html {
     scroll-behavior: smooth;
 }
@@ -6,7 +6,7 @@ html {
 body {
     background-color: #081120;
 
-    /* Subtle grid pattern across the portfolio. */
+    /* I use two linear gradients to create the subtle grid pattern across the portfolio. */
     background-image:
         linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);

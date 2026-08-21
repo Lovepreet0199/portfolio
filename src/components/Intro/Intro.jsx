@@ -2,20 +2,22 @@ import "./Intro.css";
 import { useState } from "react";
 
 export default function Intro({ onFinish }) {
+
+    // I use this state to remove the Intro after its final animation finishes.
     const [showIntro, setShowIntro] = useState(true);
 
-    //Remove the intro after the final slide-up animation finishes.
     function handleAnimationEnd(event) {
 
+        // I only finish the Intro when the final slideUp animation ends.
         if (event.animationName === "slideUp") {
             setShowIntro(false);
 
-            //Tells the parent component that the intro has finished animation.
+            // This tells App that the Intro is finished so the Hero animations can start.
             onFinish();
         }
     }
 
-    //Stops rendering the intro after the animation is complete.
+    // Once the Intro is finished, I stop rendering it completely.
     if (!showIntro) {
         return null;
     }
@@ -48,13 +50,17 @@ export default function Intro({ onFinish }) {
                 {/* Developer-related icons shown under the role. */}
                 <div className="intro-icons d-flex justify-content-center gap-3">
 
-                    <i className="bi bi-globe2"></i>
-                    <i className="bi bi-code-slash"></i>
-                    <i className="bi bi-terminal"></i>
-                    <i className="bi bi-braces"></i>
-                    <i className="bi bi-git"></i>
+                    <i className="bi bi-globe2" aria-hidden="true"></i>
+                    <i className="bi bi-code-slash" aria-hidden="true"></i>
+                    <i className="bi bi-terminal" aria-hidden="true"></i>
+                    <i className="bi bi-braces" aria-hidden="true"></i>
+                    <i className="bi bi-git" aria-hidden="true"></i>
+
+
                 </div>
+
             </div>
+
         </div>
     );
 }

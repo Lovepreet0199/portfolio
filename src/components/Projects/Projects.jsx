@@ -7,52 +7,41 @@ export default function Projects() {
     const [projects, setProjects] = useState([]);
     const [showAllProjects, setShowAllProjects] = useState(false);
 
-    //Track whether the projects are still being loaded from the API.
+    // I use these states to handle the loading and error messages for the Projects API.
     const [loading, setLoading] = useState(true);
-
-    //Stores an error message if the API request fails.
     const [error, setError] = useState("");
 
     useEffect(() => {
 
-        // Sends a GET request to the Projects API.
+        // Loads the projects from my backend API.
         fetch(`${import.meta.env.VITE_API_URL}/api/projects`)
 
-            // Runs when the server sends back a response.
             .then((response) => {
 
-                // Checks if the HTTP response was unsuccessful such as 404, 500, etc.
+                // fetch() does not fail automatically for HTTP errors,
+                // so I check the response before using the data.
                 if (!response.ok) {
-
-                    // Stops the normal Promise chain and sends the error to .catch().
                     throw new Error("Unable to load projects.");
                 }
 
-                // Converts the JSON response into JavaScript data and passes it to the next .then().
                 return response.json();
             })
 
-            // Runs after the JSON has been successfully converted.
             .then((data) => {
-
-                // Stores the projects returned by the API in React state.
                 setProjects(data);
             })
 
-            // Runs if the API request or any previous step fails.
             .catch((error) => {
 
-                // Displays the actual error in the browser console for debugging.
+                // I keep the real error in the console so I can debug it.
                 console.error("Projects fetch error: ", error);
 
-                // Stores a user-friendly error message in React state.
                 setError("Unable to load projects");
             })
 
-            // Runs after the request finishes whether it succeeded or failed.
             .finally(() => {
 
-                // Tells React that the API request is no longer loading.
+                // The request is finished here whether it worked or failed.
                 setLoading(false);
             });
 
@@ -61,31 +50,32 @@ export default function Projects() {
     return (
         <div className="projects" id="projects">
 
-            {/* Shows a message while the projects are being fetched from the API. */}
+            {/* Show a message while the projects are still loading. */}
             {loading && (
-                <p className="project-status">
+                <p className="projects-status">
                     Loading Projects...
                 </p>
             )}
 
-            {/* Shows an error message if the API request fails. */}
+            {/* Show the API error instead of leaving the section empty. */}
             {error && (
                 <p className="projects-status projects-error">
                     {error}
                 </p>
             )}
 
+            {/* This handles a successful request that returns no projects. */}
             {!loading && !error && projects.length === 0 && (
                 <p className="projects-status">
-                    No Projects available right now.
+                    No projects available right now.
                 </p>
             )}
 
-
-            {/* Shows the projects after loading succeeds. */}
-            {!loading && !error && (
+            {/* Show the project cards after the API loads successfully. */}
+            {!loading && !error && projects.length > 0 && (
                 <>
-                    <div className={`projects-grid ${showAllProjects ? "projects-grid-expanded" : ""}`}>
+                    <div
+                        className={`projects-grid ${showAllProjects ? "projects-grid-expanded" : ""}`}>
 
                         {projects
                             .slice(0, showAllProjects ? projects.length : 2)
@@ -106,7 +96,7 @@ export default function Projects() {
 
                     </div>
 
-                    {/* Only shows the button when there are more than 2 projects. */}
+                    {/* Only show this button if there are more than two projects. */}
                     {projects.length > 2 && (
                         <button
                             type="button"
@@ -114,17 +104,16 @@ export default function Projects() {
                             onClick={() => setShowAllProjects(!showAllProjects)}
                         >
                             {showAllProjects ? "Show Less" : "View More Projects"}
-
                             <i
-                                className={`bi ${showAllProjects
-                                    ? "bi-chevron-up"
-                                    : "bi-chevron-down"
-                                    }`}
+                                className={`bi ${showAllProjects ? "bi-chevron-up" : "bi-chevron-down"}`}
+                                aria-hidden="true"
                             ></i>
                         </button>
                     )}
+
                 </>
             )}
+
         </div>
     );
 }

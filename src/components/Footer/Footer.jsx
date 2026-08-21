@@ -6,6 +6,7 @@ export default function Footer() {
 
     useEffect(() => {
 
+        // Checks the Footer position whenever the user scrolls.
         function handleScroll() {
 
             const footerSection = document.getElementById("footer");
@@ -16,6 +17,7 @@ export default function Footer() {
 
             const sectionPosition = footerSection.getBoundingClientRect();
 
+            // Start the animation when the Footer is visible in the viewport.
             if (
                 sectionPosition.top < window.innerHeight * 0.9 &&
                 sectionPosition.bottom > 0
@@ -28,6 +30,7 @@ export default function Footer() {
 
         window.addEventListener("scroll", handleScroll);
 
+        // I check once on load too in case the Footer is already visible.
         handleScroll();
 
         return () => {
@@ -60,11 +63,17 @@ export default function Footer() {
 
                     <div className="footer-socials">
 
-                        <a href="https://github.com/Lovepreet0199" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                        <a href="https://github.com/Lovepreet0199"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="GitHub">
                             <i className="bi bi-github"></i>
                         </a>
 
-                        <a href="https://www.linkedin.com/in/lovepreet-singh-sandhu-567345164/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                        <a href="https://www.linkedin.com/in/lovepreet-singh-sandhu-567345164/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="LinkedIn">
                             <i className="bi bi-linkedin"></i>
                         </a>
 
@@ -80,7 +89,7 @@ export default function Footer() {
                     className={`footer-bottom ${footerVisible ? "footer-bottom-show" : ""}`}>
 
                     <p>
-                        © 2026 Lovepreet Sandhu. All rights reserved.
+                        &copy; {new Date().getFullYear()} Lovepreet Sandhu. All rights reserved.
                     </p>
 
                 </div>

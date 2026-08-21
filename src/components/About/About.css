@@ -23,11 +23,11 @@
     letter-spacing: 2.4px;
     margin-bottom: 12px;
 
-    /* hide the about label before animations */
+    /* I keep the label hidden until the About animation starts. */
     opacity: 0;
 }
 
-/* Shows the About label when the user scrolls to the section. */
+/* Shows the label when the About section enters the viewport. */
 .about-label.about-show-item {
     animation: fadeUp 700ms ease forwards;
 }
@@ -39,6 +39,7 @@
     font-weight: 700;
     margin-bottom: 20px;
 
+    /* The title starts hidden so it can appear after the label. */
     opacity: 0;
 }
 
@@ -47,19 +48,6 @@
 }
 
 .about-title span {
-    color: #51A2FF;
-}
-
-/* Keeps the About email link consistent with the other information values. */
-.about-info-value a {
-    color: #E2E8F0;
-    text-decoration: none;
-
-    transition: color 250ms ease;
-}
-
-/* Highlights the email when the user hovers over it. */
-.about-info-value a:hover {
     color: #51A2FF;
 }
 
@@ -72,6 +60,7 @@
     max-width: 560px;
     margin-bottom: 32px;
 
+    /* Keeps the description hidden until its animation begins. */
     opacity: 0;
 }
 
@@ -84,6 +73,18 @@
     font-weight: 600;
 }
 
+/* Keeps the email link looking like the other About values. */
+.about-info-value a {
+    color: #E2E8F0;
+    text-decoration: none;
+
+    transition: color 250ms ease;
+}
+
+.about-info-value a:hover {
+    color: #51A2FF;
+}
+
 .about-info {
     margin-top: 32px;
 }
@@ -94,10 +95,9 @@
     gap: 20px;
     margin-bottom: 16px;
 
-    /* Keeps each information row hidden until its animation begins. */
+    /* Each row starts hidden so I can animate them one after another. */
     opacity: 0;
 
-    /* Smooth movement when the user hovers over an information row. */
     transition: transform 200ms ease;
 }
 
@@ -105,11 +105,12 @@
     transform: translateX(5px);
 }
 
-/* Animates the information rows after the About description. */
+/* Uses the same entrance animation for all About information rows. */
 .about-info-show {
     animation: fadeUp 600ms ease forwards;
 }
 
+/* These delays create the staggered effect for each row. */
 .about-info-show:nth-child(1) {
     animation-delay: 450ms;
 }
@@ -149,10 +150,10 @@
     font-size: 20px;
     width: 24px;
 
-    /* Smooth icon movement on hover. */
     transition: transform 200ms ease;
 }
 
+/* Makes the icon react with the row when it is hovered. */
 .about-info-item:hover .about-info-icon {
     transform: scale(1.15);
 }
@@ -160,26 +161,6 @@
 .about-availability {
     color: #00C950;
 }
-
-/* 
-.about-cv-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-
-    margin-top: 16px;
-    padding: 12px 22px;
-
-    background-color: #155DFC;
-    color: #FFFFFF;
-
-    font-family: "Inter", sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-
-    text-decoration: none;
-    border-radius: 10px;
-} */
 
 .about-top {
     display: flex;
@@ -195,11 +176,11 @@
     align-items: center;
     justify-content: center;
 
-    /* Keeps the image hidden until its entrance animation begins. */
+    /* Keeps the image hidden until its entrance animation starts. */
     opacity: 0;
 }
 
-/* Shows the About image when the About section animation starts. */
+/* Brings the About image in after the text starts appearing. */
 .about-image.about-image-show {
     animation: fadeInRight 900ms ease 400ms forwards;
 }
@@ -220,6 +201,7 @@
 
 .about-stat-card {
     padding: 16px 20px;
+
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
 
@@ -239,16 +221,16 @@
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
 
-/* Keeps the stat cards hidden until their entrance animation begins. */
+/* Stat cards start hidden so they can appear after the About information rows. */
 .about-stats .col-12 {
     opacity: 0;
 }
 
-/* Shows each stat card after the About information rows. */
 .about-stat-show {
     animation: fadeUpScale 600ms ease forwards;
 }
 
+/* These delays stagger the three stat cards. */
 .about-stat-show:nth-child(1) {
     animation-delay: 1000ms;
 }
@@ -287,9 +269,10 @@
     margin: 0;
 }
 
-/* Shared message style for loading and empty About stats states. */
+/* I use the same message box for the loading and empty API states. */
 .about-stats-status {
     width: 100%;
+
     margin: 16px 0;
     padding: 16px 20px;
 
@@ -307,7 +290,7 @@
     text-align: center;
 }
 
-/* Extra styling when the About stats API fails. */
+/* Keeps the same status layout but makes API errors easier to notice. */
 .about-stats-error {
     color: #FCA5A5;
     background: rgba(127, 29, 29, 0.18);
@@ -316,11 +299,7 @@
 
 @media (max-width: 991px) {
 
-    .about-image {
-        max-width: 340px;
-        margin: 20px auto 0;
-    }
-
+    /* I hide the About image on smaller screens so the content has more room. */
     .about-image {
         display: none;
     }

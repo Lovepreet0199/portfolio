@@ -1,4 +1,4 @@
-/*Full-screen welcome section displayed when the portfolio first loads. */
+/* Full-screen welcome section displayed when the portfolio first loads. */
 .intro {
     position: fixed;
     inset: 0;
@@ -9,13 +9,14 @@
 
     background: #081120;
 
+    /* Keeps the Intro above the rest of the portfolio while it is running. */
     z-index: 9999;
 
-    /* Slides the intro screen away after the content disappears. */
+    /* After all the Intro content finishes, the whole screen slides upward. */
     animation: slideUp 900ms ease 4300ms forwards;
 }
 
-/* Small welcome text displayed above the developer name. */
+/* Small welcome text displayed above my name. */
 .intro-welcome {
     margin: 0 0 10px 0;
 
@@ -25,11 +26,11 @@
 
     color: #90A1B9;
 
-    /* Run the fade-up animation when the intro loads. */
+    /* This is the first text animation that runs when the Intro loads. */
     animation: fadeUp 800ms ease forwards;
 }
 
-/* Main developer name displayed after the welcome message. */
+/* My name is the main focus of the Intro. */
 .intro-name {
     margin: 0 0 30px 0;
 
@@ -38,10 +39,10 @@
 
     color: #FFFFFF;
 
-    /* Keeping the name hidden until its animation begins. */
+    /* I keep the name hidden until its animation starts. */
     opacity: 0;
 
-    /* ORDER- NAME DURATION EASING DELAY FILL-MODE  */
+    /* Animation order: name, duration, easing, delay, fill-mode. */
     animation: fadeUp 800ms ease 750ms forwards;
 }
 
@@ -49,7 +50,7 @@
     color: #51A2FF;
 }
 
-/* Developers role displayed after the developers name. */
+/* My developer role appears after the name animation. */
 .intro-role {
     margin: 0;
 
@@ -58,28 +59,28 @@
 
     color: #90A1B9;
 
-    /* Keeping the role hidden until its animation begins. */
+    /* I keep the role hidden until its animation starts. */
     opacity: 0;
 
     animation: fadeUp 600ms ease 1630ms forwards;
 }
 
-/* Developer icons displayed below the role. */
+/* Developer-related icons displayed below the role. */
 .intro-icons {
     margin-top: 20px;
 }
 
-/* Controls the size and color of all the intro icons. */
 .intro-icons i {
     font-size: 26px;
     color: #90A1B9;
 
-    /* Keeping each icon hidden until its animation begins. */
+    /* Each icon starts hidden so I can bring them in one after another. */
     opacity: 0;
 
     animation: fadeUpScale 600ms ease forwards;
 }
 
+/* Different delays create the staggered icon animation. */
 .intro-icons i:nth-child(1) {
     animation-delay: 2300ms;
 }
@@ -100,13 +101,13 @@
     animation-delay: 2700ms;
 }
 
-/* Fades all intro content out after the entrance animations finish. */
+/* After everything has appeared, I fade the content out before the screen slides away. */
 .intro-content {
     animation: fadeOutUp 600ms ease 3700ms forwards;
 }
 
 /* Tablet */
-@media (max-width:991px) {
+@media (max-width: 991px) {
 
     .intro-name {
         font-size: 64px;
@@ -128,7 +129,7 @@
 }
 
 /* Mobile */
-@media (max-width:576px) {
+@media (max-width: 576px) {
 
     .intro-content {
         padding: 0 20px;

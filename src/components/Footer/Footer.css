@@ -21,6 +21,9 @@
     gap: 30px;
 
     padding-bottom: 30px;
+
+    /* I keep the main Footer content hidden until its animation starts. */
+    opacity: 0;
 }
 
 .footer-brand h3 {
@@ -35,6 +38,7 @@
 
 .footer-brand p {
     color: #62748E;
+
     font-family: "Inter", sans-serif;
     font-size: 12px;
 
@@ -48,14 +52,15 @@
 }
 
 .footer-links a {
+    display: inline-block;
+
     color: #90A1B9;
+
     font-family: "Inter", sans-serif;
     font-size: 13px;
     font-weight: 500;
 
     text-decoration: none;
-
-    display: inline-block;
 
     transition:
         color 250ms ease,
@@ -105,38 +110,39 @@
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
 }
 
+/* Makes keyboard focus easy to see on Footer links. */
+.footer-links a:focus-visible,
+.footer-socials a:focus-visible {
+    outline: 2px solid #51A2FF;
+    outline-offset: 4px;
+}
+
 .footer-bottom {
     padding-top: 20px;
 
     border-top: 1px solid rgba(255, 255, 255, 0.06);
 
     text-align: center;
+
+    /* I keep the copyright hidden until the main Footer appears. */
+    opacity: 0;
 }
 
 .footer-bottom p {
     color: #62748E;
+
     font-family: "Inter", sans-serif;
     font-size: 11px;
 
     margin: 0;
 }
 
-/* Keeps Footer content hidden before its entrance animation. */
-.footer-content {
-    opacity: 0;
-}
-
-/* Shows the main Footer content when the Footer enters the screen. */
+/* Shows the main Footer content when the section enters the screen. */
 .footer-content.footer-content-show {
     animation: fadeUp 700ms ease forwards;
 }
 
-/* Keeps the copyright area hidden until the main Footer appears. */
-.footer-bottom {
-    opacity: 0;
-}
-
-/* Shows the copyright shortly after the main Footer content. */
+/* The copyright comes in just after the main Footer content. */
 .footer-bottom.footer-bottom-show {
     animation: fadeUp 700ms ease 200ms forwards;
 }

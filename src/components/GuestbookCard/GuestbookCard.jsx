@@ -1,5 +1,6 @@
 import "./GuestbookCard.css";
 
+// Reusable card for showing one message from the Guestbook API.
 export default function GuestbookCard({
     name,
     message,

@@ -4,12 +4,12 @@
     gap: 24px;
 }
 
-/* Centers the View More button below the certification cards. */
+/* Keeps the View More button centered under the cards. */
 .certifications {
     text-align: center;
 }
 
-/* Button used to expand or collapse the certification list. */
+/* This button lets me expand or collapse the certification list. */
 .certifications-view-more-btn {
     margin-top: 28px;
     padding: 12px 24px;
@@ -32,19 +32,19 @@
         background-color 200ms ease;
 }
 
-/* Adds hover feedback to the View More button. */
+/* Gives some feedback when the View More button is hovered. */
 .certifications-view-more-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 22px rgba(21, 93, 252, 0.3);
     background-color: #2B7FFF;
 }
 
-/* Adds a small entrance animation when more certifications are displayed. */
+/* Plays a small animation when the extra certifications are shown. */
 .certifications-grid-expanded {
     animation: fadeUp 500ms ease forwards;
 }
 
-/* Shared message style for loading, error, and empty Certifications API states. */
+/* I use the same message style for loading and empty API states. */
 .certifications-status {
     margin: 32px 0;
     padding: 16px 20px;
@@ -63,7 +63,7 @@
     text-align: center;
 }
 
-/* Extra styling only when the Certifications API fails. */
+/* Keeps the same status box but makes an API error stand out. */
 .certifications-error {
     color: #FCA5A5;
     background: rgba(127, 29, 29, 0.18);

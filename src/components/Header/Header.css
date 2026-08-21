@@ -1,7 +1,8 @@
 .site-header {
-    background-color: transparent;
-    padding: 14px 0;
     width: 100%;
+    padding: 14px 0;
+
+    background-color: transparent;
 
     font-family: "Inter", sans-serif;
 
@@ -10,11 +11,11 @@
     z-index: 1000;
 }
 
-/* Floating rounded navigation container. */
+/* This creates the floating rounded container around the navigation. */
 .site-header .container {
     position: relative;
-    max-width: 90%;
 
+    max-width: 90%;
     padding: 12px 22px;
 
     background-color: rgba(8, 17, 32, 0.92);
@@ -27,24 +28,36 @@
     backdrop-filter: blur(12px);
 }
 
+
+/* BRAND */
+
 .header-brand {
     color: white;
-    text-decoration: none;
+
     font-weight: 600;
+
+    text-decoration: none;
 }
 
 .logo-icon {
     width: 32px;
     height: 32px;
+
     display: grid;
     place-items: center;
+
+    margin-right: 3px;
+
     background-color: #155DFC;
     color: #f6f7f8;
-    font-weight: 900;
+
     border-radius: 4px;
+
     font-size: small;
-    margin-right: 3px;
+    font-weight: 900;
+
     box-shadow: 0 4px 8px rgba(21, 93, 252, 0.4);
+
     transition:
         transform 250ms ease,
         box-shadow 250ms ease;
@@ -56,6 +69,11 @@
 }
 
 .logo-name {
+    color: #d1cdcd;
+
+    font-size: 16px;
+    font-weight: 600;
+
     transition: color 250ms ease;
 }
 
@@ -63,33 +81,28 @@
     color: #FFFFFF;
 }
 
-.logo-name {
-    color: #d1cdcd;
-    font-size: 16px;
-    font-weight: 600;
-}
 
-ul {
-    list-style: none;
-}
-
-a {
-    text-decoration: none;
-}
+/* NAVIGATION */
 
 .nav-list {
     display: flex;
     gap: 18px;
+
     margin: 0;
     padding: 0;
+
+    list-style: none;
 }
 
 .nav-list a {
     display: inline-block;
 
     color: #90A1B9;
+
     font-size: 14px;
     font-weight: 500;
+
+    text-decoration: none;
 
     transition:
         color 250ms ease,
@@ -101,13 +114,20 @@ a {
     transform: translateY(-2px);
 }
 
+
+/* LET'S TALK BUTTON */
+
 .lets-talk-btn {
+    padding: 8px 20px;
+
     background-color: #155DFC;
-    border-radius: 8px;
     color: white;
 
-    padding: 8px 20px;
+    border-radius: 8px;
+
     font-size: 14px;
+
+    text-decoration: none;
 
     box-shadow: 0 4px 8px rgba(21, 93, 252, 0.4);
 
@@ -126,27 +146,33 @@ a {
     box-shadow: 0 8px 20px rgba(21, 93, 252, 0.45);
 }
 
+
+/* MOBILE MENU */
+
 .menu-toggle {
     display: none;
 }
 
-/* Hidden on desktop. */
+/* The second Let's Talk button is only needed inside the mobile menu. */
 .nav-list .mobile-lets-talk-btn {
     display: none;
 }
 
+
 @media (max-width: 991px) {
+
     .menu-toggle {
+        width: 42px;
+        height: 42px;
+        padding: 9px;
+
         display: flex;
         flex-direction: column;
         justify-content: center;
         gap: 5px;
 
-        width: 42px;
-        height: 42px;
-        padding: 9px;
-
         background: transparent;
+
         border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 8px;
     }
@@ -154,44 +180,45 @@ a {
     .menu-toggle span {
         width: 100%;
         height: 2px;
+
         background-color: white;
+
         border-radius: 2px;
     }
 
-    /* Mobile navigation menu positioned below the header. */
+    /* I position the mobile menu underneath the floating Header. */
     .main-navigation {
         position: absolute;
         top: calc(100% + 18px);
         left: 50%;
 
         width: 100vw;
-
         padding: 24px;
+
         background-color: #081120;
+
         border-top: 1px solid rgba(255, 255, 255, 0.08);
+
         box-shadow: 0 18px 30px rgba(0, 0, 0, 0.35);
 
-        /* Keeps the menu hidden and slightly above its final position. */
+        /* The menu starts hidden and slightly above its open position. */
         opacity: 0;
         visibility: hidden;
 
-        /* -50% keeps the menu horizontally centered.
-       -20px moves it upward so it can slide down when opened. */
-        transform: translate(-50%, -20px);
+        /* -50% keeps it centered and -40px gives it the upward close effect. */
+        transform: translate(-50%, -40px);
 
-        /* Creates a smooth fade and slide when opening or closing the menu. */
         transition:
-            opacity 300ms ease,
-            transform 300ms ease,
-            visibility 300ms ease;
+            opacity 350ms ease,
+            transform 350ms ease,
+            visibility 350ms ease;
     }
 
-    /* Applied when the hamburger button opens the mobile navigation. */
+    /* This class is added when the hamburger button opens the menu. */
     .main-navigation--open {
         opacity: 1;
         visibility: visible;
 
-        /* Keeps the menu centered and moves it to its final vertical position. */
         transform: translate(-50%, 0);
     }
 
@@ -207,7 +234,9 @@ a {
 
     .nav-list a {
         display: block;
+
         padding: 14px 12px;
+
         border-radius: 8px;
     }
 
@@ -216,18 +245,23 @@ a {
         background-color: rgba(255, 255, 255, 0.08);
     }
 
+    /* The desktop button is replaced by the one inside the mobile menu. */
     .lets-talk-btn {
         display: none;
     }
 
-    .mobile-lets-talk-btn {
+    .nav-list .mobile-lets-talk-btn {
         display: block;
+
         margin-top: 16px;
         padding: 12px 20px;
 
         background-color: #155DFC;
         color: white;
+
         text-align: center;
+
         border-radius: 8px;
     }
+
 }

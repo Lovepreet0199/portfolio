@@ -6,52 +6,41 @@ export default function Skills() {
 
     const [skills, setSkills] = useState([]);
 
-    //Tracks whether the skills are still being loaded from the API.
+    // I use these states to handle the loading and error messages for the Skills API.
     const [loading, setLoading] = useState(true);
-
-    //Stores an error message if the skills API request fails.
     const [error, setError] = useState("");
 
     useEffect(() => {
 
-        // Sends a GET request to the Skills API.
+        // Loads the skills from my backend API.
         fetch(`${import.meta.env.VITE_API_URL}/api/skills`)
 
-            // Runs when the server sends back a response.
             .then((response) => {
 
-                // Checks whether the HTTP response was unsuccessful.
+                // fetch() does not fail automatically for HTTP errors,
+                // so I check the response before using the data.
                 if (!response.ok) {
-
-                    // Stops the normal Promise chain and sends the error to .catch().
                     throw new Error("Unable to load skills.");
                 }
 
-                // Converts the JSON response into JavaScript data.
                 return response.json();
             })
 
-            // Runs after the JSON has been successfully converted.
             .then((data) => {
-
-                // Stores the skills returned by the API in React state.
                 setSkills(data);
             })
 
-            // Runs if the API request or any previous step fails.
             .catch((error) => {
 
-                // Shows the actual error in the browser console for debugging.
+                // I keep the real error in the console so I can debug it.
                 console.error("Skills fetch error: ", error);
 
-                // Stores a user-friendly error message.
                 setError("Unable to load skills");
             })
 
-            // Runs whether the request succeeds or fails.
             .finally(() => {
 
-                // Tells React that loading is finished.
+                // The request is finished here whether it worked or failed.
                 setLoading(false);
             });
 
@@ -60,27 +49,31 @@ export default function Skills() {
     return (
         <div id="skills" className="skills">
 
+            {/* Show a message while the skills are still loading. */}
             {loading && (
                 <p className="skills-status">
                     Loading Skills...
                 </p>
             )}
 
+            {/* Show the API error instead of leaving the section empty. */}
             {error && (
                 <p className="skills-status skills-error">
                     {error}
                 </p>
             )}
 
+            {/* This handles a successful request that returns no skills. */}
             {!loading && !error && skills.length === 0 && (
                 <p className="skills-status">
                     No skills available right now.
                 </p>
             )}
 
-
+            {/* Show the skill categories after the API loads successfully. */}
             {!loading && !error && skills.length > 0 && (
                 <>
+
                     <div className="skills-category">
 
                         <p className="skills-category-title">
@@ -99,7 +92,7 @@ export default function Skills() {
                                             category={skill.category}
                                             icon={skill.icon}
                                         />
-                                    )
+                                    );
                                 })}
 
                         </div>
@@ -125,11 +118,13 @@ export default function Skills() {
                                             category={skill.category}
                                             icon={skill.icon}
                                         />
-                                    )
+                                    );
                                 })}
+
                         </div>
 
                     </div>
+
 
                     <div className="skills-category">
 
@@ -149,7 +144,7 @@ export default function Skills() {
                                             category={skill.category}
                                             icon={skill.icon}
                                         />
-                                    )
+                                    );
                                 })}
 
                         </div>
@@ -175,14 +170,16 @@ export default function Skills() {
                                             category={skill.category}
                                             icon={skill.icon}
                                         />
-                                    )
+                                    );
                                 })}
 
                         </div>
 
                     </div>
+
                 </>
             )}
+
         </div>
     );
 }

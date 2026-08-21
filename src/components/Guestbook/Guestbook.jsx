@@ -4,13 +4,26 @@ import GuestbookCard from "../GuestbookCard/GuestbookCard";
 
 
 export default function Guestbook() {
+    // Stores the name and message entered in the Guestbook form.
     const [guestData, setGuestData] = useState({
         guestName: "",
         guestMessage: ""
     });
 
-    // Tracks whether the Guestbook section should start its animations.
+    // I use this to start the Guestbook animations when it enters the screen.
     const [guestbookVisible, setGuestbookVisible] = useState(false);
+
+    const [guestbookEntries, setGuestbookEntries] = useState([]);
+
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+
+    // I use these states for loading messages and submitting the form.
+    const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
+
+    // This error is separate because it is only for loading the messages.
+    const [loadError, setLoadError] = useState("");
 
     useEffect(() => {
 
@@ -44,21 +57,8 @@ export default function Guestbook() {
 
     }, []);
 
-    const [guestbookEntries, setGuestbookEntries] = useState([]);
 
-    const [error, setError] = useState("");
-
-    const [success, setSuccess] = useState("");
-
-    // Tracks whether Guestbook messages are still being loaded.
-    const [loading, setLoading] = useState(true);
-
-    // Tracks whether a new Guestbook entry is currently being submitted.
-    const [submitting, setSubmitting] = useState(false);
-
-    // Stores an error specifically for loading Guestbook messages.
-    const [loadError, setLoadError] = useState("");
-
+    // Updates the correct form field using its name.
     function handleChange(event) {
         setGuestData({
             ...guestData,
@@ -68,12 +68,12 @@ export default function Guestbook() {
 
     useEffect(() => {
 
-        // Sends a GET request to load Guestbook messages.
+        // Loads the existing Guestbook messages from my backend.
         fetch(`${import.meta.env.VITE_API_URL}/api/guestbook`)
 
             .then((response) => {
 
-                // Checks whether the HTTP response was unsuccessful.
+                // I check this because fetch does not automatically fail on HTTP errors.
                 if (!response.ok) {
                     throw new Error("Unable to load Guestbook messages.");
                 }
@@ -82,23 +82,18 @@ export default function Guestbook() {
             })
 
             .then((data) => {
-
-                // Stores the Guestbook messages returned by the API.
                 setGuestbookEntries(data);
             })
 
             .catch((error) => {
 
-                // Shows the real error in the browser console.
+                // Keep the actual error in the console so I can debug it.
                 console.error("Guestbook fetch error: ", error);
 
-                // Stores a user-friendly loading error.
                 setLoadError("Unable to load Guestbook messages.");
             })
 
             .finally(() => {
-
-                // Tells React that the initial Guestbook loading is finished.
                 setLoading(false);
             });
 
@@ -107,16 +102,18 @@ export default function Guestbook() {
     async function handleSubmit(event) {
         event.preventDefault();
 
+        // Stops the form if either field was left empty.
         if (guestData.guestName === "" || guestData.guestMessage === "") {
             setError("Please fill in all fields");
             setSuccess("");
             return;
         }
 
-        // Starts the submitting state after validation passes.
+        // Disable the button while the message is being sent.
         setSubmitting(true);
 
         try {
+            // Sends the new Guestbook message to my backend.
             const response = await fetch(
                 `${import.meta.env.VITE_API_URL}/api/guestbook`,
                 {
@@ -141,14 +138,20 @@ export default function Guestbook() {
             setError("");
             setSuccess(data.message);
 
+            // Clear the form after the message was added successfully.
             setGuestData({
                 guestName: "",
                 guestMessage: ""
             });
 
+            // Load the messages again so the new entry appears right away.
             const guestbookResponse = await fetch(
                 `${import.meta.env.VITE_API_URL}/api/guestbook`
             );
+
+            if (!guestbookResponse.ok) {
+                throw new Error("Unable to reload Guestbook messages.");
+            }
 
             const guestbookData = await guestbookResponse.json();
 
@@ -159,9 +162,12 @@ export default function Guestbook() {
 
             setError("Unable to submit Guestbook entry.");
             setSuccess("");
+
         } finally {
-            // Runs whether the Guestbook submission succeeds or fails.
+
+            // Re-enable the submit button whether the request worked or failed.
             setSubmitting(false);
+
         }
 
     }
@@ -258,7 +264,10 @@ export default function Guestbook() {
                                 >
                                     {submitting ? "Signing..." : "Sign Guestbook"}
 
-                                    <i className="bi bi-chat-left-text"></i>
+                                    <i
+                                        className="bi bi-chat-left-text"
+                                        aria-hidden="true"
+                                    ></i>
                                 </button>
 
                             </form>

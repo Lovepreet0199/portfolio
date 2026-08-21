@@ -24533,3 +24533,907 @@ git commit -m "Make About stats dynamic"
 
 git push
 ```
+
+# Step 31 - Footer, Resume Setup, Mobile Navigation Fixes, and Rubric Review
+
+## Goal
+
+Finish several final portfolio cleanup items before starting the code-quality and accessibility audit.
+
+This step included:
+
+```text
+Footer polish
+Dynamic copyright year
+Footer keyboard focus styles
+Resume link setup
+Mobile Hero scroll fix
+Mobile navigation Let’s Talk fix
+Improved mobile menu animation
+Assignment rubric review
+```
+
+---
+
+# Footer Review
+
+The Footer already included:
+
+```text
+Brand name
+Developer role
+Internal navigation
+GitHub
+LinkedIn
+Email
+Copyright
+Responsive mobile layout
+Entrance animations
+```
+
+The existing design was kept because it was already consistent with the portfolio.
+
+---
+
+# Dynamic Copyright Year
+
+Changed the hardcoded year:
+
+```jsx
+© 2026 Lovepreet Sandhu. All rights reserved.
+```
+
+to:
+
+```jsx
+© {new Date().getFullYear()} Lovepreet Sandhu. All rights reserved.
+```
+
+This automatically uses the current year.
+
+Example:
+
+```text
+2026
+→ © 2026 Lovepreet Sandhu
+
+2027
+→ © 2027 Lovepreet Sandhu
+```
+
+No manual update is required.
+
+---
+
+# Footer Navigation Accessibility
+
+The visible Footer navigation links already clearly describe their destinations:
+
+```jsx
+<a href="#home">Home</a>
+<a href="#about">About</a>
+<a href="#showcase">Portfolio</a>
+<a href="#contact">Contact</a>
+<a href="#guestbook">Guestbook</a>
+```
+
+Additional `aria-label` attributes were not added because the visible link text is already descriptive.
+
+---
+
+# Footer Social Accessibility
+
+The Footer social icons already use accessible labels:
+
+```jsx
+<a
+    href="https://github.com/Lovepreet0199"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="GitHub"
+>
+    <i className="bi bi-github"></i>
+</a>
+```
+
+Similar labels are included for:
+
+```text
+LinkedIn
+Email
+```
+
+---
+
+# Footer Keyboard Focus Styling
+
+Added:
+
+```css
+/* Shows a clear focus indicator for keyboard navigation. */
+.footer-links a:focus-visible,
+.footer-socials a:focus-visible {
+    outline: 2px solid #51A2FF;
+    outline-offset: 4px;
+}
+```
+
+This gives keyboard users a visible indicator when navigating using the Tab key.
+
+Flow:
+
+```text
+Tab
+↓
+Home
+↓
+About
+↓
+Portfolio
+↓
+Contact
+↓
+Guestbook
+↓
+GitHub
+↓
+LinkedIn
+↓
+Email
+```
+
+---
+
+# Footer Mobile Layout
+
+The existing mobile Footer layout was kept:
+
+```css
+@media (max-width: 768px) {
+
+    .footer {
+        padding: 32px 0 18px;
+    }
+
+    .footer .container {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 22px;
+    }
+
+    .footer-links {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 16px 22px;
+    }
+
+    .footer-socials {
+        justify-content: center;
+    }
+}
+```
+
+Result:
+
+```text
+Desktop
+→ Horizontal Footer layout
+
+Mobile
+→ Vertical centered Footer layout
+```
+
+---
+
+# Footer Status
+
+```text
+Footer design ✅
+Dynamic year ✅
+Internal navigation ✅
+GitHub link ✅
+LinkedIn link ✅
+Email link ✅
+Social aria-labels ✅
+Keyboard focus styles ✅
+Mobile responsive layout ✅
+Footer animations ✅
+```
+
+---
+
+# Resume Setup
+
+The Hero already included a resume link.
+
+Originally:
+
+```jsx
+<a href="/resume.pdf" className="hero-secondary-btn">
+    Download CV
+    <i className="bi bi-download"></i>
+</a>
+```
+
+The portfolio will use a resume PDF stored in:
+
+```text
+public/
+└── resume.pdf
+```
+
+Once the resume is finished, the only required setup will be:
+
+```text
+1. Export resume as PDF
+2. Name it resume.pdf
+3. Put it inside public/
+4. Redeploy the portfolio
+```
+
+---
+
+# View Resume Instead of Forced Download
+
+The preferred behavior was changed from:
+
+```text
+Download CV
+```
+
+to:
+
+```text
+View Resume
+```
+
+Recommended link:
+
+```jsx
+<a
+    href="/resume.pdf"
+    className="hero-secondary-btn"
+    target="_blank"
+    rel="noopener noreferrer"
+>
+    View Resume
+    <i className="bi bi-file-earmark-person"></i>
+</a>
+```
+
+This opens the resume in a new browser tab.
+
+The browser PDF viewer can still provide:
+
+```text
+Download
+Print
+Zoom
+```
+
+controls.
+
+---
+
+# Resume File Status
+
+The resume is not complete yet.
+
+Before final deployment:
+
+```text
+Either:
+Add public/resume.pdf
+
+OR:
+Temporarily remove/hide the View Resume button
+```
+
+A broken resume link should not remain in the final submitted site.
+
+---
+
+# Mobile Hero Scroll Indicator Fix
+
+The Hero scroll indicator was positioned absolutely:
+
+```css
+.hero-scroll {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+}
+```
+
+On mobile it overlapped with the Hero social icons.
+
+Instead of repositioning it, the scroll indicator was hidden on mobile.
+
+Added:
+
+```css
+@media (max-width: 768px) {
+
+    .hero-scroll {
+        display: none;
+    }
+}
+```
+
+Result:
+
+```text
+Desktop
+→ Scroll indicator visible
+
+Mobile
+→ Scroll indicator hidden
+→ No social icon overlap
+```
+
+---
+
+# Mobile Navigation Let’s Talk Bug
+
+The mobile Let’s Talk button existed in the JSX:
+
+```jsx
+<li>
+    <a
+        href="#contact"
+        className="mobile-lets-talk-btn"
+        onClick={() => setIsMenuOpen(false)}
+    >
+        Let&apos;s Talk
+    </a>
+</li>
+```
+
+But it was not appearing on mobile.
+
+---
+
+# Cause
+
+The desktop CSS used:
+
+```css
+.nav-list .mobile-lets-talk-btn {
+    display: none;
+}
+```
+
+The mobile CSS used:
+
+```css
+.mobile-lets-talk-btn {
+    display: block;
+}
+```
+
+The desktop selector had higher CSS specificity.
+
+Because of this:
+
+```text
+.nav-list .mobile-lets-talk-btn
+```
+
+continued to override:
+
+```text
+.mobile-lets-talk-btn
+```
+
+---
+
+# Mobile Let’s Talk Fix
+
+Changed the mobile selector to match the same specificity:
+
+```css
+.nav-list .mobile-lets-talk-btn {
+    display: block;
+    margin-top: 16px;
+    padding: 12px 20px;
+
+    background-color: #155DFC;
+    color: white;
+    text-align: center;
+    border-radius: 8px;
+}
+```
+
+Result:
+
+```text
+Mobile navigation
+↓
+Home
+Projects
+Skills
+Certifications
+About
+Contact
+Guestbook
+
+Let’s Talk ✅
+```
+
+---
+
+# Mobile Navigation Animation Improvement
+
+The mobile menu already used a fade and slide animation.
+
+The hidden position was adjusted from:
+
+```css
+transform: translate(-50%, -20px);
+```
+
+to:
+
+```css
+transform: translate(-50%, -40px);
+```
+
+The transition uses:
+
+```css
+transition:
+    opacity 350ms ease,
+    transform 350ms ease,
+    visibility 350ms ease;
+```
+
+The open state remains:
+
+```css
+.main-navigation--open {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+}
+```
+
+This creates:
+
+```text
+OPEN
+↓
+Menu slides down
+↓
+Fades into place
+
+CLOSE
+↓
+Menu moves upward
+↓
+Fades away
+```
+
+This was designed to feel slightly closer to the upward disappearance used by the Intro animation.
+
+---
+
+# Mobile Navigation Status
+
+```text
+Hamburger menu ✅
+Open animation ✅
+Close-upward animation ✅
+Mobile Let’s Talk button ✅
+Menu link close behavior ✅
+aria-label ✅
+aria-expanded ✅
+Responsive menu ✅
+```
+
+---
+
+# Assignment Rubric Review
+
+The assignment rubric was reviewed before the final cleanup pass.
+
+The three grading categories are:
+
+```text
+Code Quality - 5
+Design - 5
+Usability - 5
+```
+
+The assignment rubric is originally out of:
+
+```text
+15
+```
+
+and is scaled to:
+
+```text
+18
+```
+
+in Blackboard.
+
+---
+
+# Code Quality Requirements
+
+Excellent-level code should:
+
+```text
+Work correctly
+Be efficient
+Be well-commented
+Be well-formatted
+Follow best practices
+```
+
+Current strengths:
+
+```text
+React component structure ✅
+API-driven content ✅
+Reusable cards ✅
+Environment API URL ✅
+GET API handling ✅
+POST API handling ✅
+Loading states ✅
+Error states ✅
+Empty states ✅
+Submitting states ✅
+Form validation ✅
+Duplicate-submit protection ✅
+Responsive CSS ✅
+```
+
+Main remaining issue:
+
+```text
+Comments are inconsistent across files.
+```
+
+Some components are well-commented while others have little or uneven commenting.
+
+A full code-quality commenting and formatting pass is required before submission.
+
+---
+
+# Design Rubric Status
+
+The portfolio currently includes:
+
+```text
+Professional dark visual system ✅
+Consistent typography ✅
+Floating glass navbar ✅
+Intro animation ✅
+Hero animations ✅
+Typing effect ✅
+Interactive ID badge ✅
+Dynamic lanyard ✅
+Responsive Hero ✅
+About section ✅
+Portfolio Showcase ✅
+Skills ✅
+Projects ✅
+Certifications ✅
+Contact ✅
+Guestbook ✅
+Footer ✅
+Hover interactions ✅
+Responsive mobile layouts ✅
+```
+
+Current Design target:
+
+```text
+Excellent - 5/5
+```
+
+---
+
+# Usability Rubric Status
+
+Current usability features:
+
+```text
+Clear navigation ✅
+Responsive hamburger menu ✅
+Mobile Let’s Talk CTA ✅
+Loading feedback ✅
+Error feedback ✅
+Empty-state feedback ✅
+Form validation ✅
+Submit feedback ✅
+Duplicate-submit protection ✅
+Social aria-labels ✅
+Hamburger aria-label ✅
+aria-expanded ✅
+Footer focus styles ✅
+```
+
+Remaining final checks:
+
+```text
+Full keyboard navigation
+Focus-visible styles throughout site
+All image alt text
+Heading order
+Color contrast
+No horizontal overflow
+No mobile overlap
+All anchor links
+All external links
+Resume link
+Production API behavior
+```
+
+---
+
+# Submission Requirements Remaining
+
+```text
+React site ✅
+Express API integration ✅
+Project data ✅
+Skill data ✅
+Certification data ✅
+Contact method ✅
+Dynamic About stats ✅
+
+Still remaining:
+Final code-quality pass
+Final accessibility pass
+Final mobile testing
+Resume PDF / remove broken link
+Deployment
+Production API verification
+README
+README live-site URL
+Final Git push
+```
+
+---
+
+# Step 31 Status
+
+```text
+Footer polish ✅
+Dynamic Footer year ✅
+Footer accessibility improvement ✅
+Resume structure prepared ✅
+View Resume behavior planned ✅
+Mobile Hero scroll issue fixed ✅
+Mobile Let’s Talk issue fixed ✅
+Mobile nav animation improved ✅
+Assignment rubric reviewed ✅
+Remaining full-mark risks identified ✅
+```
+
+---
+
+# Next Step
+
+Complete the final Code Quality pass.
+
+Files to review:
+
+```text
+1. Header.jsx
+2. Hero.jsx
+3. About.jsx
+4. Projects.jsx
+5. Skills.jsx
+6. Certifications.jsx
+7. Contact.jsx
+8. Guestbook.jsx
+9. Footer.jsx
+10. Card components
+11. App.jsx
+12. Remaining React components
+13. CSS formatting / cleanup
+```
+
+For each file check:
+
+```text
+Helpful comments
+Formatting
+Naming
+Dead code
+Commented-out code
+Duplicated code
+Accessibility
+Best practices
+Console warning risks
+```
+
+Do not comment every obvious JSX line.
+
+Comments should mainly explain:
+
+```text
+State purpose
+Effects
+API logic
+Animation logic
+Non-obvious conditions
+Dynamic rendering
+Important interaction behavior
+```
+
+PROJECT LOG – React Portfolio
+Checkpoint: Final Code Cleanup and Review
+
+1. Reviewed the main React components and CSS files before the final project check.
+
+2. Improved code comments throughout the project so that the more advanced parts of the code are easier to understand and explain.
+
+3. Kept comments focused on important logic instead of commenting basic React, HTML, or CSS unnecessarily.
+
+4. Reviewed accessibility and added improvements where needed:
+   - Added aria-label to the main navigation.
+   - Added aria-expanded to the mobile menu button.
+   - Added aria-hidden="true" to decorative icons.
+   - Added rel="noopener noreferrer" to links that open in a new tab.
+   - Added visible :focus-visible styles where needed.
+
+5. Reviewed the mobile navigation:
+   - Confirmed the hamburger menu state works correctly.
+   - Confirmed the menu opens and closes using isMenuOpen.
+   - Confirmed navigation links close the mobile menu after being clicked.
+   - Confirmed Projects, Skills, and Certifications links also change the active Portfolio Showcase tab.
+
+6. Reviewed the Intro component:
+   - Confirmed the Intro is removed after the slideUp animation finishes.
+   - Confirmed onFinish() tells App when the Intro has completed.
+   - Confirmed the Hero can use introFinished to start after the Intro.
+   - Added aria-hidden to decorative Intro icons.
+
+7. Reviewed the Intro animations:
+   - fadeUp introduces the welcome text, name, and role.
+   - fadeUpScale creates the staggered icon entrance.
+   - fadeOutUp removes the Intro content.
+   - slideUp moves the full Intro screen out of view.
+
+8. Reviewed the Portfolio Showcase:
+   - Confirmed activePortfolioTab is stored in App so both Header and PortfolioShowcase can access it.
+   - Projects, Skills, and Certifications can be selected from the Showcase tabs.
+   - Added aria-pressed to the tab buttons.
+   - Added aria-hidden to decorative tab icons.
+   - Confirmed the blue slider moves between the three active tabs.
+   - Confirmed the selected component is rendered based on activePortfolioTab.
+   - The key on portfolio content recreates the content when the active tab changes so its animation can play again.
+
+9. Reviewed Projects API handling:
+   - Added/confirmed loading state.
+   - Added/confirmed error state.
+   - Added/confirmed empty state.
+   - Projects render normally after a successful request.
+   - fetch() response.ok is checked before processing JSON.
+   - Actual API errors are kept in the browser console for debugging.
+   - Visitors receive a simpler error message.
+   - Confirmed View More / Show Less functionality.
+   - Added aria-hidden to the decorative chevron icon.
+
+10. Reviewed ProjectCard:
+    - Confirmed project information is received through props.
+    - Technologies are rendered using map().
+    - Added rel="noopener noreferrer" to external links.
+    - Added aria-hidden to decorative link icons.
+    - Added a visible keyboard focus style to project links.
+
+11. Reviewed Certifications API handling:
+    - Confirmed loading state.
+    - Confirmed error state.
+    - Confirmed empty state.
+    - Confirmed successful certification rendering.
+    - Confirmed View More / Show Less functionality.
+
+12. Reviewed CertificationCard:
+    - Confirmed certification information is passed through props.
+    - Added rel="noopener noreferrer" to the credential link.
+    - Added aria-hidden to the decorative external-link icon.
+
+13. Reviewed Skills API handling:
+    - Confirmed loading state.
+    - Confirmed error state.
+    - Confirmed empty state.
+    - Confirmed successful skill rendering.
+    - Skills are filtered into Front-End, Back-End, Database, and Tools categories.
+    - filter() selects skills belonging to each category.
+    - map() converts the filtered skill data into SkillCard components.
+
+14. Reviewed SkillCard:
+    - Confirmed name, category, and icon are received through props.
+    - The icon CSS class comes from the API data.
+    - Added aria-hidden to the decorative skill icon.
+
+15. Cleaned Skills responsive CSS:
+    - Kept the skills grid layout inside Skills.css.
+    - Desktop uses four columns.
+    - Tablet uses two columns.
+    - Mobile uses two smaller columns.
+    - Removed conflicting skills-grid responsive rules from SkillCard.css.
+    - SkillCard.css now focuses on styling the individual card.
+
+16. Reviewed About section styling and animations:
+    - Confirmed About entrance animations.
+    - Confirmed information row animations.
+    - Confirmed stat card animations.
+    - Confirmed loading/error styling for API-based About stats.
+    - Kept responsive image and content behavior.
+
+17. Reviewed Contact section:
+    - Confirmed Contact entrance animations.
+    - Confirmed form focus states.
+    - Confirmed disabled submit button styling.
+    - Confirmed contact links and social interactions.
+    - Kept loading/submission behavior visually clear.
+
+18. Reviewed Guestbook:
+    - Confirmed Guestbook form and Recent Messages animations.
+    - Confirmed loading, error, and empty message styling.
+    - Confirmed disabled submit button state.
+    - Confirmed Guestbook card hover interaction.
+    - Moved Guestbook card-specific hover styling into GuestbookCard.css where appropriate.
+
+19. Reviewed Footer:
+    - Confirmed Footer scroll entrance animation.
+    - Confirmed social and navigation link hover states.
+    - Added visible keyboard focus styles.
+    - Confirmed responsive mobile layout.
+
+20. Reviewed shared animation keyframes:
+    - fadeUp
+    - fadeUpScale
+    - fadeOutUp
+    - slideUp
+    - cardDrop
+    - badgeSwing
+    - fadeInRight
+    - contactSlideLeft
+    - contactSlideRight
+    - guestbookSlideLeft
+    - guestbookSlideRight
+    - Removed tabContentIn if it was no longer being used.
+
+21. Reviewed global CSS:
+    - Enabled smooth scrolling for navigation links.
+    - Confirmed the portfolio background grid is created using two linear gradients.
+    - One gradient creates horizontal lines.
+    - One gradient creates vertical lines.
+    - The pattern repeats at 32px by 32px.
+
+22. Reviewed App.jsx:
+    - introFinished is stored in App because Intro and Hero need to communicate.
+    - activePortfolioTab is stored in App because Header and PortfolioShowcase both need access to the active tab.
+    - Confirmed all main portfolio sections are rendered in the correct order.
+
+23. General cleanup:
+    - Improved formatting and spacing for readability.
+    - Kept className expressions readable when conditional classes are used.
+    - Added missing semicolons where appropriate.
+    - Removed or identified duplicate/unused CSS where found.
+    - Kept existing design and functionality unchanged during cleanup.
+    - Avoided unnecessary advanced React patterns so the project remains understandable and explainable.
+
+CURRENT STATUS:
+- Frontend feature work is complete for this checkpoint.
+- Main components have been reviewed.
+- API loading/error/empty states have been reviewed.
+- Responsive styling has been reviewed.
+- Accessibility improvements have been added.
+- Animations have been reviewed and documented.
+- Code comments have been cleaned up and made easier to explain.
+- Ready for Git commit/push.
+- After Git, perform one final review using the complete project ZIP.

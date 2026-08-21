@@ -52,23 +52,28 @@
     padding: 28px;
 
     background-color: #081120;
+
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
 }
 
 .contact-info-title {
     color: #FFFFFF;
+
     font-family: "Manrope", sans-serif;
     font-size: 20px;
     font-weight: 600;
+
     margin-bottom: 8px;
 }
 
 .contact-info-description {
     color: #90A1B9;
+
     font-family: "Inter", sans-serif;
     font-size: 13px;
     line-height: 1.6;
+
     margin-bottom: 32px;
 }
 
@@ -85,6 +90,12 @@
     display: flex;
     align-items: center;
     gap: 14px;
+
+    transition: transform 250ms ease;
+}
+
+.contact-detail:hover {
+    transform: translateX(5px);
 }
 
 .contact-detail i {
@@ -102,12 +113,23 @@
 
     background-color: rgba(21, 93, 252, 0.12);
     border-radius: 10px;
+
+    transition:
+        transform 250ms ease,
+        background-color 250ms ease;
+}
+
+/* I animate the icon with the row so the whole item feels connected. */
+.contact-detail:hover i {
+    transform: scale(1.08);
+    background-color: rgba(21, 93, 252, 0.2);
 }
 
 .contact-detail span {
     display: block;
 
     color: #62748E;
+
     font-family: "Inter", sans-serif;
     font-size: 12px;
     font-weight: 500;
@@ -117,6 +139,7 @@
 
 .contact-detail p {
     color: #E2E8F0;
+
     font-family: "Inter", sans-serif;
     font-size: 13px;
 
@@ -133,6 +156,7 @@
 .contact-detail p a:hover {
     color: #51A2FF;
 }
+
 
 /* SOCIAL LINKS */
 
@@ -159,24 +183,25 @@
     font-size: 17px;
 
     background-color: #0B1422;
+
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 10px;
 
     text-decoration: none;
+
+    transition:
+        transform 250ms ease,
+        color 250ms ease,
+        border-color 250ms ease;
 }
 
+/* Gives the social icons a small lift when they are hovered. */
 .contact-socials a:hover {
     color: #51A2FF;
     border-color: rgba(81, 162, 255, 0.35);
+    transform: translateY(-4px);
 }
 
-/* Shows that the contact form is currently being submitted. */
-.contact-submit:disabled {
-    cursor: not-allowed;
-    opacity: 0.7;
-    transform: none;
-    box-shadow: none;
-}
 
 /* CONTACT FORM */
 
@@ -185,6 +210,7 @@
     padding: 28px;
 
     background-color: #081120;
+
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
 }
@@ -199,6 +225,7 @@
     display: block;
 
     color: #E2E8F0;
+
     font-family: "Inter", sans-serif;
     font-size: 13px;
     font-weight: 500;
@@ -222,6 +249,10 @@
     font-size: 13px;
 
     outline: none;
+
+    transition:
+        border-color 250ms ease,
+        box-shadow 250ms ease;
 }
 
 .contact-form textarea {
@@ -234,9 +265,11 @@
     color: #62748E;
 }
 
+/* Makes it easier to see which field the user is currently typing in. */
 .contact-form input:focus,
 .contact-form textarea:focus {
     border-color: #155DFC;
+    box-shadow: 0 0 0 3px rgba(21, 93, 252, 0.12);
 }
 
 .contact-submit {
@@ -260,99 +293,7 @@
     font-weight: 600;
 
     cursor: pointer;
-}
 
-.contact-label,
-.contact-title,
-.contact-description {
-    opacity: 0;
-}
-
-/* Shows the Contact label first. */
-.contact-label.contact-show-item {
-    animation: fadeUp 700ms ease forwards;
-}
-
-/* Shows the Contact heading shortly after the label. */
-.contact-title.contact-show-item {
-    animation: fadeUp 700ms ease 150ms forwards;
-}
-
-/* Shows the Contact description after the heading. */
-.contact-description.contact-show-item {
-    animation: fadeUp 700ms ease 300ms forwards;
-}
-
-/* Keeps both Contact cards hidden before their entrance animations. */
-.contact-info,
-.contact-form-area {
-    opacity: 0;
-}
-
-/* Brings the Contact Information card in from the left. */
-.contact-info.contact-info-show {
-    animation: contactSlideLeft 700ms ease 500ms forwards;
-}
-
-/* Brings the Contact Form in from the right. */
-.contact-form-area.contact-form-show {
-    animation: contactSlideRight 700ms ease 500ms forwards;
-}
-
-/* Smooth interaction for each Contact detail row. */
-.contact-detail {
-    transition: transform 250ms ease;
-}
-
-.contact-detail:hover {
-    transform: translateX(5px);
-}
-
-/* Smooth interaction for the Contact detail icons. */
-.contact-detail i {
-    transition:
-        transform 250ms ease,
-        background-color 250ms ease;
-}
-
-.contact-detail:hover i {
-    transform: scale(1.08);
-    background-color: rgba(21, 93, 252, 0.2);
-}
-
-
-/* Smooth hover animation for social links. */
-.contact-socials a {
-    transition:
-        transform 250ms ease,
-        color 250ms ease,
-        border-color 250ms ease;
-}
-
-.contact-socials a:hover {
-    color: #51A2FF;
-    border-color: rgba(81, 162, 255, 0.35);
-    transform: translateY(-4px);
-}
-
-
-/* Smooth transition when the user selects a form field. */
-.contact-form input,
-.contact-form textarea {
-    transition:
-        border-color 250ms ease,
-        box-shadow 250ms ease;
-}
-
-.contact-form input:focus,
-.contact-form textarea:focus {
-    border-color: #155DFC;
-    box-shadow: 0 0 0 3px rgba(21, 93, 252, 0.12);
-}
-
-
-/* Smooth Send Message button interaction. */
-.contact-submit {
     transition:
         transform 250ms ease,
         box-shadow 250ms ease;
@@ -361,4 +302,48 @@
 .contact-submit:not(:disabled):hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(21, 93, 252, 0.3);
+}
+
+/* Shows that the message is being sent and prevents the button looking clickable. */
+.contact-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+    box-shadow: none;
+}
+
+
+/* CONTACT ANIMATIONS */
+
+/* I keep the heading content hidden until the section animation starts. */
+.contact-label,
+.contact-title,
+.contact-description {
+    opacity: 0;
+}
+
+.contact-label.contact-show-item {
+    animation: fadeUp 700ms ease forwards;
+}
+
+.contact-title.contact-show-item {
+    animation: fadeUp 700ms ease 150ms forwards;
+}
+
+.contact-description.contact-show-item {
+    animation: fadeUp 700ms ease 300ms forwards;
+}
+
+/* Both cards stay hidden until the Contact section enters the screen. */
+.contact-info,
+.contact-form-area {
+    opacity: 0;
+}
+
+.contact-info.contact-info-show {
+    animation: contactSlideLeft 700ms ease 500ms forwards;
+}
+
+.contact-form-area.contact-form-show {
+    animation: contactSlideRight 700ms ease 500ms forwards;
 }

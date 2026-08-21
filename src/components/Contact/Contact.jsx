@@ -3,13 +3,12 @@ import { useEffect, useState } from "react";
 
 export default function Contact() {
 
-    // Tracks whether the Contact section should start its animations.
+    // I use this state to start the Contact animations when the section is visible.
     const [contactVisible, setContactVisible] = useState(false);
-
-
 
     useEffect(() => {
 
+        // I check the Contact section position whenever the user scrolls.
         function handleScroll() {
 
             const contactSection = document.getElementById("contact");
@@ -20,6 +19,7 @@ export default function Contact() {
 
             const sectionPosition = contactSection.getBoundingClientRect();
 
+            // Start the animations once enough of the section enters the screen.
             if (
                 sectionPosition.top < window.innerHeight * 0.8 &&
                 sectionPosition.bottom > 0
@@ -32,6 +32,7 @@ export default function Contact() {
 
         window.addEventListener("scroll", handleScroll);
 
+        // I also check once when the component loads in case it is already visible.
         handleScroll();
 
         return () => {
@@ -40,6 +41,7 @@ export default function Contact() {
 
     }, []);
 
+    // Stores everything entered into the Contact form.
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -48,12 +50,12 @@ export default function Contact() {
     });
 
     const [error, setError] = useState("");
-
     const [success, setSuccess] = useState("");
 
-    //Track whether the contact form is currently being submitted.
+    // I use this to disable the button while the message is being sent.
     const [submitting, setSubmitting] = useState(false);
 
+    // Updates the correct form field using the input's name.
     function handleChange(event) {
         setFormData({
             ...formData,
@@ -64,23 +66,31 @@ export default function Contact() {
     async function handleSubmit(event) {
         event.preventDefault();
 
+        // I check the fields before sending anything to the backend.
         if (
-            formData.name === "" || formData.email === "" || formData.subject === "" || formData.message === ""
+            formData.name === "" ||
+            formData.email === "" ||
+            formData.subject === "" ||
+            formData.message === ""
         ) {
             setError("Please fill in all fields");
+            setSuccess("");
             return;
         }
 
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+        // I do a basic email check before submitting the form.
         if (!emailPattern.test(formData.email)) {
             setError("Please enter a valid email address.");
+            setSuccess("");
             return;
         }
 
         //Starts the submitting state after validation passes.
         setSubmitting(true);
 
+        // Send the completed form to my Contact API.
         try {
             const response = await fetch(
                 `${import.meta.env.VITE_API_URL}/api/contact`,
@@ -95,6 +105,7 @@ export default function Contact() {
 
             const data = await response.json();
 
+            // If the backend rejects it, show the message returned by the API.
             if (!response.ok) {
                 setError(data.message);
                 setSuccess("");
@@ -104,20 +115,25 @@ export default function Contact() {
             setError("");
             setSuccess(data.message);
 
+            // Clear the form after the message is sent successfully.
             setFormData({
                 name: "",
                 email: "",
                 subject: "",
                 message: ""
             });
+
         } catch (error) {
+
+            // Keep the actual error in the console so I can debug it.
             console.error("Contact form error: ", error);
 
             setError("Unable to send message.");
             setSuccess("");
+
         } finally {
 
-            //Runs whether the request succeeds or fails.
+            // Re-enable the submit button after the request finishes.
             setSubmitting(false);
         }
     }
@@ -313,7 +329,7 @@ export default function Contact() {
                                     disabled={submitting}
                                 >
                                     {submitting ? "Sending..." : "Send Message"}
-                                    < i className="bi bi-send"></i>
+                                    <i className="bi bi-send" aria-hidden="true"></i>
                                 </button>
 
                             </form>

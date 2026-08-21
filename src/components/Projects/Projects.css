@@ -1,21 +1,27 @@
+.projects {
+    /* I center this so the View More button stays below the project grid. */
+    text-align: center;
+}
+
 .projects-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 24px;
 }
 
-/* Centers the View More button below the project cards. */
-.projects {
-    text-align: center;
-}
 
-/* Button used to expand or collapse the project list. */
+/* VIEW MORE BUTTON */
+
 .projects-view-more-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
     margin-top: 28px;
     padding: 12px 24px;
 
-    background-color: #155DFC;
     color: #FFFFFF;
+    background-color: #155DFC;
 
     border: none;
     border-radius: 10px;
@@ -26,10 +32,6 @@
 
     cursor: pointer;
 
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-
     transition:
         transform 200ms ease,
         box-shadow 200ms ease,
@@ -37,17 +39,28 @@
 }
 
 .projects-view-more-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 22px rgba(21, 93, 252, 0.3);
     background-color: #2B7FFF;
+
+    transform: translateY(-3px);
+
+    box-shadow: 0 10px 22px rgba(21, 93, 252, 0.3);
 }
 
-/* Adds a small entrance animation when more projects are displayed. */
+/* Gives keyboard users a visible indicator when the button is selected. */
+.projects-view-more-btn:focus-visible {
+    outline: 2px solid #51A2FF;
+    outline-offset: 4px;
+}
+
+/* I play this animation when the user expands the project list. */
 .projects-grid-expanded {
     animation: fadeUp 500ms ease forwards;
 }
 
-/* Shared message style for loading, error, and empty project states. */
+
+/* PROJECT STATUS MESSAGES */
+
+/* I use the same style for the loading, error, and empty project messages. */
 .projects-status {
     margin: 32px 0;
     padding: 16px 20px;
@@ -66,17 +79,20 @@
     text-align: center;
 }
 
-/* Extra styling only when the Projects API fails. */
+/* I change the colors when the Projects API fails. */
 .projects-error {
     color: #FCA5A5;
     background: rgba(127, 29, 29, 0.18);
+
     border-color: rgba(248, 113, 113, 0.3);
 }
 
 
+/* MOBILE */
 
 @media (max-width: 768px) {
 
+    /* On smaller screens I show one project card per row instead of two. */
     .projects-grid {
         grid-template-columns: 1fr;
         gap: 18px;
