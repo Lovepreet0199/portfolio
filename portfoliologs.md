@@ -19704,3 +19704,1106 @@ Accessibility check
 Deployment preparation
 Final README update
 ```
+
+# Step 25 - Projects API Loading and Error Handling
+
+## Goal
+
+Improve the Projects section so the UI properly handles all API states:
+
+```text
+Loading
+Success
+Error
+Empty projects
+```
+
+Previously, the Projects component fetched project data from the API but did not clearly handle loading or failed requests.
+
+---
+
+# Projects API
+
+The portfolio Projects section loads its project data from the deployed backend API.
+
+Environment variable:
+
+```env
+VITE_API_URL=<portfolio-api-url>
+```
+
+API request:
+
+```js
+fetch(`${import.meta.env.VITE_API_URL}/api/projects`)
+```
+
+This keeps the API URL outside the component and allows different URLs to be used for development and production.
+
+---
+
+# Projects State
+
+The component now uses four pieces of state:
+
+```jsx
+const [projects, setProjects] = useState([]);
+const [showAllProjects, setShowAllProjects] = useState(false);
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState("");
+```
+
+Purpose:
+
+```text
+projects
+Stores the projects returned by the API.
+
+showAllProjects
+Controls whether the first two projects or all projects are displayed.
+
+loading
+Tracks whether the API request is still running.
+
+error
+Stores a user-friendly message if loading the projects fails.
+```
+
+---
+
+# Loading State
+
+Added:
+
+```jsx
+const [loading, setLoading] = useState(true);
+```
+
+It starts as:
+
+```js
+true
+```
+
+because when the component first loads, the API request has not finished yet.
+
+The UI checks:
+
+```jsx
+{loading && (
+    <p className="projects-status">
+        Loading Projects...
+    </p>
+)}
+```
+
+Meaning:
+
+```text
+If loading is true
+→ display "Loading Projects..."
+```
+
+---
+
+# Error State
+
+Added:
+
+```jsx
+const [error, setError] = useState("");
+```
+
+An empty string means there is currently no error.
+
+If the API request fails:
+
+```jsx
+setError("Unable to load projects");
+```
+
+The UI checks:
+
+```jsx
+{error && (
+    <p className="projects-status projects-error">
+        {error}
+    </p>
+)}
+```
+
+Meaning:
+
+```text
+If error contains a value
+→ display the error message
+```
+
+---
+
+# Fetch Request
+
+The Projects API request is run inside `useEffect()`:
+
+```jsx
+useEffect(() => {
+
+    fetch(`${import.meta.env.VITE_API_URL}/api/projects`)
+
+        .then((response) => {
+
+            if (!response.ok) {
+                throw new Error("Unable to load projects.");
+            }
+
+            return response.json();
+        })
+
+        .then((data) => {
+            setProjects(data);
+        })
+
+        .catch((error) => {
+
+            console.error("Projects fetch error: ", error);
+
+            setError("Unable to load projects");
+        })
+
+        .finally(() => {
+            setLoading(false);
+        });
+
+}, []);
+```
+
+---
+
+# Checking `response.ok`
+
+`fetch()` does not automatically treat HTTP errors such as:
+
+```text
+404
+500
+503
+```
+
+as rejected Promises.
+
+Because of this, the response must be checked manually:
+
+```jsx
+if (!response.ok) {
+    throw new Error("Unable to load projects.");
+}
+```
+
+`response.ok` is true for successful HTTP responses.
+
+The `!` means NOT.
+
+Therefore:
+
+```js
+!response.ok
+```
+
+means:
+
+```text
+The response was NOT successful.
+```
+
+When this happens:
+
+```jsx
+throw new Error("Unable to load projects.");
+```
+
+stops the normal Promise chain and transfers control to `.catch()`.
+
+---
+
+# Converting JSON
+
+After a successful response:
+
+```jsx
+return response.json();
+```
+
+converts the JSON returned by the API into JavaScript data.
+
+That data is passed to the next `.then()`:
+
+```jsx
+.then((data) => {
+    setProjects(data);
+})
+```
+
+The API project array is therefore stored inside React state.
+
+---
+
+# Catching API Errors
+
+Added:
+
+```jsx
+.catch((error) => {
+
+    console.error("Projects fetch error: ", error);
+
+    setError("Unable to load projects");
+})
+```
+
+Two different things happen here.
+
+Developer debugging:
+
+```jsx
+console.error("Projects fetch error: ", error);
+```
+
+This allows the real JavaScript/API error to be inspected in the browser console.
+
+User feedback:
+
+```jsx
+setError("Unable to load projects");
+```
+
+This gives visitors a simple message instead of displaying technical error information.
+
+---
+
+# `.finally()`
+
+Added:
+
+```jsx
+.finally(() => {
+    setLoading(false);
+});
+```
+
+`.finally()` runs whether the request:
+
+```text
+Succeeds
+or
+Fails
+```
+
+Therefore loading always ends after the request finishes.
+
+Flow:
+
+```text
+Component loads
+↓
+loading = true
+↓
+API request starts
+↓
+Request succeeds OR fails
+↓
+.finally()
+↓
+loading = false
+```
+
+---
+
+# Successful Projects Rendering
+
+Normal project content should only appear when:
+
+```text
+The request is finished
+AND
+there is no error
+```
+
+Added:
+
+```jsx
+{!loading && !error && (
+    <>
+        ...
+    </>
+)}
+```
+
+Meaning:
+
+```text
+!loading
+→ loading is false
+
+!error
+→ there is no error
+
+&&
+→ both conditions must be true
+```
+
+Therefore:
+
+```text
+Not loading AND no error
+→ display Projects UI
+```
+
+---
+
+# React Fragment
+
+The successful state contains both:
+
+```text
+Projects grid
+View More button
+```
+
+They need to be grouped together.
+
+Instead of adding an unnecessary `<div>`, a React Fragment is used:
+
+```jsx
+<>
+    ...
+</>
+```
+
+A Fragment groups multiple JSX elements without creating another HTML element in the DOM.
+
+Example:
+
+```jsx
+<>
+    <div className="projects-grid">
+        ...
+    </div>
+
+    <button>
+        View More
+    </button>
+</>
+```
+
+---
+
+# Project Array Rendering
+
+Projects are rendered using:
+
+```jsx
+{projects
+    .slice(0, showAllProjects ? projects.length : 2)
+    .map((project) => {
+        return (
+            <ProjectCard
+                key={project._id}
+                title={project.title}
+                type={project.type}
+                description={project.description}
+                technologies={project.technologies}
+                image={project.imageUrl}
+                githubLink={project.githubLink}
+                liveLink={project.liveLink}
+            />
+        );
+    })}
+```
+
+The logic has two main stages:
+
+```text
+.slice()
+↓
+Select which projects should be displayed
+
+.map()
+↓
+Turn every selected project into a ProjectCard
+```
+
+---
+
+# `.slice()`
+
+Used:
+
+```jsx
+.slice(0, showAllProjects ? projects.length : 2)
+```
+
+When:
+
+```js
+showAllProjects === false
+```
+
+the expression becomes:
+
+```jsx
+.slice(0, 2)
+```
+
+Only the first two projects are selected.
+
+When:
+
+```js
+showAllProjects === true
+```
+
+it becomes:
+
+```jsx
+.slice(0, projects.length)
+```
+
+All projects are selected.
+
+---
+
+# `.map()`
+
+After `.slice()` chooses the projects, `.map()` loops through them.
+
+```jsx
+.map((project) => {
+```
+
+`project` represents the current project object.
+
+Example:
+
+```js
+project = {
+    _id: "...",
+    title: "PhotoScout",
+    description: "...",
+    technologies: [...]
+}
+```
+
+Properties are accessed using:
+
+```js
+project.title
+project.description
+project.technologies
+```
+
+They are passed to `ProjectCard` as props:
+
+```jsx
+<ProjectCard
+    title={project.title}
+    description={project.description}
+/>
+```
+
+Flow:
+
+```text
+API
+↓
+projects array
+↓
+slice selected projects
+↓
+map each project
+↓
+create ProjectCard
+↓
+pass project properties as props
+```
+
+---
+
+# React Key
+
+Each mapped component receives:
+
+```jsx
+key={project._id}
+```
+
+MongoDB `_id` values are unique.
+
+React uses the key to identify each rendered ProjectCard.
+
+This becomes important when projects are:
+
+```text
+Added
+Removed
+Changed
+Reordered
+```
+
+---
+
+# View More Button Condition
+
+The View More button should only exist when there are more than two projects.
+
+Added:
+
+```jsx
+{projects.length > 2 && (
+    <button>
+        ...
+    </button>
+)}
+```
+
+Meaning:
+
+```text
+If projects.length > 2
+→ display button
+
+Otherwise
+→ display nothing
+```
+
+Example:
+
+```text
+2 projects
+2 > 2 = false
+No View More button
+
+5 projects
+5 > 2 = true
+Show View More button
+```
+
+---
+
+# View More Toggle
+
+Button:
+
+```jsx
+onClick={() => setShowAllProjects(!showAllProjects)}
+```
+
+The `!` changes the Boolean to its opposite.
+
+```text
+false → true
+true → false
+```
+
+Initially:
+
+```js
+showAllProjects = false
+```
+
+Click:
+
+```js
+setShowAllProjects(!false);
+```
+
+becomes:
+
+```js
+setShowAllProjects(true);
+```
+
+React re-renders.
+
+The `.slice()` expression now sees:
+
+```js
+showAllProjects = true
+```
+
+and displays all projects.
+
+Clicking again changes:
+
+```text
+true → false
+```
+
+and the list returns to the first two projects.
+
+---
+
+# Dynamic Button Text
+
+Added:
+
+```jsx
+{showAllProjects
+    ? "Show Less"
+    : "View More Projects"}
+```
+
+Meaning:
+
+```text
+showAllProjects = false
+→ View More Projects
+
+showAllProjects = true
+→ Show Less
+```
+
+---
+
+# Dynamic Chevron
+
+Added:
+
+```jsx
+<i
+    className={`bi ${
+        showAllProjects
+            ? "bi-chevron-up"
+            : "bi-chevron-down"
+    }`}
+></i>
+```
+
+When collapsed:
+
+```text
+View More Projects ↓
+```
+
+When expanded:
+
+```text
+Show Less ↑
+```
+
+---
+
+# Dynamic Projects Grid Class
+
+The grid uses:
+
+```jsx
+<div
+    className={`projects-grid ${
+        showAllProjects
+            ? "projects-grid-expanded"
+            : ""
+    }`}
+>
+```
+
+Collapsed:
+
+```html
+<div class="projects-grid">
+```
+
+Expanded:
+
+```html
+<div class="projects-grid projects-grid-expanded">
+```
+
+This allows CSS to apply different animation/layout behaviour when the project list expands.
+
+---
+
+# Empty Projects State
+
+A successful API request could return:
+
+```js
+[]
+```
+
+In that case:
+
+```js
+projects.length === 0
+```
+
+Instead of displaying an empty section, show:
+
+```jsx
+{!loading && !error && projects.length === 0 && (
+    <p className="projects-status">
+        No projects available right now.
+    </p>
+)}
+```
+
+The normal grid should then check:
+
+```jsx
+!loading && !error && projects.length > 0
+```
+
+This gives the Projects component four clear UI states:
+
+```text
+1. Loading
+2. Error
+3. Empty
+4. Success
+```
+
+---
+
+# Final Projects.jsx
+
+```jsx
+import "./Projects.css";
+import ProjectCard from "../ProjectCard/ProjectCard";
+import { useState, useEffect } from "react";
+
+export default function Projects() {
+
+    const [projects, setProjects] = useState([]);
+    const [showAllProjects, setShowAllProjects] = useState(false);
+
+    // Track whether the projects are still being loaded from the API.
+    const [loading, setLoading] = useState(true);
+
+    // Stores an error message if the API request fails.
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+
+        // Sends a GET request to the Projects API.
+        fetch(`${import.meta.env.VITE_API_URL}/api/projects`)
+
+            // Runs when the server sends back a response.
+            .then((response) => {
+
+                // Checks if the HTTP response was unsuccessful such as 404, 500, etc.
+                if (!response.ok) {
+
+                    // Stops the normal Promise chain and sends the error to .catch().
+                    throw new Error("Unable to load projects.");
+                }
+
+                // Converts the JSON response into JavaScript data
+                // and passes it to the next .then().
+                return response.json();
+            })
+
+            // Runs after the JSON has been successfully converted.
+            .then((data) => {
+
+                // Stores the projects returned by the API in React state.
+                setProjects(data);
+            })
+
+            // Runs if the API request or any previous step fails.
+            .catch((error) => {
+
+                // Displays the actual error in the browser console for debugging.
+                console.error("Projects fetch error: ", error);
+
+                // Stores a user-friendly error message in React state.
+                setError("Unable to load projects");
+            })
+
+            // Runs after the request finishes whether it succeeded or failed.
+            .finally(() => {
+
+                // Tells React that the API request is no longer loading.
+                setLoading(false);
+            });
+
+    }, []);
+
+    return (
+        <div className="projects" id="projects">
+
+            {/* Shows a message while projects are being fetched from the API. */}
+            {loading && (
+                <p className="projects-status">
+                    Loading Projects...
+                </p>
+            )}
+
+            {/* Shows an error message if the API request fails. */}
+            {error && (
+                <p className="projects-status projects-error">
+                    {error}
+                </p>
+            )}
+
+            {/* Shows a message if the API works but there are no projects. */}
+            {!loading && !error && projects.length === 0 && (
+                <p className="projects-status">
+                    No projects available right now.
+                </p>
+            )}
+
+            {/* Shows the projects after loading succeeds. */}
+            {!loading && !error && projects.length > 0 && (
+                <>
+                    <div
+                        className={`projects-grid ${
+                            showAllProjects
+                                ? "projects-grid-expanded"
+                                : ""
+                        }`}
+                    >
+
+                        {projects
+                            .slice(
+                                0,
+                                showAllProjects
+                                    ? projects.length
+                                    : 2
+                            )
+                            .map((project) => {
+                                return (
+                                    <ProjectCard
+                                        key={project._id}
+                                        title={project.title}
+                                        type={project.type}
+                                        description={project.description}
+                                        technologies={project.technologies}
+                                        image={project.imageUrl}
+                                        githubLink={project.githubLink}
+                                        liveLink={project.liveLink}
+                                    />
+                                );
+                            })}
+
+                    </div>
+
+                    {/* Only shows the button when there are more than 2 projects. */}
+                    {projects.length > 2 && (
+                        <button
+                            type="button"
+                            className="projects-view-more-btn"
+                            onClick={() =>
+                                setShowAllProjects(!showAllProjects)
+                            }
+                        >
+                            {showAllProjects
+                                ? "Show Less"
+                                : "View More Projects"}
+
+                            <i
+                                className={`bi ${
+                                    showAllProjects
+                                        ? "bi-chevron-up"
+                                        : "bi-chevron-down"
+                                }`}
+                            ></i>
+                        </button>
+                    )}
+                </>
+            )}
+
+        </div>
+    );
+}
+```
+
+---
+
+# Step 25 Status
+
+```text
+Projects API integration ✅
+
+Environment API URL ✅
+
+Projects state ✅
+
+Loading state ✅
+
+HTTP response checking ✅
+
+response.ok handling ✅
+
+JSON conversion ✅
+
+API error catching ✅
+
+Developer console error ✅
+
+User-friendly error message ✅
+
+.finally() loading reset ✅
+
+Success-state conditional rendering ✅
+
+Empty-state handling ✅
+
+React Fragment ✅
+
+Projects array mapping ✅
+
+Projects array slicing ✅
+
+ProjectCard props ✅
+
+React key using MongoDB _id ✅
+
+View More conditional rendering ✅
+
+View More / Show Less state toggle ✅
+
+Dynamic button label ✅
+
+Dynamic chevron ✅
+
+Expanded grid class ✅
+```
+
+---
+
+# API State Flow
+
+```text
+Projects component mounts
+        ↓
+loading = true
+        ↓
+GET /api/projects
+        ↓
+        ├── Success
+        │      ↓
+        │ response.json()
+        │      ↓
+        │ setProjects(data)
+        │      ↓
+        │ .finally()
+        │      ↓
+        │ loading = false
+        │      ↓
+        │ Projects render
+        │
+        └── Failure
+               ↓
+          throw Error / fetch error
+               ↓
+            .catch()
+               ↓
+        setError("Unable to load projects")
+               ↓
+            .finally()
+               ↓
+          loading = false
+               ↓
+        Error message renders
+```
+
+---
+
+# Concepts Practiced
+
+```text
+useState()
+
+useEffect()
+
+fetch()
+
+Promises
+
+.then()
+
+.catch()
+
+.finally()
+
+response.ok
+
+throw new Error()
+
+response.json()
+
+Environment variables
+
+Conditional rendering
+
+&& operator
+
+! operator
+
+Ternary operator
+
+React Fragments
+
+Array .slice()
+
+Array .map()
+
+React keys
+
+Component props
+
+State-driven UI
+
+API loading states
+
+API error states
+
+API empty states
+```
+
+---
+
+# Git Checkpoint - Projects API Error Handling
+
+Before committing:
+
+```bash
+git status
+```
+
+Then:
+
+```bash
+git add .
+```
+
+Commit:
+
+```bash
+git commit -m "Add project API loading and error states"
+```
+
+Push:
+
+```bash
+git push
+```
+
+---
+
+# Current Portfolio Final Cleanup
+
+```text
+Footer polish
+Real GitHub link
+Real LinkedIn link
+Email links
+Resume / CV file
+Final mobile testing
+Projects API loading state ✅
+Projects API error state ✅
+Projects API empty state ✅
+Other API loading/error states
+Accessibility check
+Deployment preparation
+Final README update
+```
