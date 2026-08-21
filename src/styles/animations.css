@@ -1,4 +1,4 @@
-/* Fade in while moving it upwards. */
+/* Fade in while moving the element upwards. */
 @keyframes fadeUp {
 
     from {
@@ -12,8 +12,9 @@
     }
 }
 
-/* Fades an element in while moving upwards and growing  to its normal size. */
+/* Fades an element in while moving upwards and growing to its normal size. */
 @keyframes fadeUpScale {
+
     from {
         opacity: 0;
         transform: translateY(15px) scale(0.7);
@@ -50,6 +51,9 @@
         transform: translateY(-100%);
     }
 }
+
+
+/* BADGE ANIMATIONS */
 
 /* Drops the hanging badge from above and settles it into position. */
 @keyframes cardDrop {
@@ -95,8 +99,12 @@
     }
 }
 
+
+/* SECTION ANIMATIONS */
+
 /* Brings an element into view from the right side. */
 @keyframes fadeInRight {
+
     from {
         opacity: 0;
         transform: translateX(40px) scale(0.96);
@@ -108,22 +116,9 @@
     }
 }
 
-/* Fades Showcase tab content in with a small upward movement. */
-@keyframes tabContentIn {
-
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Moves the element from the left while fading it in. */
+/* Moves the Contact information from the left while fading it in. */
 @keyframes contactSlideLeft {
+
     from {
         opacity: 0;
         transform: translateX(-30px);
@@ -135,8 +130,9 @@
     }
 }
 
-/* Moves the element from the right while fading it in. */
+/* Moves the Contact form from the right while fading it in. */
 @keyframes contactSlideRight {
+
     from {
         opacity: 0;
         transform: translateX(30px);
@@ -150,6 +146,7 @@
 
 /* Moves the Guestbook form from the left while fading it in. */
 @keyframes guestbookSlideLeft {
+
     from {
         opacity: 0;
         transform: translateX(-30px);
@@ -163,6 +160,7 @@
 
 /* Moves the Recent Messages from the right while fading them in. */
 @keyframes guestbookSlideRight {
+
     from {
         opacity: 0;
         transform: translateX(30px);

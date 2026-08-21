@@ -12,6 +12,7 @@
 
 .skills-category-title {
     color: #62748E;
+
     font-family: "Inter", sans-serif;
     font-size: 11px;
     font-weight: 600;
@@ -27,7 +28,10 @@
     gap: 16px;
 }
 
-/* Shared message style for loading, error, and empty Skills API states. */
+
+/* SKILLS STATUS MESSAGES */
+
+/* I use the same style for the loading, error, and empty Skills API messages. */
 .skills-status {
     margin: 32px 0;
     padding: 16px 20px;
@@ -46,29 +50,39 @@
     text-align: center;
 }
 
-/* Extra styling only when the Skills API fails. */
+/* I change the colors when the Skills API fails. */
 .skills-error {
     color: #FCA5A5;
     background: rgba(127, 29, 29, 0.18);
+
     border-color: rgba(248, 113, 113, 0.3);
 }
 
 
-/* Tablet */
+/* TABLET */
+
 @media (max-width: 992px) {
+
+    /* I reduce the grid from four columns to two on tablet-sized screens. */
     .skills-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
 }
 
-/* Mobile */
+
+/* MOBILE */
+
 @media (max-width: 576px) {
+
     .skills-category {
         margin-bottom: 32px;
     }
 
+    /* I keep two smaller cards per row on mobile. */
     .skills-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
+
 }

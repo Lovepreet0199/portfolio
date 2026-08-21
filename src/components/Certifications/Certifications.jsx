@@ -7,52 +7,42 @@ export default function Certifications() {
     const [certifications, setCertifications] = useState([]);
     const [showAllCertifications, setShowAllCertifications] = useState(false);
 
-    // Tracks whether certifications are still being loaded from the API.
+    // I use these two states to handle the API loading and error messages.
     const [loading, setLoading] = useState(true);
-
-    // Stores an error message if the Certifications API request fails.
     const [error, setError] = useState("");
 
     useEffect(() => {
 
-        // Sends a GET request to the Certifications API.
+        // Loads the certifications from my backend API.
         fetch(`${import.meta.env.VITE_API_URL}/api/certifications`)
 
-            // Runs when the server sends back a response.
             .then((response) => {
 
-                // Checks whether the HTTP response was unsuccessful.
+                // fetch() does not fail automatically for HTTP errors,
+                // so I check the response before using the data.
                 if (!response.ok) {
-
-                    // Stops the normal Promise chain and sends the error to .catch().
                     throw new Error("Unable to load certifications.");
                 }
 
-                // Converts the JSON response into JavaScript data.
                 return response.json();
             })
 
-            // Runs after the JSON has been successfully converted.
             .then((data) => {
-
-                // Stores the certifications returned by the API in React state.
                 setCertifications(data);
             })
 
-            // Runs if the API request or any previous step fails.
             .catch((error) => {
 
-                // Shows the actual error in the browser console for debugging.
+                // I keep the real error in the console for debugging.
                 console.error("Certifications fetch error: ", error);
 
-                // Stores a user-friendly error message.
+                // The visitor only needs a simple message.
                 setError("Unable to load certifications");
             })
 
-            // Runs whether the request succeeds or fails.
             .finally(() => {
 
-                // Tells React that loading is finished.
+                // The request is finished here whether it worked or failed.
                 setLoading(false);
             });
 
@@ -61,28 +51,34 @@ export default function Certifications() {
     return (
         <div className="certifications">
 
+            {/* Show a message while the API request is still running. */}
             {loading && (
                 <p className="certifications-status">
                     Loading Certifications...
                 </p>
             )}
 
+            {/* Show the API error instead of leaving the section empty. */}
             {error && (
                 <p className="certifications-status certifications-error">
                     {error}
                 </p>
             )}
 
+            {/* This handles a successful request that returns no certifications. */}
             {!loading && !error && certifications.length === 0 && (
                 <p className="certifications-status">
                     No certifications available right now.
                 </p>
             )}
 
+            {/* Show the normal certification content after the API loads successfully. */}
             {!loading && !error && certifications.length > 0 && (
                 <>
-
-                    <div className={`certifications-grid ${showAllCertifications ? "certifications-grid-expanded" : ""}`}>
+                    <div
+                        className={`certifications-grid 
+                            ${showAllCertifications ? "certifications-grid-expanded" : ""}`}
+                    >
 
                         {certifications
                             .slice(
@@ -106,7 +102,7 @@ export default function Certifications() {
 
                     </div>
 
-                    {/* Only shows the button when there are more than 2 certifications. */}
+                    {/* Only show this button if there are more than two certifications. */}
                     {certifications.length > 2 && (
                         <button
                             type="button"
@@ -120,7 +116,10 @@ export default function Certifications() {
                                 : "View More Certifications"}
                         </button>
                     )}
-                </>)}
+
+                </>
+            )}
+
         </div>
     );
 }

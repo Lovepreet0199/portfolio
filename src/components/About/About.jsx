@@ -3,20 +3,23 @@ import logoImage from "../../assets/images/logo.png";
 import { useEffect, useState } from "react";
 
 export default function About() {
-    // Tracks whether the About section should start its animations.
+
+    // I use this state to control when the About section animations should play.
     const [aboutVisible, setAboutVisible] = useState(false);
 
+    // These states store the About statistics and handle the different API states.
     const [aboutStats, setAboutStats] = useState([]);
     const [loadingStats, setLoadingStats] = useState(true);
     const [statsError, setStatsError] = useState("");
 
     useEffect(() => {
 
-        // Loads the live About statistics from the API.
+        // I load these numbers from the API so they update automatically when I add new projects, skills, or certifications.
         fetch(`${import.meta.env.VITE_API_URL}/api/about-stats`)
 
             .then((response) => {
 
+                // fetch() does not automatically fail for HTTP errors like 404 or 500, so I check the response before trying to use the data.
                 if (!response.ok) {
                     throw new Error("Unable to load About stats.");
                 }
@@ -29,11 +32,15 @@ export default function About() {
             })
 
             .catch((error) => {
+
+                // I keep the real error in the console for debugging, but show a simpler message to the visitor.
                 console.error("About stats fetch error: ", error);
                 setStatsError("Unable to load About stats.");
             })
 
             .finally(() => {
+
+                // The request is finished here whether it worked or failed.
                 setLoadingStats(false);
             });
 
@@ -46,13 +53,14 @@ export default function About() {
 
             const aboutSection = document.getElementById("about");
 
+            //This prevents an error if the section is not available in the DOM.
             if (!aboutSection) {
                 return;
             }
 
             const sectionPosition = aboutSection.getBoundingClientRect();
 
-            // Starts the animation when the section enters the visible screen.
+            //  I check the section against the viewport instead of using a fixed scroll position so the animation also works on different screen sizes.
             if (
                 sectionPosition.top < window.innerHeight * 0.8 &&
                 sectionPosition.bottom > 0
@@ -65,9 +73,10 @@ export default function About() {
 
         window.addEventListener("scroll", handleScroll);
 
-        // Checks the position once when the component first loads.
+        // I run it once on load too in case the About section is already visible.
         handleScroll();
 
+        // Remove the listener when the component is no longer being used.
         return () => {
             window.removeEventListener("scroll", handleScroll);
         };
@@ -127,11 +136,6 @@ export default function About() {
 
                         </div>
 
-                        {/* <a href="/resume.pdf" className="about-cv-btn">
-                            Download CV
-                            <i className="bi bi-download"></i>
-                        </a> */}
-
                     </div>
 
                     <div className={`about-image ${aboutVisible ? "about-image-show" : ""}`}>
@@ -146,24 +150,28 @@ export default function About() {
 
                 <div className="about-stats row">
 
+                    {/* Show feedback while the stats API request is running. */}
                     {loadingStats && (
                         <p className="about-stats-status">
                             Loading stats...
                         </p>
                     )}
 
+                    {/* Show the API error instead of leaving the section empty. */}
                     {statsError && (
                         <p className="about-stats-status about-stats-error">
                             {statsError}
                         </p>
                     )}
 
+                    {/* This handles a successful API request that returns no stats. */}
                     {!loadingStats && !statsError && aboutStats.length === 0 && (
                         <p className="about-stats-status">
                             No stats available right now.
                         </p>
                     )}
 
+                    {/* Each API object becomes one About stat card. */}
                     {!loadingStats && !statsError && aboutStats.length > 0 && (
                         <>
                             {aboutStats.map((stat) => {

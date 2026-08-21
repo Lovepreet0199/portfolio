@@ -53,11 +53,15 @@
     margin: 0;
 }
 
+
+/* GUESTBOOK FORM */
+
 .guestbook-form-area {
     height: 100%;
     padding: 28px;
 
     background-color: #0B1422;
+
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
 }
@@ -68,17 +72,21 @@
 
 .guestbook-form-header h3 {
     color: #E2E8F0;
+
     font-family: "Manrope", sans-serif;
     font-size: 20px;
     font-weight: 600;
+
     margin-bottom: 8px;
 }
 
 .guestbook-form-header p {
     color: #90A1B9;
+
     font-family: "Inter", sans-serif;
     font-size: 13px;
     line-height: 1.6;
+
     margin: 0;
 }
 
@@ -96,6 +104,7 @@
 
 .guestbook-form-group label {
     color: #CAD5E2;
+
     font-family: "Inter", sans-serif;
     font-size: 13px;
     font-weight: 500;
@@ -104,6 +113,7 @@
 .guestbook-form-group input,
 .guestbook-form-group textarea {
     width: 100%;
+
     padding: 12px 14px;
 
     color: #E2E8F0;
@@ -116,6 +126,10 @@
     font-size: 14px;
 
     outline: none;
+
+    transition:
+        border-color 250ms ease,
+        box-shadow 250ms ease;
 }
 
 .guestbook-form-group textarea {
@@ -128,13 +142,16 @@
     color: #62748E;
 }
 
+/* Makes it easy to see which Guestbook field is selected. */
 .guestbook-form-group input:focus,
 .guestbook-form-group textarea:focus {
     border-color: #51A2FF;
+    box-shadow: 0 0 0 3px rgba(81, 162, 255, 0.12);
 }
 
 .guestbook-submit {
     width: 100%;
+
     padding: 12px 18px;
 
     display: flex;
@@ -153,21 +170,31 @@
     font-weight: 600;
 
     cursor: pointer;
+
+    transition:
+        transform 250ms ease,
+        background-color 250ms ease,
+        box-shadow 250ms ease,
+        opacity 250ms ease;
 }
 
+/* Only gives hover feedback while the button can actually be clicked. */
 .guestbook-submit:not(:disabled):hover {
     background-color: #1447E6;
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(21, 93, 252, 0.3);
 }
 
-/* Shows that the Guestbook form is currently being submitted. */
+/* Makes it clear that the form is being submitted. */
 .guestbook-submit:disabled {
     cursor: not-allowed;
     opacity: 0.7;
     transform: none;
     box-shadow: none;
 }
+
+
+/* RECENT MESSAGES */
 
 .guestbook-comments {
     display: flex;
@@ -203,20 +230,6 @@
     margin: 0;
 }
 
-/* Adds a smooth interaction when hovering over a Guestbook message. */
-.guestbook-card {
-    transition:
-        transform 250ms ease,
-        border-color 250ms ease,
-        box-shadow 250ms ease;
-}
-
-.guestbook-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(81, 162, 255, 0.3);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
 .guestbook-count {
     padding: 6px 10px;
 
@@ -233,75 +246,24 @@
     white-space: nowrap;
 }
 
-/* Keeps the Guestbook heading content hidden before animations begin. */
-.guestbook-label,
-.guestbook-title,
-.guestbook-description {
-    opacity: 0;
-}
-
-/* Shows the Guestbook label first. */
-.guestbook-label.guestbook-show-item {
-    animation: fadeUp 700ms ease forwards;
-}
-
-/* Shows the Guestbook title shortly after the label. */
-.guestbook-title.guestbook-show-item {
-    animation: fadeUp 700ms ease 150ms forwards;
-}
-
-/* Shows the Guestbook description after the title. */
-.guestbook-description.guestbook-show-item {
-    animation: fadeUp 700ms ease 300ms forwards;
-}
-
-/* Keeps the Guestbook form and messages hidden before their animations. */
-.guestbook-form-area,
-.guestbook-comments {
-    opacity: 0;
-}
-
-/* Brings the Guestbook form in from the left. */
-.guestbook-form-area.guestbook-form-show {
-    animation: guestbookSlideLeft 700ms ease 450ms forwards;
-}
-
-/* Brings the Recent Messages area in from the right. */
-.guestbook-comments.guestbook-comments-show {
-    animation: guestbookSlideRight 700ms ease 550ms forwards;
-}
-
-/* Smooth focus animation for Guestbook fields. */
-.guestbook-form-group input,
-.guestbook-form-group textarea {
+/* Gives each message a small lift when it is hovered. */
+.guestbook-card {
     transition:
+        transform 250ms ease,
         border-color 250ms ease,
         box-shadow 250ms ease;
 }
 
-.guestbook-form-group input:focus,
-.guestbook-form-group textarea:focus {
-    border-color: #51A2FF;
-    box-shadow: 0 0 0 3px rgba(81, 162, 255, 0.12);
+.guestbook-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(81, 162, 255, 0.3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 
-/* Smooth hover animation for the Sign Guestbook button. */
-.guestbook-submit {
-    transition:
-        transform 250ms ease,
-        background-color 250ms ease,
-        box-shadow 250ms ease,
-        opacity 250ms ease;
-}
+/* API STATUS MESSAGES */
 
-.guestbook-submit:hover {
-    background-color: #1447E6;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(21, 93, 252, 0.3);
-}
-
-/* Shared message style for loading and empty Guestbook states. */
+/* I use the same box for loading and empty Guestbook states. */
 .guestbook-status {
     margin: 16px 0;
     padding: 16px 20px;
@@ -320,12 +282,50 @@
     text-align: center;
 }
 
-/* Extra styling when the Guestbook messages fail to load. */
+/* Keeps the same status box but makes loading errors stand out. */
 .guestbook-error {
     color: #FCA5A5;
     background: rgba(127, 29, 29, 0.18);
     border-color: rgba(248, 113, 113, 0.3);
 }
+
+
+/* GUESTBOOK ANIMATIONS */
+
+/* The heading content starts hidden so I can stagger the entrance. */
+.guestbook-label,
+.guestbook-title,
+.guestbook-description {
+    opacity: 0;
+}
+
+.guestbook-label.guestbook-show-item {
+    animation: fadeUp 700ms ease forwards;
+}
+
+.guestbook-title.guestbook-show-item {
+    animation: fadeUp 700ms ease 150ms forwards;
+}
+
+.guestbook-description.guestbook-show-item {
+    animation: fadeUp 700ms ease 300ms forwards;
+}
+
+/* The form and messages start hidden until the section enters the screen. */
+.guestbook-form-area,
+.guestbook-comments {
+    opacity: 0;
+}
+
+/* I bring the form in from the left and the messages in from the right. */
+.guestbook-form-area.guestbook-form-show {
+    animation: guestbookSlideLeft 700ms ease 450ms forwards;
+}
+
+.guestbook-comments.guestbook-comments-show {
+    animation: guestbookSlideRight 700ms ease 550ms forwards;
+}
+
 
 @media (max-width: 768px) {
 

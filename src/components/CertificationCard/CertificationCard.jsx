@@ -1,5 +1,6 @@
 import "./CertificationCard.css";
 
+// Reusable card used to display one certification from the certification API.
 export default function CertificationCard({
     title,
     issuer,
@@ -31,10 +32,10 @@ export default function CertificationCard({
                     href={credentialLink}
                     className="certification-link"
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                 >
                     View Credential
-                    <i className="bi bi-arrow-up-right"></i>
+                    <i className="bi bi-arrow-up-right" aria-hidden="true" ></i>
                 </a>
 
             </div>

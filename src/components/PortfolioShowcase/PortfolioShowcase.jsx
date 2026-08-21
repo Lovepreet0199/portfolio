@@ -7,7 +7,8 @@ import Certifications from "../Certifications/Certifications";
 import { useState, useEffect } from "react";
 
 export default function PortfolioShowcase({ activePortfolioTab, setActivePortfolioTab }) {
-    // Tracks whether the Portfolio Showcase should start its animations.
+
+    // I use this state to start the Showcase animations when the section enters the screen.
     const [showcaseVisible, setShowcaseVisible] = useState(false);
 
     useEffect(() => {
@@ -22,6 +23,7 @@ export default function PortfolioShowcase({ activePortfolioTab, setActivePortfol
 
             const sectionPosition = showcaseSection.getBoundingClientRect();
 
+            // I check the section against the viewport so the animation works properly on different screen sizes.
             if (
                 sectionPosition.top < window.innerHeight * 0.8 &&
                 sectionPosition.bottom > 0
@@ -34,6 +36,7 @@ export default function PortfolioShowcase({ activePortfolioTab, setActivePortfol
 
         window.addEventListener("scroll", handleScroll);
 
+        // I also check once when the component loads in case it is already visible.
         handleScroll();
 
         return () => {
@@ -63,37 +66,56 @@ export default function PortfolioShowcase({ activePortfolioTab, setActivePortfol
 
                     <div className={`portfolio-tabs ${showcaseVisible ? "showcase-tabs-show" : ""}`}>
 
-                        <div className={`portfolio-tab-slider slider-${activePortfolioTab}`}></div>
+                        {/* The slider moves under whichever portfolio tab is active. */}
+                        <div
+                            className={`portfolio-tab-slider slider-${activePortfolioTab}`}
+                            aria-hidden="true"
+                        ></div>
 
                         <button
                             type="button"
                             className={`portfolio-tab ${activePortfolioTab === "projects" ? "active" : ""}`}
+                            aria-pressed={activePortfolioTab === "projects"}
                             onClick={() => setActivePortfolioTab("projects")}
                         >
-                            <i className="bi bi-folder"></i>
+                            <i
+                                className="bi bi-folder"
+                                aria-hidden="true"
+                            ></i>
                             Projects
                         </button>
 
                         <button
                             type="button"
                             className={`portfolio-tab ${activePortfolioTab === "skills" ? "active" : ""}`}
+                            aria-pressed={activePortfolioTab === "skills"}
                             onClick={() => setActivePortfolioTab("skills")}
                         >
-                            <i className="bi bi-code-slash"></i>
+                            <i
+                                className="bi bi-code-slash"
+                                aria-hidden="true"
+                            ></i>
                             Skills
                         </button>
 
                         <button
                             type="button"
                             className={`portfolio-tab ${activePortfolioTab === "certifications" ? "active" : ""}`}
+                            aria-pressed={activePortfolioTab === "certifications"}
                             onClick={() => setActivePortfolioTab("certifications")}
                         >
-                            <i className="bi bi-award"></i>
+                            <i
+                                className="bi bi-award"
+                                aria-hidden="true"
+                            ></i>
                             Certifications
                         </button>
 
                     </div>
+
                 </div>
+
+                {/* The active tab decides which portfolio component is shown. The key also makes React recreate the content when the tab changes, which lets the tab content animation play again. */}
                 <div
                     key={activePortfolioTab}
                     className={`portfolio-content ${showcaseVisible ? "showcase-content-show" : ""}`}>
@@ -106,8 +128,8 @@ export default function PortfolioShowcase({ activePortfolioTab, setActivePortfol
 
                 </div>
 
-
             </div>
+
         </section>
     );
 }

@@ -1,5 +1,6 @@
 import "./ProjectCard.css";
 
+// Reusable card that receives the information for one project through props.
 export default function ProjectCard({
     title,
     type,
@@ -11,13 +12,16 @@ export default function ProjectCard({
 
 }) {
     return (
+
         <article className="project-card">
 
             <div className="project-image">
+
                 <img
                     src={image}
                     alt={`${title} project`}
                 />
+
             </div>
 
             <div className="project-content">
@@ -28,18 +32,24 @@ export default function ProjectCard({
                     <span className="project-type">
                         {type}
                     </span>
+
                 </div>
 
                 <p className="project-description">
                     {description}
                 </p>
 
+                {/* I map through the technologies so each project can have its own list. */}
                 <div className="project-technologies">
+
                     {technologies.map((technology) => (
+
                         <span key={technology}>
                             {technology}
                         </span>
+
                     ))}
+
                 </div>
 
                 <div className="project-links">
@@ -48,9 +58,12 @@ export default function ProjectCard({
                         href={githubLink}
                         className="project-link"
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                     >
-                        <i className="bi bi-github"></i>
+                        <i
+                            className="bi bi-github"
+                            aria-hidden="true"
+                        ></i>
                         GitHub
                     </a>
 
@@ -58,10 +71,13 @@ export default function ProjectCard({
                         href={liveLink}
                         className="project-link"
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                     >
                         Live Demo
-                        <i className="bi bi-arrow-up-right"></i>
+                        <i
+                            className="bi bi-arrow-up-right"
+                            aria-hidden="true"
+                        ></i>
                     </a>
 
                 </div>

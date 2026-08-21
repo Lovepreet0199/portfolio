@@ -9,11 +9,12 @@
     gap: 14px;
 
     background-color: #0B1422;
+
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
 }
 
-.skill-card>i {
+.skill-card > i {
     color: #51A2FF;
     font-size: 38px;
 }
@@ -24,6 +25,7 @@
 
 .skill-info h3 {
     color: #E2E8F0;
+
     font-family: "Manrope", sans-serif;
     font-size: 16px;
     font-weight: 600;
@@ -33,15 +35,19 @@
 
 .skill-info p {
     color: #62748E;
+
     font-family: "Inter", sans-serif;
     font-size: 12px;
 
     margin: 0;
 }
 
-/* Tablet */
+
+/* TABLET */
+
 @media (max-width: 992px) {
 
+    /* Changes the Skills grid to two columns on tablet-sized screens. */
     .skills-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -49,13 +55,16 @@
 }
 
 
-/* Mobile */
+/* MOBILE */
+
 @media (max-width: 576px) {
 
+    /* Shows one Skill card per row on smaller screens. */
     .skills-grid {
         grid-template-columns: 1fr;
     }
 
+    /* Makes each Skill card a little more compact on mobile. */
     .skill-card {
         padding: 10px 10px;
         gap: 10px;
@@ -72,4 +81,5 @@
     .skill-info p {
         font-size: 12px;
     }
+
 }
