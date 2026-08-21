@@ -12,10 +12,18 @@ export default function CertificationCard({
         <article className="certification-card">
 
             <div className="certification-image">
-                <img
-                    src={image}
-                    alt={`${title} certificate`}
-                />
+                <a
+                    href={image}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="certification-image-link"
+                    aria-label={`View ${title} certificate`}
+                >
+                    <img
+                        src={image}
+                        alt={`${title} certificate`}
+                    />
+                </a>
             </div>
 
             <div className="certification-content">
