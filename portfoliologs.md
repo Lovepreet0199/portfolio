@@ -23855,3 +23855,681 @@ Deployment preparation
 README update
 ```
 
+# Step 30 - Dynamic About Statistics
+
+## Goal
+
+Remove the hardcoded statistics from the About section and calculate them dynamically using the existing portfolio data.
+
+Previously, the About section contained:
+
+```text
+Technologies → 20+
+Projects Built → 10+
+Certifications → 7+
+```
+
+These values were manually written inside `About.jsx`.
+
+The goal was to make them automatically update whenever projects, skills, or certifications change.
+
+---
+
+# Previous Hardcoded About Stats
+
+The About section previously contained three separate hardcoded cards:
+
+```jsx
+<div className="about-stat-card">
+
+    <div className="about-stat-info">
+        <i className="bi bi-code-slash"></i>
+        <p>Technologies</p>
+    </div>
+
+    <h3>20+</h3>
+
+</div>
+```
+
+Similar cards were manually created for:
+
+```text
+Projects Built
+Certifications
+```
+
+Problem:
+
+```text
+Add new project
+↓
+About count stays the same
+↓
+Manually edit React
+
+Add new skill
+↓
+About count stays the same
+↓
+Manually edit React
+```
+
+---
+
+# Better Approach
+
+The backend already has access to:
+
+```js
+db.getProjects()
+db.getSkills()
+db.getCertifications()
+```
+
+Instead of creating another MongoDB collection, the About statistics can be calculated from the existing data.
+
+This avoids storing duplicate information.
+
+```text
+Projects collection
+↓
+projects.length
+
+Skills collection
+↓
+skills.length
+
+Certifications collection
+↓
+certifications.length
+```
+
+---
+
+# New About Stats API
+
+Added a new endpoint to the Express backend:
+
+```js
+// -----------------------------------------ABOUT STATS API (GET)-------------------------------------------------
+
+// Returns live portfolio totals for the About section.
+app.get("/api/about-stats", async (request, response) => {
+
+    const projects = await db.getProjects();
+    const skills = await db.getSkills();
+    const certifications = await db.getCertifications();
+
+    response.json([
+        {
+            label: "Technologies",
+            value: skills.length,
+            icon: "bi-code-slash"
+        },
+        {
+            label: "Projects Built",
+            value: projects.length,
+            icon: "bi-folder"
+        },
+        {
+            label: "Certifications",
+            value: certifications.length,
+            icon: "bi-mortarboard"
+        }
+    ]);
+});
+```
+
+No new MongoDB collection was required.
+
+No new `db.js` functions were required.
+
+---
+
+# API Response
+
+The endpoint:
+
+```text
+GET /api/about-stats
+```
+
+returns data similar to:
+
+```json
+[
+    {
+        "label": "Technologies",
+        "value": 20,
+        "icon": "bi-code-slash"
+    },
+    {
+        "label": "Projects Built",
+        "value": 10,
+        "icon": "bi-folder"
+    },
+    {
+        "label": "Certifications",
+        "value": 7,
+        "icon": "bi-mortarboard"
+    }
+]
+```
+
+---
+
+# Admin Dashboard Update
+
+Added the new API to the Available API Endpoints section:
+
+```pug
+li.apiItem
+    a.apiLink(href="/api/about-stats") /api/about-stats
+```
+
+The dashboard stat cards were not changed because About Stats is not a separate database resource.
+
+It is calculated using:
+
+```text
+Projects
+Skills
+Certifications
+```
+
+The dashboard helper text was also updated to better describe all available management features.
+
+---
+
+# React About State
+
+Added state for the dynamic statistics:
+
+```jsx
+const [aboutStats, setAboutStats] = useState([]);
+
+const [loadingStats, setLoadingStats] = useState(true);
+
+const [statsError, setStatsError] = useState("");
+```
+
+Purpose:
+
+```text
+aboutStats
+→ Stores API statistics
+
+loadingStats
+→ Tracks whether statistics are loading
+
+statsError
+→ Stores an error if the API request fails
+```
+
+---
+
+# Fetch About Statistics
+
+Added another `useEffect()` to `About.jsx`:
+
+```jsx
+useEffect(() => {
+
+    // Loads the live About statistics from the API.
+    fetch(`${import.meta.env.VITE_API_URL}/api/about-stats`)
+
+        .then((response) => {
+
+            if (!response.ok) {
+                throw new Error("Unable to load About stats.");
+            }
+
+            return response.json();
+        })
+
+        .then((data) => {
+            setAboutStats(data);
+        })
+
+        .catch((error) => {
+            console.error("About stats fetch error: ", error);
+            setStatsError("Unable to load About stats.");
+        })
+
+        .finally(() => {
+            setLoadingStats(false);
+        });
+
+}, []);
+```
+
+---
+
+# About API Flow
+
+```text
+About component loads
+↓
+loadingStats = true
+↓
+GET /api/about-stats
+↓
+        ┌───────────────┬───────────────┐
+        │ SUCCESS       │ FAILURE       │
+        │               │               │
+        │ response.json │ catch()       │
+        │ ↓             │ ↓             │
+        │ setAboutStats │ setStatsError │
+        └───────────────┴───────────────┘
+                  ↓
+               finally()
+                  ↓
+       setLoadingStats(false)
+```
+
+---
+
+# Dynamic About Cards
+
+Removed the three hardcoded cards.
+
+The API data is now rendered using:
+
+```jsx
+{aboutStats.map((stat) => {
+    return (
+        <div
+            key={stat.label}
+            className={`col-12 col-md-4 ${aboutVisible ? "about-stat-show" : ""}`}
+        >
+            <div className="about-stat-card">
+
+                <div className="about-stat-info">
+                    <i className={`bi ${stat.icon}`}></i>
+                    <p>{stat.label}</p>
+                </div>
+
+                <h3>{stat.value}+</h3>
+
+            </div>
+        </div>
+    );
+})}
+```
+
+---
+
+# Dynamic Icon Class
+
+The API returns:
+
+```js
+icon: "bi-folder"
+```
+
+React combines it with the Bootstrap Icons base class:
+
+```jsx
+<i className={`bi ${stat.icon}`}></i>
+```
+
+Result:
+
+```html
+<i class="bi bi-folder"></i>
+```
+
+---
+
+# React Key
+
+Used:
+
+```jsx
+key={stat.label}
+```
+
+The About Stats objects are calculated by the API and are not MongoDB documents, so they do not contain MongoDB `_id` values.
+
+The labels are unique:
+
+```text
+Technologies
+Projects Built
+Certifications
+```
+
+so they can be used as React keys.
+
+---
+
+# Keeping the `+` Design
+
+The backend returns the actual numeric count:
+
+```js
+value: projects.length
+```
+
+React adds the visual `+`:
+
+```jsx
+<h3>{stat.value}+</h3>
+```
+
+Example:
+
+```text
+Database contains 11 projects
+
+projects.length
+→ 11
+
+React
+→ 11+
+```
+
+---
+
+# About Loading State
+
+Added:
+
+```jsx
+{loadingStats && (
+    <p className="about-stats-status">
+        Loading stats...
+    </p>
+)}
+```
+
+---
+
+# About Error State
+
+Added:
+
+```jsx
+{statsError && (
+    <p className="about-stats-status about-stats-error">
+        {statsError}
+    </p>
+)}
+```
+
+---
+
+# About Empty State
+
+Added:
+
+```jsx
+{!loadingStats && !statsError && aboutStats.length === 0 && (
+    <p className="about-stats-status">
+        No stats available right now.
+    </p>
+)}
+```
+
+---
+
+# About Success State
+
+The cards only render when:
+
+```jsx
+!loadingStats &&
+!statsError &&
+aboutStats.length > 0
+```
+
+This prevents the cards from rendering during loading or error states.
+
+---
+
+# About Status CSS
+
+Added:
+
+```css
+/* Shared message style for loading and empty About stats states. */
+.about-stats-status {
+    width: 100%;
+    margin: 16px 0;
+    padding: 16px 20px;
+
+    color: #CBD5E1;
+    background: rgba(15, 23, 42, 0.7);
+
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+
+    text-align: center;
+}
+
+/* Extra styling when the About stats API fails. */
+.about-stats-error {
+    color: #FCA5A5;
+    background: rgba(127, 29, 29, 0.18);
+    border-color: rgba(248, 113, 113, 0.3);
+}
+```
+
+---
+
+# Automatic Updating
+
+The About cards no longer need manual number changes.
+
+Example:
+
+```text
+Current Projects
+10
+↓
+Add project through Admin
+↓
+Database contains 11 projects
+↓
+/api/about-stats returns 11
+↓
+React displays 11+
+```
+
+The same applies to:
+
+```text
+Skills
+Certifications
+```
+
+---
+
+# Mobile Hero Scroll Fix
+
+A separate mobile visual issue was also fixed.
+
+Problem:
+
+```text
+Hero social icons
++
+SCROLL indicator
+↓
+Overlapping on mobile
+```
+
+The Scroll indicator is useful on desktop but unnecessary on smaller screens.
+
+Added inside:
+
+```css
+@media (max-width: 768px)
+```
+
+the following:
+
+```css
+/* Hides the Hero scroll indicator on mobile devices. */
+.hero-scroll {
+    display: none;
+}
+```
+
+Result:
+
+```text
+Desktop
+→ Scroll indicator visible
+
+Mobile
+→ Scroll indicator hidden
+→ No social icon overlap
+→ Cleaner Hero layout
+```
+
+---
+
+# Step 30 Status
+
+```text
+Hardcoded About stat values removed ✅
+About Stats GET API created ✅
+Existing database data reused ✅
+No duplicate MongoDB collection ✅
+No new db.js methods required ✅
+Dynamic project count ✅
+Dynamic skill count ✅
+Dynamic certification count ✅
+Dynamic Bootstrap icons ✅
+React map() rendering ✅
+Loading state ✅
+Error state ✅
+Empty state ✅
+Success state ✅
+Status CSS ✅
+Admin API endpoint list updated ✅
+Mobile Hero scroll indicator hidden ✅
+Mobile social overlap fixed ✅
+```
+
+---
+
+# Files Updated
+
+Backend:
+
+```text
+index.js
+views/index.pug
+```
+
+React Portfolio:
+
+```text
+About.jsx
+About.css
+Hero.css
+```
+
+---
+
+# Concepts Practiced
+
+```text
+Derived data
+Reusing existing database data
+API endpoints
+Array length
+GET requests
+useState()
+useEffect()
+fetch()
+response.ok
+response.json()
+Promises
+.then()
+.catch()
+.finally()
+Conditional rendering
+Array map()
+React keys
+Dynamic class names
+Bootstrap Icons
+Loading states
+Error states
+Empty states
+Responsive CSS
+```
+
+---
+
+# Current Portfolio API Status
+
+```text
+Projects API ✅
+Skills API ✅
+Certifications API ✅
+About Stats API ✅
+Contact API ✅
+Guestbook API ✅
+
+Projects loading/error/empty handling ✅
+Skills loading/error/empty handling ✅
+Certifications loading/error/empty handling ✅
+About loading/error/empty handling ✅
+Contact submitting/error handling ✅
+Guestbook loading/submitting/error handling ✅
+```
+
+---
+
+# Later - Cloudflare API
+
+The portfolio is currently using the existing Express backend.
+
+The separate Cloudflare API work will be integrated later.
+
+When that migration happens, remember to also add:
+
+```text
+GET /api/about-stats
+```
+
+to the Cloudflare API so the dynamic About statistics continue working.
+
+---
+
+# Git Checkpoint
+
+The backend and frontend are separate projects, so commit each repository separately.
+
+## Backend
+
+```bash
+git status
+
+git add .
+
+git commit -m "Add dynamic About stats API"
+
+git push
+```
+
+## React Portfolio
+
+```bash
+git status
+
+git add .
+
+git commit -m "Make About stats dynamic"
+
+git push
+```
