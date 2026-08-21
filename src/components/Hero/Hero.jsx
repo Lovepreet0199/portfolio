@@ -246,7 +246,7 @@ export default function Hero({ introFinished }) {
 
                     <div className={`hero-actions ${introFinished ? "hero-actions-show" : ""}`}>
 
-                        <a href="#projects" className="hero-primary-btn">
+                        <a href="#showcase" className="hero-primary-btn">
                             View My Work
                             <i className="bi bi-arrow-right-short"></i>
                         </a>

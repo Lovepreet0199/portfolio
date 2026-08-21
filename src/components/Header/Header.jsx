@@ -9,7 +9,10 @@ export default function Header({ setActivePortfolioTab }) {
     return (
         <header className="site-header">
 
-            <div className="container d-flex align-items-center justify-content-between">
+            <div
+                className={`container d-flex align-items-center justify-content-between 
+                    ${isMenuOpen ? "header-menu-open" : ""}`}
+            >
 
                 <a
                     href="#home"
