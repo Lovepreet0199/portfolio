@@ -6,7 +6,6 @@ export default function CertificationCard({
     issuer,
     date,
     image,
-    credentialLink
 }) {
     return (
         <article className="certification-card">
@@ -35,16 +34,6 @@ export default function CertificationCard({
                     <span>•</span>
                     <span>{date}</span>
                 </div>
-
-                <a
-                    href={credentialLink}
-                    className="certification-link"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    View Credential
-                    <i className="bi bi-arrow-up-right" aria-hidden="true" ></i>
-                </a>
 
             </div>
 

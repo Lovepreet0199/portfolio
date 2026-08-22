@@ -95,7 +95,6 @@ export default function Certifications() {
                                         issuer={certification.issuer}
                                         date={certification.date}
                                         image={certification.imageUrl}
-                                        credentialLink={certification.credentialLink}
                                     />
                                 );
                             })}
