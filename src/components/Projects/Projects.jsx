@@ -28,7 +28,13 @@ export default function Projects() {
             })
 
             .then((data) => {
-                setProjects(data);
+
+                //sort the projects by date in descending order (newest first)
+                const sortedProjects = data.sort((a, b) => {
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                });
+
+                setProjects(sortedProjects);
             })
 
             .catch((error) => {
