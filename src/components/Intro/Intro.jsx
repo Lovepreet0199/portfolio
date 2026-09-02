@@ -44,7 +44,7 @@ export default function Intro({ onFinish }) {
 
                 {/* Developer role displayed below the name. */}
                 <p className="intro-role">
-                    FULL-STACK WEB DEVELOPER
+                    FULL-STACK DEVELOPER
                 </p>
 
                 {/* Developer-related icons shown under the role. */}
